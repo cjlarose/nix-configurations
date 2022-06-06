@@ -31,6 +31,8 @@
             permitRootLogin = "no";
           };
 
+          users.mutableUsers = false;
+
           users.users.cjlarose = {
             isNormalUser = true;
             home = "/home/cjlarose";
