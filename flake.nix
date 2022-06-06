@@ -33,6 +33,8 @@
             permitRootLogin = "no";
           };
 
+          programs.ssh.startAgent = true;
+
           users.mutableUsers = false;
 
           users.users.cjlarose = {
