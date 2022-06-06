@@ -30,6 +30,7 @@ mount_block_devices() {
   mount /dev/disk/by-label/nixos /mnt
   mkdir -p /mnt/boot
   mount /dev/disk/by-label/boot /mnt/boot
+  swapon /dev/disk/by-label/swap
 }
 
 write_nixos_config() {
