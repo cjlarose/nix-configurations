@@ -22,6 +22,7 @@
             extraOptions = ''
               experimental-features = nix-command flakes
             '';
+            registry.nixpkgs.flake = nixpkgs;
           };
 
           services.openssh = {
