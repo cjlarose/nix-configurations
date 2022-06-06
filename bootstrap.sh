@@ -35,6 +35,23 @@ mount_block_devices() {
 
 write_nixos_config() {
   nixos-generate-config --root /mnt
+  cat > /mnt/etc/nixos/configuration.nix <<EOF
+{ config, pkgs, ... }:
+
+{
+  imports = [ ./hardware-configuration.nix ];
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  system.stateVersion = "22.05";
+  nix = {
+    package = pkgs.nixFlakes;
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
+}
+EOF
 }
 
 main() {
