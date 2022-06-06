@@ -39,6 +39,8 @@ write_nixos_config() {
 main() {
   local blockdevice=$1
   partition_and_format "$blockdevice"
+  mount_block_devices
+  write_nixos_config
 }
 
 main $1
