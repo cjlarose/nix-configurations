@@ -44,6 +44,14 @@ write_nixos_config() {
   boot.loader.efi.canTouchEfiVariables = true;
 
   system.stateVersion = "22.05";
+
+  services.openssh = {
+    enable = true;
+    passwordAuthentication = true;
+    permitRootLogin = "yes";
+  };
+  users.users.root.initialPassword = "root";
+
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
