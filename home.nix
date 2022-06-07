@@ -132,6 +132,30 @@
 
       " Always display signcolumn
       set signcolumn=yes
+
+      """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+      " Terminal Buffer Shortcuts                                                    "
+      """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+      function! s:create_named_terminal_buffer(name, ...)
+        let term_command = a:0 >= 1 ? a:000 : &shell
+        enew
+        call termopen(term_command, {'cwd': getcwd()})
+        call s:rename_terminal_buffer(a:name)
+      endfunction
+
+      command! -nargs=+ CreateNamedShellTerminalBuffer :call s:create_named_terminal_buffer(<f-args>)
+      nmap <leader>tn :CreateNamedShellTerminalBuffer<space>
+
+      function! s:rename_terminal_buffer(name)
+        let b:term_title = a:name . ' (' . bufname('%') . ')'
+      endfunction
+
+      command! -nargs=1 RenameTerminalBuffer :call s:rename_terminal_buffer(<q-args>)
+      nmap <leader>tr :RenameTerminalBuffer<space>
+
+      command! -nargs=0 CreateGitTerminalBuffer :call s:create_named_terminal_buffer('git')
+      nmap <leader>tg :CreateGitTerminalBuffer<CR>
     '';
     plugins = with pkgs.vimPlugins; [
       vim-sensible
