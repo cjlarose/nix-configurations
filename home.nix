@@ -9,7 +9,15 @@
     pkgs.neovim-remote
   ];
 
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    initExtra = ''
+      # Allow command line editing in an external editor
+      autoload -Uz edit-command-line
+      zle -N edit-command-line
+      bindkey '^x^e' edit-command-line
+    '';
+  };
 
   programs.git = {
     enable = true;
