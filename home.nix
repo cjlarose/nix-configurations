@@ -134,6 +134,7 @@
       set signcolumn=yes
     '';
     plugins = with pkgs.vimPlugins; [
+      vim-sensible
       vim-nix
       {
         plugin = onedark-vim;
@@ -141,7 +142,6 @@
           " Enable 24-bit/true color
           set termguicolors
 
-          syntax on
           colorscheme onedark
         '';
       }
