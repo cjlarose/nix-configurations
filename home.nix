@@ -12,6 +12,11 @@
   programs.zsh = {
     enable = true;
     initExtra = ''
+      # Prompt
+      setopt prompt_subst
+      . ${pkgs.git}/share/git/contrib/completion/git-prompt.sh
+      PROMPT='%~ %F{green}$(__git_ps1 "%s ")%f$ '
+
       # Allow command line editing in an external editor
       autoload -Uz edit-command-line
       zle -N edit-command-line
