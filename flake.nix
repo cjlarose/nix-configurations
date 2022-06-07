@@ -37,6 +37,14 @@
 
           programs.ssh.startAgent = true;
 
+          services.avahi = {
+            enable = true;
+            publish = {
+              enable = true;
+              addresses = true;
+            };
+          };
+
           users.mutableUsers = false;
 
           users.users.cjlarose = {
