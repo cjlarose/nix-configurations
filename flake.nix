@@ -14,6 +14,8 @@
         ({ pkgs, ... }: {
           imports = [ ./hardware-configuration.nix ];
 
+	  networking.hostName = "nixos-dev";
+
           boot.loader.systemd-boot.enable = true;
           boot.loader.efi.canTouchEfiVariables = true;
 
