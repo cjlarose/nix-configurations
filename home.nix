@@ -5,6 +5,13 @@
     userEmail = "cjlarose@gmail.com";
   };
 
+  programs.ssh = {
+    enable = true;
+    extraOptionOverrides = {
+      AddKeysToAgent = "yes";
+    };
+  };
+
   programs.neovim = {
     enable = true;
     viAlias = true;
