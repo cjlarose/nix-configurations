@@ -3,6 +3,7 @@
 
   home.sessionVariables = {
     EDITOR = "nvr-edit-in-split-window";
+    LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
   };
 
   home.packages = [
