@@ -14,7 +14,7 @@
         ({ pkgs, ... }: {
           imports = [ ./hardware-configuration.nix ];
 
-	  networking.hostName = "nixos-dev";
+          networking.hostName = "nixos-dev";
 
           boot.loader.systemd-boot.enable = true;
           boot.loader.efi.canTouchEfiVariables = true;
@@ -37,7 +37,7 @@
 
           programs.ssh.startAgent = true;
 
-	  programs.zsh.enable = true;
+          programs.zsh.enable = true;
 
           services.avahi = {
             enable = true;
