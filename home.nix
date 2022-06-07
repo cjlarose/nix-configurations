@@ -133,5 +133,8 @@
       " Always display signcolumn
       set signcolumn=yes
     '';
+    plugins = with pkgs.vimPlugins; [
+      vim-nix
+    ];
   };
 }
