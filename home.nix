@@ -1,4 +1,10 @@
 { pkgs, ... }: {
+  imports = [ ./personal-scripts.nix ];
+
+  home.sessionVariables = {
+    EDITOR = "nvr-edit-in-split-window";
+  };
+
   home.packages = [
     pkgs.neovim-remote
   ];
