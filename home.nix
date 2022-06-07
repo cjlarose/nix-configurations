@@ -3,6 +3,8 @@
     pkgs.neovim-remote
   ];
 
+  programs.zsh.enable = true;
+
   programs.git = {
     enable = true;
     userName = "Chris LaRose";
