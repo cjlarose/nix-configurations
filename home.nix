@@ -10,6 +10,10 @@
     pkgs.neovim-remote
   ];
 
+  home.shellAliases = {
+    gs = "git status";
+  };
+
   programs.zsh = {
     enable = true;
     initExtra = ''
