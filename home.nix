@@ -135,6 +135,16 @@
     '';
     plugins = with pkgs.vimPlugins; [
       vim-nix
+      {
+        plugin = onedark-vim;
+        config = ''
+          " Enable 24-bit/true color
+          set termguicolors
+
+          syntax on
+          colorscheme onedark
+        '';
+      }
     ];
   };
 }
