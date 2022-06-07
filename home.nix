@@ -15,6 +15,16 @@
     enable = true;
     userName = "Chris LaRose";
     userEmail = "cjlarose@gmail.com";
+    extraConfig = {
+      color.ui = true;
+      rebase.autosquash = true;
+      commit.verbose = true;
+      pull.ff = "only";
+    };
+    ignores = [
+      "[._]*.s[a-w][a-z]"
+      "[._]s[a-w][a-z]"
+    ];
   };
 
   programs.ssh = {
