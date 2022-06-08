@@ -82,72 +82,6 @@
 
           " disable fzf preview
           let g:fzf_preview_window = []
-
-          " Quickly switch tabs with fzf
-          if !exists('g:fzf_tabs_mru')
-            let g:fzf_tabs_mru = {}
-          endif
-          augroup fzf_tabs
-            autocmd!
-            autocmd TabEnter * let g:fzf_tabs_mru[tabpagenr()] = localtime()
-            autocmd TabClosed * silent! call remove(g:fzf_tabs_mru, expand('<afile>'))
-          augroup END
-
-          function! s:fzf_tab_sink(line)
-            let list = matchlist(a:line, '^\[\([0-9]\+\)\]')
-            let tabnr = list[1]
-            execute tabnr . 'tabnext'
-          endfunction
-
-          function! s:sort_tabs_mru(...)
-            let [t1, t2] = map(copy(a:000), 'get(g:fzf_tabs_mru, v:val, v:val)')
-            return t1 - t2
-          endfunction
-
-          function! s:fzf_list_tabs(...)
-            let l:tabs = []
-            let l:longest_tab_number_length = 0
-            let l:longest_name_length = 0
-
-            for t in sort(range(1, tabpagenr('$')), 's:sort_tabs_mru')
-              let tab_number = printf("[%d]", t)
-              let pwd = getcwd(-1, t)
-              let name = fnamemodify(pwd, ':t')
-
-              let l:tab_number_length = len(l:tab_number)
-              if l:tab_number_length > l:longest_tab_number_length
-                let l:longest_tab_number_length = l:tab_number_length
-              endif
-
-              let l:name_length = len(l:name)
-              if l:name_length > l:longest_name_length
-                let l:longest_name_length = l:name_length
-              endif
-
-              let tab = {
-                \ 'tab_number' : tab_number,
-                \ 'directory_path' : fnamemodify(pwd, ':p:~'),
-                \ 'directory_name' : name,
-                \ }
-              call add(l:tabs, tab)
-            endfor
-
-            let lines = []
-            let l:format = "%-" . l:longest_tab_number_length . "S %-" . l:longest_name_length . "S %s"
-            for tab in l:tabs
-              let line = printf(l:format, tab['tab_number'], tab['directory_name'], tab['directory_path'])
-              call add(lines, line)
-            endfor
-
-            return fzf#run({
-            \ 'source': reverse(lines),
-            \ 'sink': function('s:fzf_tab_sink'),
-            \ 'down': '30%',
-            \ 'options': ['--header-lines=1']
-            \})
-          endfunction
-
-          command! -nargs=0 FzfTabs :call s:fzf_list_tabs()
         '';
       }
     ];
@@ -249,6 +183,72 @@
       """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
       " FZF Shortcuts                                                                "
       """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+      " Quickly switch tabs with fzf
+      if !exists('g:fzf_tabs_mru')
+        let g:fzf_tabs_mru = {}
+      endif
+      augroup fzf_tabs
+        autocmd!
+        autocmd TabEnter * let g:fzf_tabs_mru[tabpagenr()] = localtime()
+        autocmd TabClosed * silent! call remove(g:fzf_tabs_mru, expand('<afile>'))
+      augroup END
+
+      function! s:fzf_tab_sink(line)
+        let list = matchlist(a:line, '^\[\([0-9]\+\)\]')
+        let tabnr = list[1]
+        execute tabnr . 'tabnext'
+      endfunction
+
+      function! s:sort_tabs_mru(...)
+        let [t1, t2] = map(copy(a:000), 'get(g:fzf_tabs_mru, v:val, v:val)')
+        return t1 - t2
+      endfunction
+
+      function! s:fzf_list_tabs(...)
+        let l:tabs = []
+        let l:longest_tab_number_length = 0
+        let l:longest_name_length = 0
+
+        for t in sort(range(1, tabpagenr('$')), 's:sort_tabs_mru')
+          let tab_number = printf("[%d]", t)
+          let pwd = getcwd(-1, t)
+          let name = fnamemodify(pwd, ':t')
+
+          let l:tab_number_length = len(l:tab_number)
+          if l:tab_number_length > l:longest_tab_number_length
+            let l:longest_tab_number_length = l:tab_number_length
+          endif
+
+          let l:name_length = len(l:name)
+          if l:name_length > l:longest_name_length
+            let l:longest_name_length = l:name_length
+          endif
+
+          let tab = {
+            \ 'tab_number' : tab_number,
+            \ 'directory_path' : fnamemodify(pwd, ':p:~'),
+            \ 'directory_name' : name,
+            \ }
+          call add(l:tabs, tab)
+        endfor
+
+        let lines = []
+        let l:format = "%-" . l:longest_tab_number_length . "S %-" . l:longest_name_length . "S %s"
+        for tab in l:tabs
+          let line = printf(l:format, tab['tab_number'], tab['directory_name'], tab['directory_path'])
+          call add(lines, line)
+        endfor
+
+        return fzf#run({
+        \ 'source': reverse(lines),
+        \ 'sink': function('s:fzf_tab_sink'),
+        \ 'down': '30%',
+        \ 'options': ['--header-lines=1']
+        \})
+      endfunction
+
+      command! -nargs=0 FzfTabs :call s:fzf_list_tabs()
 
       " Key mappings for fzf plugin
       nmap <leader>f :FzfGFiles<CR>
