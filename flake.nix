@@ -29,6 +29,10 @@
             registry.nixpkgs.flake = nixpkgs;
           };
 
+          security.sudo.extraConfig = ''
+            Defaults timestamp_timeout=60
+          '';
+
           services.openssh = {
             enable = true;
             passwordAuthentication = false;
