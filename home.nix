@@ -84,6 +84,9 @@
           let g:fzf_preview_window = []
         '';
       }
+      vim-fugitive
+      vim-rhubarb
+      vim-fubitive
     ];
     extraConfig = ''
       " Map leader key to ,
