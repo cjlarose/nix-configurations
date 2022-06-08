@@ -21,6 +21,8 @@
 
           system.stateVersion = "22.05";
 
+          networking.firewall.allowedTCPPorts = [ 3000 ];
+
           nix = {
             package = pkgs.nixFlakes;
             extraOptions = ''
