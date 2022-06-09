@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "fzfVim": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1654815057,
+        "narHash": "sha256-e1WwzUd3gDAD8+eWnqqYHBEZGfay4Mii0HZPShJ/Mz8=",
+        "owner": "cjlarose",
+        "repo": "fzf.vim",
+        "rev": "27953294924fa33ed7300ea6b9c07889fbd41640",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cjlarose",
+        "repo": "fzf.vim",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -38,6 +58,7 @@
     },
     "root": {
       "inputs": {
+        "fzfVim": "fzfVim",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
       }

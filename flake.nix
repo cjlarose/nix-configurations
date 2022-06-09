@@ -5,9 +5,11 @@
     nixpkgs.url = "github:nixos/nixpkgs/release-22.05";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    fzfVim.url = "github:cjlarose/fzf.vim";
+    fzfVim.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager }: {
+  outputs = { self, nixpkgs, home-manager, fzfVim }: {
     nixosConfigurations.dev = nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
       modules = [
@@ -70,6 +72,9 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.cjlarose = import ./home.nix;
+          home-manager.extraSpecialArgs = {
+            inherit fzfVim;
+          };
         }
       ];
     };
