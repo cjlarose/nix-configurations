@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1654815057,
-        "narHash": "sha256-e1WwzUd3gDAD8+eWnqqYHBEZGfay4Mii0HZPShJ/Mz8=",
+        "lastModified": 1654883707,
+        "narHash": "sha256-XsJj4SWs2BdMOQ+ZEV+9I7GVW41RUk/zqvrgeLwE1EE=",
         "owner": "cjlarose",
         "repo": "fzf.vim",
-        "rev": "27953294924fa33ed7300ea6b9c07889fbd41640",
+        "rev": "5a6af6579be024efc5f9f8148e4aa5274dd3c861",
         "type": "github"
       },
       "original": {

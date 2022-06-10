@@ -33,6 +33,10 @@
             registry.nixpkgs.flake = nixpkgs;
           };
 
+          nixpkgs.overlays = [
+            fzfVim.overlay
+          ];
+
           security.sudo.extraConfig = ''
             Defaults timestamp_timeout=60
           '';
@@ -72,9 +76,6 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.cjlarose = import ./home.nix;
-          home-manager.extraSpecialArgs = {
-            inherit fzfVim;
-          };
         }
       ];
     };

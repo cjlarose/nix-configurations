@@ -1,4 +1,4 @@
-{ pkgs, fzfVim, ... }: {
+{ pkgs, ... }: {
   imports = [ ./personal-scripts.nix ];
 
   home.sessionVariables = {
@@ -75,7 +75,7 @@
         '';
       }
       {
-        plugin = fzfVim.defaultPackage."${self.system}";
+        plugin = fzf-vim;
         config = ''
           " set prefix for FZF functions
           let g:fzf_command_prefix = 'Fzf'
