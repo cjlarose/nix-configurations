@@ -7,9 +7,11 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     fzfVim.url = "github:cjlarose/fzf.vim";
     fzfVim.inputs.nixpkgs.follows = "nixpkgs";
+    fzfProject.url = "github:cjlarose/fzf-project";
+    fzfProject.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, fzfVim }: {
+  outputs = { self, nixpkgs, home-manager, fzfVim, fzfProject }: {
     nixosConfigurations.dev = nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
       modules = [
@@ -35,6 +37,7 @@
 
           nixpkgs.overlays = [
             fzfVim.overlay
+            fzfProject.overlay
           ];
 
           security.sudo.extraConfig = ''

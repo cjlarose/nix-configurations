@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "fzfProject": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1654884630,
+        "narHash": "sha256-JQZ4mLCsMsJpOR9nzm5rAzbonujwDuzVa4BGP3+7kJE=",
+        "owner": "cjlarose",
+        "repo": "fzf-project",
+        "rev": "d57401d96dc6270a34582ba2199285e732d70bf3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cjlarose",
+        "repo": "fzf-project",
+        "type": "github"
+      }
+    },
     "fzfVim": {
       "inputs": {
         "nixpkgs": [
@@ -58,6 +78,7 @@
     },
     "root": {
       "inputs": {
+        "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
