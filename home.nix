@@ -7,6 +7,7 @@
   };
 
   home.packages = [
+    pkgs.dig
     pkgs.fluxctl
     pkgs.kubectl
     pkgs.kubernetes-helm
