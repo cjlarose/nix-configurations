@@ -63,6 +63,8 @@
 
   programs.neovim = {
     enable = true;
+    withPython3 = false;
+    withRuby = false;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
