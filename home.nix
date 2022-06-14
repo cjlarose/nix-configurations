@@ -71,6 +71,7 @@
     plugins = with pkgs.vimPlugins; [
       vim-sensible
       vim-nix
+      kotlin-vim
       {
         plugin = onedark-vim;
         config = ''
