@@ -56,6 +56,19 @@
     };
   };
 
+  programs.direnv = {
+    enable = true;
+    config = {
+      disable_stdin = true;
+      strict_env = true;
+      whitelist = {
+        prefix = [
+          "/home/cjlarose/workspace/picktrace"
+        ];
+      };
+    };
+  };
+
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
