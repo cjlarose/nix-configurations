@@ -62,6 +62,10 @@
             };
           };
 
+          services.postgresql = {
+            enable = true;
+          };
+
           users.mutableUsers = false;
 
           users.users.cjlarose = {
