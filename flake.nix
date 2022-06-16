@@ -42,6 +42,8 @@
 
           security.sudo.wheelNeedsPassword = false;
 
+          virtualisation.docker.enable = true;
+
           environment.systemPackages = with pkgs; [
             lsof
           ];
@@ -100,7 +102,7 @@
           users.users.cjlarose = {
             isNormalUser = true;
             home = "/home/cjlarose";
-            extraGroups = [ "wheel" ];
+            extraGroups = [ "docker" "wheel" ];
             shell = pkgs.zsh;
             hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
             openssh.authorizedKeys.keys = [
