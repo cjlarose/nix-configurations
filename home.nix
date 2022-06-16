@@ -9,6 +9,7 @@
   home.packages = [
     pkgs.dig
     pkgs.fluxctl
+    pkgs.google-cloud-sdk
     pkgs.kubectl
     pkgs.kubernetes-helm
     pkgs.neovim-remote
