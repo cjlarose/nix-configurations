@@ -7,7 +7,7 @@
   home.sessionVariables = {
     EDITOR = "nvr-edit-in-split-window";
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
-    KUBECONFIG = "$HOME/.kube/lab.yaml:$HOME/.kube/local-k3s.yaml";
+    KUBECONFIG = "$HOME/.kube/gke.yaml:$HOME/.kube/lab.yaml:$HOME/.kube/local-k3s.yaml";
   };
 
   home.packages = [
