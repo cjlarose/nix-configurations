@@ -33,9 +33,17 @@
     enable = true;
     initExtra = ''
       # Prompt
+      __kube_ps1() {
+        local context
+        context=$(kubectl config current-context)
+        if [ -n "''${context}" ]; then
+          echo "(k8s: ''${context}) "
+        fi
+      }
+
       setopt prompt_subst
       . ${pkgs.git}/share/git/contrib/completion/git-prompt.sh
-      PROMPT='%~ %F{green}$(__git_ps1 "%s ")%f$ '
+      PROMPT='%~ %F{green}$(__git_ps1 "%s ")%f%F{blue}$(__kube_ps1)%f$ '
 
       # Allow command line editing in an external editor
       autoload -Uz edit-command-line
