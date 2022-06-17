@@ -11,6 +11,7 @@
     pkgs.fluxctl
     pkgs.google-cloud-sdk
     pkgs.htop
+    pkgs.jq
     pkgs.kubectl
     pkgs.kubernetes-helm
     pkgs.neovim-remote
