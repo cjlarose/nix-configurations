@@ -25,7 +25,11 @@
 
           system.stateVersion = "22.05";
 
-          networking.firewall.allowedTCPPorts = [ 3000 ];
+          networking.firewall.allowedTCPPorts = [
+            3000 # web-client
+            6443 # k8s API
+            10250 # k8s node API
+          ];
 
           nix = {
             package = pkgs.nixFlakes;
