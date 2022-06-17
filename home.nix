@@ -18,6 +18,7 @@
     pkgs.jq
     pkgs.kubectl
     pkgs.kubernetes-helm
+    pkgs.kubeseal
     pkgs.kustomize
     pkgs.neovim-remote
     pkgs.tree
