@@ -13,6 +13,7 @@
     pkgs.kubectl
     pkgs.kubernetes-helm
     pkgs.neovim-remote
+    pkgs.tree
   ];
 
   home.shellAliases = {
