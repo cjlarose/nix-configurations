@@ -22,6 +22,7 @@
     pkgs.kustomize
     pkgs.neovim-remote
     pkgs.tree
+    pkgs.yq-go
   ];
 
   home.shellAliases = {
