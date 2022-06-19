@@ -87,6 +87,7 @@
       vim-sensible
       vim-nix
       kotlin-vim
+      vim-terraform
       {
         plugin = onedark-vim;
         config = ''
