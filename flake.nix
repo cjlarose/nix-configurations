@@ -44,6 +44,10 @@
             Defaults timestamp_timeout=60
           '';
 
+          environment.systemPackages = with pkgs; [
+            lsof
+          ];
+
           services.openssh = {
             enable = true;
             passwordAuthentication = false;
