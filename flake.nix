@@ -101,6 +101,10 @@
             ];
           };
 
+          services.dockerRegistry = {
+            enable = true;
+          };
+
           users.mutableUsers = false;
 
           users.users.cjlarose = {
