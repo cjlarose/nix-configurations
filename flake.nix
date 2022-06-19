@@ -40,9 +40,7 @@
             fzfProject.overlay
           ];
 
-          security.sudo.extraConfig = ''
-            Defaults timestamp_timeout=60
-          '';
+          security.sudo.wheelNeedsPassword = false;
 
           environment.systemPackages = with pkgs; [
             lsof
