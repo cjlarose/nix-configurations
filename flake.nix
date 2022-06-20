@@ -66,6 +66,24 @@
 
           services.postgresql = {
             enable = true;
+            authentication = ''
+              # Allow any user on the local system to connect to any database with
+              # any database user name using Unix-domain sockets (the default for local
+              # connections).
+              #
+              # TYPE  DATABASE        USER            ADDRESS                 METHOD
+              local   all             all                                     trust
+
+              # Require password authentication when accessing 127.0.0.1
+              #
+              # TYPE  DATABASE        USER            ADDRESS                 METHOD
+              host    all             all             127.0.0.1/32            scram-sha-256
+
+              # The same over IPv6.
+              #
+              # TYPE  DATABASE        USER            ADDRESS                 METHOD
+              host    all             all             ::1/128                 scram-sha-256
+            '';
           };
 
           users.mutableUsers = false;
