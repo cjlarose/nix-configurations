@@ -10,6 +10,7 @@
     pkgs.dig
     pkgs.fluxctl
     pkgs.google-cloud-sdk
+    pkgs.htop
     pkgs.kubectl
     pkgs.kubernetes-helm
     pkgs.neovim-remote
