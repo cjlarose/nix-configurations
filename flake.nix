@@ -47,6 +47,14 @@
           ];
 
           security.sudo.wheelNeedsPassword = false;
+          security.pam.loginLimits = [
+            {
+              domain = "*";
+              type = "soft";
+              item = "nofile";
+              value = "65536";
+            }
+          ];
 
           virtualisation.docker.enable = true;
 
