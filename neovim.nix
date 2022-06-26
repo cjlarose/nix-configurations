@@ -214,7 +214,10 @@
       nmap <leader>c :FzfHistory:<CR>
       nmap <leader>gt :FzfTabs<CR>
       nmap <leader>gp :FzfSwitchProject<CR>
+
+      lua require('init-config')
     '';
   };
 
+  xdg.configFile."nvim/lua/init-config.lua".source = ./init-config.lua;
 }
