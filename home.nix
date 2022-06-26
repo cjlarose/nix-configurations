@@ -46,6 +46,7 @@
       rebase.autosquash = true;
       commit.verbose = true;
       pull.ff = "only";
+      "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
     };
     ignores = [
       "[._]*.s[a-w][a-z]"
