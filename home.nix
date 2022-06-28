@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, system, pinpox, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -11,6 +11,7 @@
   };
 
   home.packages = [
+    pinpox.packages.${system}.tfenv
     pkgs.dig
     pkgs.fluxctl
     pkgs.google-cloud-sdk
