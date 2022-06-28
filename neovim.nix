@@ -41,6 +41,11 @@
       vim-fugitive
       vim-rhubarb
       vim-fubitive
+      {
+        plugin = nvim-lspconfig;
+        config = builtins.readFile ./lsp-config.lua;
+        type = "lua";
+      }
     ];
     extraConfig = ''
       " Map leader key to ,
