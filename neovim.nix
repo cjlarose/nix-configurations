@@ -46,6 +46,7 @@
         config = builtins.readFile ./lsp-config.lua;
         type = "lua";
       }
+      vim-unimpaired
     ];
     extraConfig = ''
       " Map leader key to ,
