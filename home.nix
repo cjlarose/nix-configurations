@@ -19,6 +19,7 @@
     pkgs.gopls
     pkgs.htop
     pkgs.jq
+    pkgs.kotlin-language-server
     pkgs.kubectl
     pkgs.kubernetes-helm
     pkgs.kubeseal
