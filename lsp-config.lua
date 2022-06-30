@@ -39,3 +39,10 @@ require('lspconfig')['gopls'].setup{
 require('lspconfig')['kotlin_language_server'].setup{
   on_attach = on_attach,
 }
+
+require('lspconfig')['bashls'].setup{
+  on_attach = on_attach,
+}
+
+-- Format go files on write
+vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.formatting_sync()]]

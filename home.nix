@@ -25,6 +25,8 @@
     pkgs.kubeseal
     pkgs.kustomize
     pkgs.neovim-remote
+    pkgs.nodePackages.bash-language-server
+    pkgs.shellcheck
     pkgs.tree
     pkgs.yq-go
   ];
