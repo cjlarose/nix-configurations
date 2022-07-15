@@ -27,6 +27,7 @@
     pkgs.moreutils
     pkgs.neovim-remote
     pkgs.nodePackages.bash-language-server
+    pkgs.ruby
     pkgs.shellcheck
     pkgs.tree
     pkgs.yq-go
