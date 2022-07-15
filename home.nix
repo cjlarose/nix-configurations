@@ -24,6 +24,7 @@
     pkgs.kubernetes-helm
     pkgs.kubeseal
     pkgs.kustomize
+    pkgs.moreutils
     pkgs.neovim-remote
     pkgs.nodePackages.bash-language-server
     pkgs.shellcheck
