@@ -30,6 +30,7 @@
     pkgs.ruby
     pkgs.shellcheck
     pkgs.tree
+    pkgs.docker-compose
     pkgs.yq-go
   ];
 
