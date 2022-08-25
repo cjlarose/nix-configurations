@@ -14,7 +14,7 @@
     pinpox.packages.${system}.tfenv
     pkgs.dig
     pkgs.fluxctl
-    pkgs.go
+    pkgs.go_1_18
     pkgs.google-cloud-sdk
     pkgs.gopls
     pkgs.htop
