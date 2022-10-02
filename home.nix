@@ -13,6 +13,7 @@
   home.packages = [
     pinpox.packages.${system}.tfenv
     pkgs.dig
+    pkgs.docker-compose
     pkgs.fluxctl
     pkgs.go_1_18
     pkgs.google-cloud-sdk
@@ -30,7 +31,6 @@
     pkgs.ruby
     pkgs.shellcheck
     pkgs.tree
-    pkgs.docker-compose
     pkgs.yq-go
   ];
 
