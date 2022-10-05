@@ -12,6 +12,7 @@
 
   home.packages = [
     pinpox.packages.${system}.tfenv
+    pkgs.csvtool
     pkgs.dig
     pkgs.docker-compose
     pkgs.fluxctl
