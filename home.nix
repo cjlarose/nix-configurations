@@ -31,6 +31,7 @@
     pkgs.nodePackages.bash-language-server
     pkgs.ruby
     pkgs.shellcheck
+    pkgs.teleport
     pkgs.tree
     pkgs.yq-go
   ];
