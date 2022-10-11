@@ -40,7 +40,8 @@ write_nixos_config() {
 
 {
   imports = [ ./hardware-configuration.nix ];
-  boot.loader.grub.device = "/dev/disk/by-label/boot";
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   system.stateVersion = "22.05";
 
