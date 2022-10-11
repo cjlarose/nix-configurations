@@ -16,14 +16,14 @@
   outputs = { self, nixpkgs, home-manager, fzfVim, fzfProject, pinpox }: {
     nixosConfigurations.dev = nixpkgs.lib.nixosSystem (
       let
-        system = "aarch64-linux";
+        system = "x86_64-linux";
       in {
         inherit system;
         modules = [
           ({ pkgs, ... }: {
             imports = [ ./hardware-configuration.nix ];
 
-            networking.hostName = "nixos-dev";
+            networking.hostName = "pt-dev";
 
             boot.loader.systemd-boot.enable = true;
             boot.loader.efi.canTouchEfiVariables = true;
