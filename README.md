@@ -44,7 +44,7 @@ cd /tmp
 curl -L  https://github.com/cjlarose/nixos-dev-env/tarball/master -o nixos-dev-env.tar.gz
 tar -zxvf nixos-dev-env.tar.gz
 cd cjlarose-nixos-dev-env*
-./bootstrap.sh /dev/vda
+./bootstrap.sh /dev/sda
 nixos-install --no-root-password --flake '.#dev'
 shutdown -h now
 ```
@@ -53,5 +53,5 @@ shutdown -h now
 6. Log in over SSH
 
 ```sh
-ssh cjlarose@nixos-dev.local
+ssh cjlarose@pt-dev.local
 ```
