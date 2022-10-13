@@ -463,11 +463,11 @@
         "zsh-colored-man-pages": "zsh-colored-man-pages"
       },
       "locked": {
-        "lastModified": 1655886097,
-        "narHash": "sha256-Ib/JgYLTpKJWDpqjdGjloi9ibpLvs5mTf3FllJcQUBc=",
+        "lastModified": 1665711775,
+        "narHash": "sha256-kqj8YwwtVn7c+246rpHPbfQGoZ2IFwzmqsaHcYFX+5s=",
         "owner": "cjlarose",
         "repo": "pinpox-nixos",
-        "rev": "475d2a5b109b9147b40acecd3feb7871e36730d5",
+        "rev": "401ef974552cb84c169ca59418364016e09c40db",
         "type": "github"
       },
       "original": {
