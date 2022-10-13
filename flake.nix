@@ -11,7 +11,7 @@
     fzfVim.inputs.nixpkgs.follows = "nixpkgs";
     fzfProject.url = "github:cjlarose/fzf-project";
     fzfProject.inputs.nixpkgs.follows = "nixpkgs";
-    pinpox.url = "github:pinpox/nixos";
+    pinpox.url = "github:cjlarose/pinpox-nixos";
     pinpox.inputs.nixpkgs.follows = "nixpkgs";
   };
 

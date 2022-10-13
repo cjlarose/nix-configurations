@@ -465,14 +465,14 @@
       "locked": {
         "lastModified": 1655886097,
         "narHash": "sha256-Ib/JgYLTpKJWDpqjdGjloi9ibpLvs5mTf3FllJcQUBc=",
-        "owner": "pinpox",
-        "repo": "nixos",
+        "owner": "cjlarose",
+        "repo": "pinpox-nixos",
         "rev": "475d2a5b109b9147b40acecd3feb7871e36730d5",
         "type": "github"
       },
       "original": {
-        "owner": "pinpox",
-        "repo": "nixos",
+        "owner": "cjlarose",
+        "repo": "pinpox-nixos",
         "type": "github"
       }
     },
