@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-22.05";
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     fzfVim.url = "github:cjlarose/fzf.vim";
@@ -13,7 +15,7 @@
     pinpox.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, fzfVim, fzfProject, pinpox }: {
+  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }: {
     nixosConfigurations.dev = nixpkgs.lib.nixosSystem (
       let
         system = "x86_64-linux";
@@ -144,5 +146,19 @@
         ];
       }
     );
+
+    darwinConfigurations."LaRose-MacBook-Pro" = darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      modules = [
+        ({ pkgs, ... }: {
+          environment.systemPackages = [
+            pkgs.vim
+          ];
+          services.nix-daemon.enable = true;
+          programs.zsh.enable = true;
+          system.stateVersion = 4;
+        })
+      ];
+    };
   };
 }
