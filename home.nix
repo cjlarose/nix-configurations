@@ -34,6 +34,7 @@
     pkgs.ruby
     pkgs.shellcheck
     pkgs.teleport
+    pkgs.tmux
     pkgs.tree
     pkgs.yq-go
   ];
