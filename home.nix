@@ -57,7 +57,7 @@
 
       setopt prompt_subst
       . ${pkgs.git}/share/git/contrib/completion/git-prompt.sh
-      PROMPT='%~ %F{green}$(__git_ps1 "%s ")%f%F{blue}$(__kube_ps1)%f$ '
+      PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f%F{blue}$(__kube_ps1)%f$ '
 
       # Allow command line editing in an external editor
       autoload -Uz edit-command-line
