@@ -114,6 +114,7 @@
                 # TYPE  DATABASE        USER            ADDRESS                 METHOD
                 host    all             all             ::1/128                 scram-sha-256
               '';
+              extraPlugins = with pkgs.postgresql14Packages; [ postgis ];
             };
 
             services.redis = {
