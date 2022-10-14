@@ -35,6 +35,7 @@
             networking.firewall.allowedTCPPorts = [
               80 # ingress-nginx
               443 # ingress-nginx
+              2376 # docker daemon
               3000 # web-client
               6443 # k8s API
               10250 # k8s node API
@@ -63,7 +64,13 @@
               }
             ];
 
-            virtualisation.docker.enable = true;
+            virtualisation.docker = {
+              enable = true;
+              listenOptions = [
+                "/run/docker.sock"
+                "0.0.0.0:2376"
+              ];
+            };
 
             environment.systemPackages = with pkgs; [
               lsof
