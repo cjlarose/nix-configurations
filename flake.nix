@@ -147,18 +147,34 @@
       }
     );
 
-    darwinConfigurations."LaRose-MacBook-Pro" = darwin.lib.darwinSystem {
-      system = "aarch64-darwin";
-      modules = [
-        ({ pkgs, ... }: {
-          environment.systemPackages = [
-            pkgs.vim
-          ];
-          services.nix-daemon.enable = true;
-          programs.zsh.enable = true;
-          system.stateVersion = 4;
-        })
-      ];
-    };
+    darwinConfigurations."LaRose-MacBook-Pro" = darwin.lib.darwinSystem (
+      let
+        system = "x86_64-darwin";
+      in {
+        inherit system;
+        modules = [
+          ({ pkgs, ... }: {
+            environment.systemPackages = [
+              pkgs.vim
+            ];
+            services.nix-daemon.enable = true;
+            programs.zsh.enable = true;
+            system.stateVersion = 4;
+            nixpkgs.overlays = [
+              fzfVim.overlay
+              fzfProject.overlay
+            ];
+          })
+          home-manager.darwinModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.chrislarose = import ./home.nix;
+            home-manager.extraSpecialArgs = {
+              inherit system pinpox;
+            };
+          }
+        ];
+      }
+    );
   };
 }
