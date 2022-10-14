@@ -8,12 +8,14 @@
     EDITOR = "nvr-edit-in-split-window";
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     KUBECONFIG = "$HOME/.kube/gke-dev.yaml:$HOME/.kube/gke-test.yaml:$HOME/.kube/gke-prod.yaml:$HOME/.kube/lab.yaml:$HOME/.kube/local-k3s.yaml";
+    DOCKER_HOST = "tcp://pt-dev.toothyshouse.com:2376";
   };
 
   home.packages = [
     pinpox.packages.${system}.tfenv
     pkgs.csvtool
     pkgs.dig
+    pkgs.docker
     pkgs.docker-compose
     pkgs.fluxctl
     pkgs.go_1_18
