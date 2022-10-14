@@ -48,7 +48,7 @@
       # Prompt
       __kube_ps1() {
         local context
-        context=$(kubectl config current-context)
+        context=$(kubectl config current-context 2> /dev/null)
         if [ -n "''${context}" ]; then
           echo "(k8s: ''${context}) "
         fi
