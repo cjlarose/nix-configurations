@@ -117,13 +117,6 @@
               extraPlugins = with pkgs.postgresql14Packages; [ postgis ];
             };
 
-            services.redis = {
-              servers."" = {
-                enable = true;
-                bind = "0.0.0.0";
-              };
-            };
-
             services.k3s = {
               enable = true;
               role = "server";
