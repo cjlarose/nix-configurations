@@ -28,6 +28,7 @@
     pkgs.google-cloud-sdk
     pkgs.gopls
     pkgs.htop
+    pkgs.iotop
     pkgs.jq
     pkgs.kotlin-language-server
     pkgs.kubectl
