@@ -156,6 +156,7 @@
             home-manager.users.cjlarose = import ./home.nix;
             home-manager.extraSpecialArgs = {
               inherit system pinpox;
+              server = true;
             };
           }
         ];
@@ -186,6 +187,7 @@
             home-manager.users.chrislarose = import ./home.nix;
             home-manager.extraSpecialArgs = {
               inherit system pinpox;
+              server = false;
             };
           }
         ];
