@@ -37,6 +37,7 @@
               443 # ingress-nginx
               2376 # docker daemon
               3000 # web-client
+              5432 # postgresql
               6443 # k8s API
               10250 # k8s node API
             ];
@@ -96,6 +97,7 @@
 
             services.postgresql = {
               enable = true;
+              enableTCPIP = true;
               authentication = ''
                 # Allow any user on the local system to connect to any database with
                 # any database user name using Unix-domain sockets (the default for local
@@ -104,15 +106,10 @@
                 # TYPE  DATABASE        USER            ADDRESS                 METHOD
                 local   all             all                                     trust
 
-                # Require password authentication when accessing 127.0.0.1
+                # Require password authentication when accessing over TCP/IP, all addresses
                 #
                 # TYPE  DATABASE        USER            ADDRESS                 METHOD
-                host    all             all             127.0.0.1/32            scram-sha-256
-
-                # The same over IPv6.
-                #
-                # TYPE  DATABASE        USER            ADDRESS                 METHOD
-                host    all             all             ::1/128                 scram-sha-256
+                host    all             all             0.0.0.0/0               scram-sha-256
               '';
               extraPlugins = with pkgs.postgresql14Packages; [ postgis ];
             };
