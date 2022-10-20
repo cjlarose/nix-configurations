@@ -86,6 +86,9 @@
       " Show whitespace characters (tabs, trailing spaces)
       set list
 
+      " Use the system clipboard as the default register
+      set clipboard=unnamed
+
       " Allow modified buffers to be hidden (except for netrw buffers)
       " https://github.com/tpope/vim-vinegar/issues/13
       set nohidden
