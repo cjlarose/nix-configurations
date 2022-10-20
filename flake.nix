@@ -75,6 +75,7 @@
 
             environment.systemPackages = with pkgs; [
               lsof
+              iotop
             ];
 
             services.openssh = {
