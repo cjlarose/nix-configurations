@@ -113,6 +113,7 @@
                 host    all             all             0.0.0.0/0               scram-sha-256
               '';
               extraPlugins = with pkgs.postgresql14Packages; [ postgis ];
+              dataDir = "/pt-postgresql";
             };
 
             services.k3s = {
@@ -126,6 +127,13 @@
 
             services.dockerRegistry = {
               enable = true;
+            };
+
+            services.openiscsi = {
+              enable = true;
+              name = "iqn.2020-08.org.linux-iscsi.toothyshouse:pt-dev";
+              enableAutoLoginOut = true;
+              discoverPortal = "montero.toothyshouse.com";
             };
 
             users.mutableUsers = false;

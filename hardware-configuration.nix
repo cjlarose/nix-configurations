@@ -23,6 +23,12 @@
       fsType = "vfat";
     };
 
+  fileSystems."/pt-postgresql" =
+    { device = "/dev/disk/by-label/pt-postgresql";
+      fsType = "ext4";
+      options = [ "nofail" ];
+    };
+
   swapDevices =
     [ { device = "/dev/disk/by-label/swap"; }
     ];
