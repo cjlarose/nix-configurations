@@ -29,7 +29,7 @@ curl -L  https://github.com/cjlarose/nixos-dev-env/tarball/master -o nixos-dev-e
 tar -zxvf nixos-dev-env.tar.gz
 cd cjlarose-nixos-dev-env*
 ./bootstrap.sh /dev/sda
-nixos-install --no-root-password --flake '.#dev'
+nixos-install --no-root-password --flake '.#pt-dev'
 shutdown -h now
 ```
 
@@ -42,7 +42,7 @@ ssh cjlarose@pt-dev.local
 From here, I normally clone the repo again to my home directory. If I make any changes, I execute the following to realize those changes:
 
 ```
-sudo nixos-rebuild switch --flake '.#dev'
+sudo nixos-rebuild switch --flake '.#pt-dev'
 ```
 
 ## Client Setup (Mac)

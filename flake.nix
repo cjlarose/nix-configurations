@@ -16,7 +16,7 @@
   };
 
   outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }: {
-    nixosConfigurations.dev = nixpkgs.lib.nixosSystem (
+    nixosConfigurations."pt-dev" = nixpkgs.lib.nixosSystem (
       let
         system = "x86_64-linux";
       in {
