@@ -25,7 +25,7 @@ First, create a new VM in proxmox. Use OVMF rather than SeaBIOS and attach the N
 ```sh
 sudo su -
 cd /tmp
-curl -L  https://github.com/cjlarose/nixos-dev-env/tarball/master -o nixos-dev-env.tar.gz
+curl -L  https://github.com/cjlarose/nixos-dev-env/tarball/main -o nixos-dev-env.tar.gz
 tar -zxvf nixos-dev-env.tar.gz
 cd cjlarose-nixos-dev-env*
 ./bootstrap.sh /dev/sda
