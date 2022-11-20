@@ -42,6 +42,7 @@
     pkgs.teleport
     pkgs.tmux
     pkgs.tree
+    pkgs.wget
     pkgs.yq-go
   ];
 
