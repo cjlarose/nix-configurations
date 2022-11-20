@@ -1,5 +1,26 @@
 {
   "nodes": {
+    "darwin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1665392861,
+        "narHash": "sha256-bCd8fYJMAb0LzabsiXl4nxECDoz483bJOCa2hjox7N0=",
+        "owner": "lnl7",
+        "repo": "nix-darwin",
+        "rev": "ef56fd8979b5f4e800c4716f62076e00600b1172",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lnl7",
+        "ref": "master",
+        "repo": "nix-darwin",
+        "type": "github"
+      }
+    },
     "dotfiles-awesome": {
       "inputs": {
         "flake-compat": [
@@ -442,16 +463,16 @@
         "zsh-colored-man-pages": "zsh-colored-man-pages"
       },
       "locked": {
-        "lastModified": 1655886097,
-        "narHash": "sha256-Ib/JgYLTpKJWDpqjdGjloi9ibpLvs5mTf3FllJcQUBc=",
-        "owner": "pinpox",
-        "repo": "nixos",
-        "rev": "475d2a5b109b9147b40acecd3feb7871e36730d5",
+        "lastModified": 1665711775,
+        "narHash": "sha256-kqj8YwwtVn7c+246rpHPbfQGoZ2IFwzmqsaHcYFX+5s=",
+        "owner": "cjlarose",
+        "repo": "pinpox-nixos",
+        "rev": "401ef974552cb84c169ca59418364016e09c40db",
         "type": "github"
       },
       "original": {
-        "owner": "pinpox",
-        "repo": "nixos",
+        "owner": "cjlarose",
+        "repo": "pinpox-nixos",
         "type": "github"
       }
     },
@@ -524,6 +545,7 @@
     },
     "root": {
       "inputs": {
+        "darwin": "darwin",
         "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
         "home-manager": "home-manager",

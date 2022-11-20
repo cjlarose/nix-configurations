@@ -1,18 +1,28 @@
-{ pkgs, system, pinpox, ... }: {
+{ pkgs, system, pinpox, server, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
   ];
 
-  home.sessionVariables = {
-    EDITOR = "nvr-edit-in-split-window";
-    LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
-    KUBECONFIG = "$HOME/.kube/gke-dev.yaml:$HOME/.kube/gke-test.yaml:$HOME/.kube/gke-prod.yaml:$HOME/.kube/lab.yaml:$HOME/.kube/local-k3s.yaml";
-  };
+  home.sessionVariables = let
+    commonVariables = {
+      EDITOR = "nvr-edit-in-split-window";
+      LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
+      KUBECONFIG = "$HOME/.kube/gke-dev.yaml:$HOME/.kube/gke-test.yaml:$HOME/.kube/gke-prod.yaml:$HOME/.kube/lab.yaml:$HOME/.kube/pt-dev.yaml:$HOME/.kube/local-k3s.yaml";
+    };
+    serverVariables = {
+    };
+    clientVariables = {
+      DOCKER_HOST = "tcp://pt-dev.toothyshouse.com:2376";
+    };
+  in commonVariables // (if server then serverVariables else clientVariables);
 
   home.packages = [
     pinpox.packages.${system}.tfenv
+    pkgs.csvtool
     pkgs.dig
+    pkgs.docker
+    pkgs.docker-compose
     pkgs.fluxctl
     pkgs.go_1_18
     pkgs.google-cloud-sdk
@@ -29,8 +39,10 @@
     pkgs.nodePackages.bash-language-server
     pkgs.ruby
     pkgs.shellcheck
+    pkgs.teleport
+    pkgs.tmux
     pkgs.tree
-    pkgs.docker-compose
+    pkgs.wget
     pkgs.yq-go
   ];
 
@@ -44,7 +56,7 @@
       # Prompt
       __kube_ps1() {
         local context
-        context=$(kubectl config current-context)
+        context=$(kubectl config current-context 2> /dev/null)
         if [ -n "''${context}" ]; then
           echo "(k8s: ''${context}) "
         fi
@@ -52,7 +64,7 @@
 
       setopt prompt_subst
       . ${pkgs.git}/share/git/contrib/completion/git-prompt.sh
-      PROMPT='%~ %F{green}$(__git_ps1 "%s ")%f%F{blue}$(__kube_ps1)%f$ '
+      PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f%F{blue}$(__kube_ps1)%f$ '
 
       # Allow command line editing in an external editor
       autoload -Uz edit-command-line

@@ -4,17 +4,17 @@ set -e
 
 partition_and_format() {
   local blockdevice=$1
-  parted ${blockdevice} -- mklabel gpt
+  parted "${blockdevice}" -- mklabel gpt
 
   # root partition starts after the boot partition and goes until the swap partition
-  parted ${blockdevice} -- mkpart primary 512MiB -8GiB
+  parted "${blockdevice}" -- mkpart primary 512MiB -8GiB
 
   # 8GiB swap partition at the end
-  parted ${blockdevice} -- mkpart primary linux-swap -8GiB 100%
+  parted "${blockdevice}" -- mkpart primary linux-swap -8GiB 100%
 
   # 512MiB boot partition at the beginning
-  parted ${blockdevice} -- mkpart ESP fat32 1MiB 512MiB
-  parted ${blockdevice} -- set 3 esp on
+  parted "${blockdevice}" -- mkpart ESP fat32 1MiB 512MiB
+  parted "${blockdevice}" -- set 3 esp on
 
   # initialize ext4 filesystem and label it
   mkfs.ext4 -L nixos "${blockdevice}1"
@@ -69,4 +69,4 @@ main() {
   write_nixos_config
 }
 
-main $1
+main "$1"

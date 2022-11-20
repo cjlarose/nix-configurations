@@ -3,27 +3,29 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-22.05";
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     fzfVim.url = "github:cjlarose/fzf.vim";
     fzfVim.inputs.nixpkgs.follows = "nixpkgs";
     fzfProject.url = "github:cjlarose/fzf-project";
     fzfProject.inputs.nixpkgs.follows = "nixpkgs";
-    pinpox.url = "github:pinpox/nixos";
+    pinpox.url = "github:cjlarose/pinpox-nixos";
     pinpox.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, fzfVim, fzfProject, pinpox }: {
+  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }: {
     nixosConfigurations.dev = nixpkgs.lib.nixosSystem (
       let
-        system = "aarch64-linux";
+        system = "x86_64-linux";
       in {
         inherit system;
         modules = [
           ({ pkgs, ... }: {
             imports = [ ./hardware-configuration.nix ];
 
-            networking.hostName = "nixos-dev";
+            networking.hostName = "pt-dev";
 
             boot.loader.systemd-boot.enable = true;
             boot.loader.efi.canTouchEfiVariables = true;
@@ -33,7 +35,9 @@
             networking.firewall.allowedTCPPorts = [
               80 # ingress-nginx
               443 # ingress-nginx
+              2376 # docker daemon
               3000 # web-client
+              5432 # postgresql
               6443 # k8s API
               10250 # k8s node API
             ];
@@ -61,10 +65,17 @@
               }
             ];
 
-            virtualisation.docker.enable = true;
+            virtualisation.docker = {
+              enable = true;
+              listenOptions = [
+                "/run/docker.sock"
+                "0.0.0.0:2376"
+              ];
+            };
 
             environment.systemPackages = with pkgs; [
               lsof
+              iotop
             ];
 
             services.openssh = {
@@ -87,6 +98,7 @@
 
             services.postgresql = {
               enable = true;
+              enableTCPIP = true;
               authentication = ''
                 # Allow any user on the local system to connect to any database with
                 # any database user name using Unix-domain sockets (the default for local
@@ -95,16 +107,13 @@
                 # TYPE  DATABASE        USER            ADDRESS                 METHOD
                 local   all             all                                     trust
 
-                # Require password authentication when accessing 127.0.0.1
+                # Require password authentication when accessing over TCP/IP, all addresses
                 #
                 # TYPE  DATABASE        USER            ADDRESS                 METHOD
-                host    all             all             127.0.0.1/32            scram-sha-256
-
-                # The same over IPv6.
-                #
-                # TYPE  DATABASE        USER            ADDRESS                 METHOD
-                host    all             all             ::1/128                 scram-sha-256
+                host    all             all             0.0.0.0/0               scram-sha-256
               '';
+              extraPlugins = with pkgs.postgresql14Packages; [ postgis ];
+              dataDir = "/pt-postgresql";
             };
 
             services.k3s = {
@@ -118,6 +127,13 @@
 
             services.dockerRegistry = {
               enable = true;
+            };
+
+            services.openiscsi = {
+              enable = true;
+              name = "iqn.2020-08.org.linux-iscsi.toothyshouse:pt-dev";
+              enableAutoLoginOut = true;
+              discoverPortal = "montero.toothyshouse.com";
             };
 
             users.mutableUsers = false;
@@ -139,6 +155,38 @@
             home-manager.users.cjlarose = import ./home.nix;
             home-manager.extraSpecialArgs = {
               inherit system pinpox;
+              server = true;
+            };
+          }
+        ];
+      }
+    );
+
+    darwinConfigurations."LaRose-MacBook-Pro" = darwin.lib.darwinSystem (
+      let
+        system = "x86_64-darwin";
+      in {
+        inherit system;
+        modules = [
+          ({ pkgs, ... }: {
+            environment.systemPackages = [
+              pkgs.vim
+            ];
+            services.nix-daemon.enable = true;
+            programs.zsh.enable = true;
+            system.stateVersion = 4;
+            nixpkgs.overlays = [
+              fzfVim.overlay
+              fzfProject.overlay
+            ];
+          })
+          home-manager.darwinModules.home-manager {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.chrislarose = import ./home.nix;
+            home-manager.extraSpecialArgs = {
+              inherit system pinpox;
+              server = false;
             };
           }
         ];

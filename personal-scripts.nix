@@ -20,9 +20,19 @@ let
     name = "rg";
     paths = [ wrappedRg pkgs.ripgrep ];
   };
+
+  runUntilFailure = pkgs.writeShellScriptBin "run-until-failure" ''
+    while "$@"; do :; done
+  '';
+
+  runUntilSuccess = pkgs.writeShellScriptBin "run-until-success" ''
+    while ! "$@"; do :; done
+  '';
 in {
   home.packages = [
     nvrEditInSplitWindow
     linkedRg
+    runUntilFailure
+    runUntilSuccess
   ];
 }
