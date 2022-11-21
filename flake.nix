@@ -60,6 +60,13 @@
               iotop
             ];
 
+            services.udev.extraRules = ''
+              SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a4", NAME="eth0"
+              SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a5", NAME="eth1"
+              SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a6", NAME="eth2"
+              SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a7", NAME="eth3"
+            '';
+
             services.openssh = {
               enable = true;
               passwordAuthentication = false;
