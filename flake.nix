@@ -25,12 +25,27 @@
           ({ pkgs, ... }: {
             imports = [ ./hardware-configuration-router.nix ];
 
-            networking.hostName = "router";
-
             boot.loader.systemd-boot.enable = true;
             boot.loader.efi.canTouchEfiVariables = true;
 
+            boot.kernel.sysctl = {
+              "net.ipv4.conf.all.forwarding" = true;
+            };
+
             system.stateVersion = "22.05";
+
+            networking = {
+              useDHCP = false;
+              hostName = "router";
+
+              interfaces = {
+                eth0.useDHCP = true;
+                eth1.useDHCP = false;
+                eth2.useDHCP = false;
+                eth3.useDHCP = false;
+                enp1s0.useDHCP = true;
+              };
+            };
 
             nix = {
               package = pkgs.nixFlakes;
@@ -61,6 +76,7 @@
             ];
 
             services.udev.extraRules = ''
+              SUBSYSTEM=="net", ATTR{address}=="ce:b7:91:f6:03:eb", NAME="enp1s0"
               SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a4", NAME="eth0"
               SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a5", NAME="eth1"
               SUBSYSTEM=="net", ATTR{address}=="80:61:5f:19:27:a6", NAME="eth2"
