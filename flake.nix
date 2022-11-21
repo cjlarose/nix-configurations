@@ -43,7 +43,7 @@
                 eth1.useDHCP = false;
                 eth2.useDHCP = false;
                 eth3.useDHCP = false;
-                enp1s0.useDHCP = true;
+                enp1s0.useDHCP = false;
               };
             };
 
