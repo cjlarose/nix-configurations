@@ -223,6 +223,8 @@
               };
             };
 
+            systemd.services.postgresql.serviceConfig.TimeoutSec = nixpkgs.lib.mkForce 86400;
+
             services.k3s = {
               enable = true;
               role = "server";
