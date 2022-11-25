@@ -177,8 +177,9 @@
             };
 
             environment.systemPackages = with pkgs; [
-              lsof
               iotop
+              lsof
+              pg_activity
             ];
 
             services.openssh = {
