@@ -217,6 +217,9 @@
               '';
               extraPlugins = with pkgs.postgresql14Packages; [ postgis ];
               dataDir = "/pt-postgresql";
+              settings = {
+                shared_buffers = "4096 MB";
+              };
             };
 
             services.k3s = {
