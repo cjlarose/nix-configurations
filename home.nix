@@ -39,6 +39,7 @@
     pkgs.nodePackages.bash-language-server
     pkgs.ruby
     pkgs.shellcheck
+    pkgs.stack
     pkgs.teleport
     pkgs.tmux
     pkgs.tree
