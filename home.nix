@@ -61,14 +61,18 @@
       __kube_ps1() {
         local context
         context=$(kubectl config current-context 2> /dev/null)
-        if [ -n "''${context}" ]; then
-          echo "(k8s: ''${context}) "
+        [ -z "''${context}" ] && return
+        if [[ "''${context}" = gke_* ]]; then
+          context="%F{red}(k8s: ''$context)%f"
+        else
+          context="%F{blue}(k8s: ''$context)%f"
         fi
+        echo "''$context"
       }
 
       setopt prompt_subst
       . ${pkgs.git}/share/git/contrib/completion/git-prompt.sh
-      PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f%F{blue}$(__kube_ps1)%f$ '
+      PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f$(__kube_ps1) $ '
 
       # Allow command line editing in an external editor
       autoload -Uz edit-command-line
