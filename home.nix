@@ -27,7 +27,9 @@
     pkgs.go_1_18
     pkgs.google-cloud-sdk
     pkgs.gopls
+    pkgs.gradle
     pkgs.htop
+    pkgs.jdk11
     pkgs.jq
     pkgs.kotlin-language-server
     pkgs.kubectl
