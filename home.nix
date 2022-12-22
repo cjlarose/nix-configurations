@@ -67,12 +67,12 @@
         else
           context="%F{blue}(k8s: ''$context)%f"
         fi
-        echo "''$context"
+        echo "''$context "
       }
 
       setopt prompt_subst
       . ${pkgs.git}/share/git/contrib/completion/git-prompt.sh
-      PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f$(__kube_ps1) $ '
+      PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f$(__kube_ps1)$ '
 
       # Allow command line editing in an external editor
       autoload -Uz edit-command-line
