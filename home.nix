@@ -41,6 +41,7 @@
     pkgs.nodePackages.bash-language-server
     pkgs.ruby
     pkgs.shellcheck
+    pkgs.speedtest-cli
     pkgs.stack
     pkgs.teleport
     pkgs.tmux
