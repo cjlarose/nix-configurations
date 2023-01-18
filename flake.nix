@@ -66,7 +66,7 @@
                 domain = "*";
                 type = "soft";
                 item = "nofile";
-                value = "65536";
+                value = "131072";
               }
             ];
 
