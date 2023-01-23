@@ -246,7 +246,7 @@
               enable = true;
               name = "iqn.2020-08.org.linux-iscsi.toothyshouse:pt-dev";
               enableAutoLoginOut = true;
-              discoverPortal = "montero.toothyshouse.com";
+              discoverPortal = "192.168.2.102";
             };
 
             users.mutableUsers = false;
