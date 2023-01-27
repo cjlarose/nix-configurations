@@ -24,7 +24,6 @@
     pkgs.docker
     pkgs.docker-compose
     pkgs.fluxctl
-    pkgs.go_1_18
     pkgs.google-cloud-sdk
     pkgs.gopls
     pkgs.gradle
@@ -122,5 +121,10 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.go = {
+    enable = true;
+    package = pkgs.go_1_18;
   };
 }
