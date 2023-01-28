@@ -126,5 +126,8 @@
   programs.go = {
     enable = true;
     package = pkgs.go_1_18;
+    goPrivate = [
+      "bitbucket.org/picktrace"
+    ];
   };
 }
