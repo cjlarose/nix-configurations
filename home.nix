@@ -4,6 +4,10 @@
     ./neovim.nix
   ];
 
+  home.sessionPath = [
+    "$HOME/go/bin"
+  ];
+
   home.sessionVariables = let
     commonVariables = {
       EDITOR = "nvr-edit-in-split-window";
