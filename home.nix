@@ -129,6 +129,7 @@
     package = pkgs.go_1_18;
     goPrivate = [
       "bitbucket.org/picktrace"
+      "github.com/picktrace"
     ];
   };
 }
