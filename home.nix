@@ -91,6 +91,7 @@
       commit.verbose = true;
       pull.ff = "only";
       "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
+      "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
     };
     ignores = [
       "[._]*.s[a-w][a-z]"
