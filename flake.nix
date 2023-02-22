@@ -223,7 +223,7 @@
                 max_wal_senders = "0";
                 wal_level = "minimal";
                 maintenance_work_mem = "1 GB";
-                synchronous_commit = "off";
+                synchronous_commit = "on";
               };
             };
 
