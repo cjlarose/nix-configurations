@@ -82,6 +82,9 @@
       autoload -Uz edit-command-line
       zle -N edit-command-line
       bindkey '^x^e' edit-command-line
+
+      # push directories to stack on cd
+      setopt auto_pushd
     '';
   };
 
