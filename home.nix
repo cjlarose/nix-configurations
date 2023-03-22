@@ -6,6 +6,7 @@
 
   home.sessionPath = [
     "$HOME/go/bin"
+    "$HOME/Library/Android/sdk/platform-tools"
   ];
 
   home.sessionVariables = let
