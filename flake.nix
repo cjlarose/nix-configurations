@@ -142,6 +142,7 @@
               3000 # web-client
               5432 # postgresql
               6443 # k8s API
+              8080 # device-sync
               10250 # k8s node API
             ];
 
