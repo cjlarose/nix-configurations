@@ -24,6 +24,7 @@
   home.packages = [
     pinpox.packages.${system}.tfenv
     pkgs.csvtool
+    pkgs.delta
     pkgs.dig
     pkgs.docker
     pkgs.docker-compose
@@ -95,11 +96,17 @@
     userEmail = "cjlarose@gmail.com";
     extraConfig = {
       color.ui = true;
-      rebase.autosquash = true;
       commit.verbose = true;
       pull.ff = "only";
+      rebase.autosquash = true;
       "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
       "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
+
+      # syntax highlighting in diffs
+      core.pager = "delta";
+      diff.colorMoved = "default";
+      interactive.diffFilter = "delta --color-only";
+      merge.conflictstyle = "diff3";
     };
     ignores = [
       "[._]*.s[a-w][a-z]"
