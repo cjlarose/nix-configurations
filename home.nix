@@ -44,6 +44,7 @@
     pkgs.nodePackages.bash-language-server
     pkgs.ruby
     pkgs.shellcheck
+    pkgs.socat
     pkgs.speedtest-cli
     pkgs.stack
     pkgs.teleport
