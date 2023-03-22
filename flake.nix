@@ -286,6 +286,15 @@
             environment.systemPackages = [
               pkgs.vim
             ];
+            environment.etc = {
+              "sysctl.conf" = {
+                enable = true;
+                text = ''
+                  kern.maxfiles=131072
+                  kern.maxfilesperproc=65536
+                '';
+              };
+            };
             services.nix-daemon.enable = true;
             programs.zsh.enable = true;
             system.stateVersion = 4;
