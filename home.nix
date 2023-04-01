@@ -44,6 +44,7 @@
     pkgs.moreutils
     pkgs.neovim-remote
     pkgs.nodePackages.bash-language-server
+    pkgs.nodePackages.pyright
     pkgs.ruby
     pkgs.shellcheck
     pkgs.socat
