@@ -9,17 +9,13 @@ let
     fi
   '';
 
-  wrappedRg = pkgs.writeShellScriptBin "rg" ''
+  wrappedRg = pkgs.writeShellScriptBin "rgp" ''
     if [ -t 1 ]; then
       ${pkgs.ripgrep}/bin/rg --pretty --sort path "$@" | less
     else
       ${pkgs.ripgrep}/bin/rg --sort path "$@"
     fi
   '';
-  linkedRg = pkgs.symlinkJoin {
-    name = "rg";
-    paths = [ wrappedRg pkgs.ripgrep ];
-  };
 
   runUntilFailure = pkgs.writeShellScriptBin "run-until-failure" ''
     while "$@"; do :; done
@@ -31,7 +27,7 @@ let
 in {
   home.packages = [
     nvrEditInSplitWindow
-    linkedRg
+    wrappedRg
     runUntilFailure
     runUntilSuccess
   ];
