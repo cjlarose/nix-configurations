@@ -13,7 +13,6 @@
     commonVariables = {
       EDITOR = "nvr-edit-in-split-window";
       LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
-      KUBECONFIG = "$HOME/.kube/gke-dev.yaml:$HOME/.kube/gke-test.yaml:$HOME/.kube/gke-prod.yaml:$HOME/.kube/lab.yaml:$HOME/.kube/local-picktrace-dev.yaml:$HOME/.kube/local-k3s.yaml";
     };
     serverVariables = {
     };
@@ -89,6 +88,17 @@
 
       # push directories to stack on cd
       setopt auto_pushd
+
+      function set-kubeconfig {
+        # Sets the KUBECONFIG environment variable to a dynamic concatentation of everything
+        # under ~/.kube/*
+
+        if [ -d ~/.kube ]; then
+          export KUBECONFIG=$(find ~/.kube -maxdepth 1 -type f -name '*.yaml' 2>/dev/null | paste -sd ':' -)
+        fi
+      }
+
+      add-zsh-hook precmd set-kubeconfig
     '';
   };
 
