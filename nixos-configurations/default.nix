@@ -146,7 +146,7 @@ in {
       home-manager.nixosModules.home-manager {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
-        home-manager.users.cjlarose = import ../home.nix;
+        home-manager.users.cjlarose = import ../home;
         home-manager.extraSpecialArgs = {
           inherit system pinpox;
           server = true;
