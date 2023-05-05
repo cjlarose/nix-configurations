@@ -32,6 +32,12 @@ nmap <silent> <leader>l :wincmd l<CR>
 nmap <silent> <leader>o :wincmd o<CR>
 nmap <silent> <leader>= :wincmd =<CR>
 
+" Navigate up and down with leader
+nnoremap <leader>d <c-d>
+nnoremap <c-d> <nop>
+nnoremap <leader>u <c-u>
+nnoremap <c-u> <nop>
+
 " Show whitespace characters (tabs, trailing spaces)
 set list
 
