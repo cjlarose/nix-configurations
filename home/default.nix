@@ -7,6 +7,7 @@
   home.sessionPath = [
     "$HOME/go/bin"
     "$HOME/Library/Android/sdk/platform-tools"
+    "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
   ];
 
   home.sessionVariables = let
