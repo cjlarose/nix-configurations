@@ -5,7 +5,7 @@ in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
     ({ pkgs, ... }: {
-      imports = [ ./hardware-configuration.nix ];
+      imports = [ ./pt-dev-hardware.nix ];
 
       networking.hostName = "photos";
 
