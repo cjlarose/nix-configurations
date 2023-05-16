@@ -49,6 +49,11 @@ in nixpkgs.lib.nixosSystem {
         lsof
       ];
 
+      services.openiscsi = {
+        enable = true;
+        name = "iqn.2020-08.org.linux-iscsi.toothyshouse:photos";
+      };
+
       services.openssh = {
         enable = true;
         passwordAuthentication = false;
