@@ -13,9 +13,11 @@
     fzfProject.inputs.nixpkgs.follows = "nixpkgs";
     pinpox.url = "github:cjlarose/pinpox-nixos";
     pinpox.inputs.nixpkgs.follows = "nixpkgs";
+    kmonad.url = "git+https://github.com/kmonad/kmonad?submodules=1&dir=nix";
+    kmonad.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }: {
+  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox, kmonad }: {
     nixosConfigurations = (
       import ./nixos-configurations {
         inherit nixpkgs home-manager fzfVim fzfProject pinpox;
@@ -23,7 +25,7 @@
     );
     darwinConfigurations = (
       import ./darwin-configurations {
-        inherit nixpkgs darwin home-manager fzfVim fzfProject pinpox;
+        inherit nixpkgs darwin home-manager fzfVim fzfProject pinpox kmonad;
       }
     );
   };

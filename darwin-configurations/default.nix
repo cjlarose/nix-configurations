@@ -1,4 +1,4 @@
-{ nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }:
+{ nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox, kmonad }:
 let
   system = "x86_64-darwin";
 in {
@@ -7,6 +7,7 @@ in {
     modules = [
       ({ pkgs, ... }: {
         environment.systemPackages = [
+          pkgs.kmonad
           pkgs.vim
         ];
         environment.etc = {
@@ -24,6 +25,7 @@ in {
         nixpkgs.overlays = [
           fzfVim.overlay
           fzfProject.overlay
+          kmonad.overlays.default
         ];
       })
       home-manager.darwinModules.home-manager {

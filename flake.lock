@@ -234,6 +234,30 @@
         "type": "github"
       }
     },
+    "kmonad": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "dir": "nix",
+        "lastModified": 1682527311,
+        "narHash": "sha256-+V+UnHHXPamJbb/VZtHU7GJl5HMktZyLcyAyX9yrOnE=",
+        "ref": "master",
+        "rev": "3aa2f52536de853efbcb0f6e790c97a3734687ec",
+        "revCount": 727,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/kmonad/kmonad?dir=nix"
+      },
+      "original": {
+        "dir": "nix",
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/kmonad/kmonad?dir=nix"
+      }
+    },
     "krops": {
       "flake": false,
       "locked": {
@@ -549,6 +573,7 @@
         "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
         "home-manager": "home-manager",
+        "kmonad": "kmonad",
         "nixpkgs": "nixpkgs",
         "pinpox": "pinpox"
       }
