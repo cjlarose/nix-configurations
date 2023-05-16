@@ -5,7 +5,7 @@ in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
     ({ pkgs, ... }: {
-      imports = [ ./pt-dev-hardware.nix ];
+      imports = [ ./photos-hardware.nix ];
 
       networking.hostName = "photos";
 
@@ -52,6 +52,9 @@ in nixpkgs.lib.nixosSystem {
       services.openiscsi = {
         enable = true;
         name = "iqn.2020-08.org.linux-iscsi.toothyshouse:photos";
+        enableAutoLoginOut = true;
+        discoverPortal = "192.168.2.102";
+        extraConfigFile = "/home/cjlarose/workspace/cjlarose/nixos-dev-env/iscsid.conf";
       };
 
       services.openssh = {
