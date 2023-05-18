@@ -61,6 +61,7 @@ in nixpkgs.lib.nixosSystem {
         iotop
         lsof
         pg_activity
+        teleport
       ];
 
       services.openssh = {
