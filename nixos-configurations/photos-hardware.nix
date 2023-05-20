@@ -26,20 +26,8 @@
       options = [ "nofail" ];
     };
 
-  fileSystems."/originals" =
-    { device = "/dev/disk/by-label/originals";
-      fsType = "ext4";
-      options = [ "nofail" ];
-    };
-
-  fileSystems."/photoprism-storage" =
+  fileSystems."/photoprism" =
     { device = "/dev/disk/by-label/photoprism";
-      fsType = "ext4";
-      options = [ "nofail" ];
-    };
-
-  fileSystems."/import" =
-    { device = "/dev/disk/by-label/import";
       fsType = "ext4";
       options = [ "nofail" ];
     };
