@@ -21,6 +21,11 @@ in {
         services.nix-daemon.enable = true;
         programs.zsh.enable = true;
         system.stateVersion = 4;
+        nix = {
+          extraOptions = ''
+            experimental-features = nix-command flakes
+          '';
+        };
         nixpkgs.overlays = [
           fzfVim.overlay
           fzfProject.overlay
