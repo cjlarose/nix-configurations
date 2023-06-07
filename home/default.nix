@@ -4,6 +4,8 @@
     ./neovim.nix
   ];
 
+  home.stateVersion = "22.05";
+
   home.sessionPath = [
     "$HOME/go/bin"
     "$HOME/Library/Android/sdk/platform-tools"
