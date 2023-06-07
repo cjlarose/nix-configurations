@@ -54,6 +54,7 @@
     pkgs.tmux
     pkgs.tree
     pkgs.wget
+    pkgs.wrk
     pkgs.yarn
     pkgs.yq-go
   ];
