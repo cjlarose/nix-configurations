@@ -22,6 +22,7 @@ in {
           extraOptions = ''
             experimental-features = nix-command flakes
           '';
+          registry.nixpkgs.flake = nixpkgs;
         };
         nixpkgs.overlays = [
           fzfVim.overlay
