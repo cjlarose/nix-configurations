@@ -11,8 +11,7 @@
     fzfVim.inputs.nixpkgs.follows = "nixpkgs";
     fzfProject.url = "github:cjlarose/fzf-project";
     fzfProject.inputs.nixpkgs.follows = "nixpkgs";
-    pinpox.url = "github:cjlarose/pinpox-nixos";
-    pinpox.inputs.nixpkgs.follows = "nixpkgs";
+    pinpox.url = "github:cjlarose/pinpox-nixos/tfenv";
   };
 
   outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }: {
