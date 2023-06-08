@@ -55,6 +55,7 @@
     pkgs.teleport
     pkgs.tmux
     pkgs.tree
+    pkgs.unixtools.watch
     pkgs.wget
     pkgs.wrk
     pkgs.yarn
