@@ -1,4 +1,4 @@
-{ pkgs, system, pinpox, server, ... }: {
+{ pkgs, system, server, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -25,7 +25,6 @@
   in commonVariables // (if server then serverVariables else clientVariables);
 
   home.packages = [
-    pinpox.packages.${system}.tfenv
     pkgs.csvtool
     pkgs.delta
     pkgs.dig
@@ -54,6 +53,7 @@
     pkgs.speedtest-cli
     pkgs.stack
     pkgs.teleport
+    pkgs.tfenv
     pkgs.tmux
     pkgs.tree
     pkgs.unixtools.watch

@@ -25,8 +25,9 @@ in {
           registry.nixpkgs.flake = nixpkgs;
         };
         nixpkgs.overlays = [
-          fzfVim.overlay
           fzfProject.overlay
+          fzfVim.overlay
+          pinpox.overlays.default
         ];
         users.users.chrislarose = {
           home = "/Users/chrislarose";
@@ -37,7 +38,7 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users.chrislarose = import ../home;
         home-manager.extraSpecialArgs = {
-          inherit system pinpox;
+          inherit system;
           server = false;
         };
       }
