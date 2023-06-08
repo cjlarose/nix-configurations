@@ -113,17 +113,16 @@
         "tfenv": "tfenv_2"
       },
       "locked": {
-        "lastModified": 1686205818,
-        "narHash": "sha256-/8QLgPwaHhbjjXXySogyY8p6/l1ceCjkoy6bxuKuBCY=",
+        "lastModified": 1686207347,
+        "narHash": "sha256-vf9tO2hHpr9qOcNl022FRMfzk1vbsKvbAqLmuhO3Wm4=",
         "owner": "cjlarose",
-        "repo": "pinpox-nixos",
-        "rev": "7eb0915db92b356153adc00ffa25fc741c14f0b7",
+        "repo": "tfenv-nix",
+        "rev": "012dd64e84a063f02a9cbb22ca4e6b33118d3e14",
         "type": "github"
       },
       "original": {
         "owner": "cjlarose",
-        "ref": "tfenv",
-        "repo": "pinpox-nixos",
+        "repo": "tfenv-nix",
         "type": "github"
       }
     },
