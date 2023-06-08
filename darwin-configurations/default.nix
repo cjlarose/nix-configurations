@@ -5,10 +5,7 @@ in {
   "LaRose-MacBook-Pro" = darwin.lib.darwinSystem {
     inherit system;
     modules = [
-      ({ pkgs, ... }: {
-        environment.systemPackages = [
-          pkgs.vim
-        ];
+      ({ ... }: {
         environment.etc = {
           "sysctl.conf" = {
             enable = true;
