@@ -1,4 +1,4 @@
-{ nixpkgs, home-manager, fzfVim, fzfProject, pinpox, ... }:
+{ nixpkgs, home-manager, fzfVim, fzfProject, tfenv, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -36,7 +36,7 @@ in nixpkgs.lib.nixosSystem {
       nixpkgs.overlays = [
         fzfProject.overlay
         fzfVim.overlay
-        pinpox.overlays.default
+        tfenv.overlays.default
       ];
 
       security.sudo.wheelNeedsPassword = false;

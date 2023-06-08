@@ -98,9 +98,19 @@
         "type": "github"
       }
     },
-    "pinpox": {
+    "root": {
       "inputs": {
+        "darwin": "darwin",
+        "fzfProject": "fzfProject",
+        "fzfVim": "fzfVim",
+        "home-manager": "home-manager",
+        "nixpkgs": "nixpkgs",
         "tfenv": "tfenv"
+      }
+    },
+    "tfenv": {
+      "inputs": {
+        "tfenv": "tfenv_2"
       },
       "locked": {
         "lastModified": 1686205818,
@@ -117,17 +127,7 @@
         "type": "github"
       }
     },
-    "root": {
-      "inputs": {
-        "darwin": "darwin",
-        "fzfProject": "fzfProject",
-        "fzfVim": "fzfVim",
-        "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs",
-        "pinpox": "pinpox"
-      }
-    },
-    "tfenv": {
+    "tfenv_2": {
       "flake": false,
       "locked": {
         "lastModified": 1664641260,

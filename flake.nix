@@ -11,18 +11,18 @@
     fzfVim.inputs.nixpkgs.follows = "nixpkgs";
     fzfProject.url = "github:cjlarose/fzf-project";
     fzfProject.inputs.nixpkgs.follows = "nixpkgs";
-    pinpox.url = "github:cjlarose/pinpox-nixos/tfenv";
+    tfenv.url = "github:cjlarose/pinpox-nixos/tfenv";
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }: {
+  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv }: {
     nixosConfigurations = (
       import ./nixos-configurations {
-        inherit nixpkgs home-manager fzfVim fzfProject pinpox;
+        inherit nixpkgs home-manager fzfVim fzfProject tfenv;
       }
     );
     darwinConfigurations = (
       import ./darwin-configurations {
-        inherit nixpkgs darwin home-manager fzfVim fzfProject pinpox;
+        inherit nixpkgs darwin home-manager fzfVim fzfProject tfenv;
       }
     );
   };

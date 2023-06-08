@@ -1,4 +1,4 @@
-{ nixpkgs, darwin, home-manager, fzfVim, fzfProject, pinpox }:
+{ nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv }:
 let
   system = "x86_64-darwin";
 in {
@@ -27,7 +27,7 @@ in {
         nixpkgs.overlays = [
           fzfProject.overlay
           fzfVim.overlay
-          pinpox.overlays.default
+          tfenv.overlays.default
         ];
         users.users.chrislarose = {
           home = "/Users/chrislarose";
