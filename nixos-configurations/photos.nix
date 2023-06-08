@@ -30,8 +30,9 @@ in nixpkgs.lib.nixosSystem {
       };
 
       nixpkgs.overlays = [
-        fzfVim.overlay
         fzfProject.overlay
+        fzfVim.overlay
+        pinpox.overlays.default
       ];
 
       security.sudo.wheelNeedsPassword = false;
@@ -94,7 +95,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = import ../home;
       home-manager.extraSpecialArgs = {
-        inherit system pinpox;
+        inherit system;
         server = true;
       };
     }
