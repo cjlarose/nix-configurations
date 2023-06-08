@@ -24,11 +24,19 @@ in {
           '';
           registry.nixpkgs.flake = nixpkgs;
         };
-        nixpkgs.overlays = [
-          fzfProject.overlay
-          fzfVim.overlay
-          tfenv.overlays.default
-        ];
+        nixpkgs = {
+          overlays = [
+            fzfProject.overlay
+            fzfVim.overlay
+            tfenv.overlays.default
+            (final: prev: {
+              nodejs = prev.nodejs_16;
+            })
+          ];
+          config.permittedInsecurePackages = [
+            "nodejs-16.20.0"
+          ];
+        };
         users.users.chrislarose = {
           home = "/Users/chrislarose";
         };
