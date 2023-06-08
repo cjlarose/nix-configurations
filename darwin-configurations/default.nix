@@ -30,6 +30,9 @@ in {
           fzfVim.overlay
           fzfProject.overlay
         ];
+        users.users.chrislarose = {
+          home = "/Users/chrislarose";
+        };
       })
       home-manager.darwinModules.home-manager {
         home-manager.useGlobalPkgs = true;
