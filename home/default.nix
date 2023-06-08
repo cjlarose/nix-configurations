@@ -46,6 +46,7 @@
     pkgs.neovim-remote
     pkgs.nodePackages.bash-language-server
     pkgs.nodePackages.pyright
+    pkgs.postgresql
     pkgs.ripgrep
     pkgs.ruby
     pkgs.shellcheck
