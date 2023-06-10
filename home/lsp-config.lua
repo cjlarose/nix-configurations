@@ -49,4 +49,4 @@ require('lspconfig')['pyright'].setup{
 }
 
 -- Format go files on write
-vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.formatting_sync()]]
+vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.format { async = false }]]
