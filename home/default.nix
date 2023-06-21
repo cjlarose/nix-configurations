@@ -96,6 +96,9 @@
       # push directories to stack on cd
       setopt auto_pushd
 
+      # Bulk renaming
+      autoload -U zmv
+
       function set-kubeconfig {
         # Sets the KUBECONFIG environment variable to a dynamic concatentation of everything
         # under ~/.kube/*
