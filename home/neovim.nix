@@ -8,6 +8,7 @@
     vimAlias = true;
     vimdiffAlias = true;
     plugins = with pkgs.vimPlugins; [
+      vim-commentary
       vim-sensible
       vim-nix
       kotlin-vim
