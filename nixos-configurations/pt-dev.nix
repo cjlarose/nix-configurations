@@ -56,6 +56,7 @@ in nixpkgs.lib.nixosSystem {
           "/run/docker.sock"
           "0.0.0.0:2376"
         ];
+        liveRestore = false;
       };
 
       environment.systemPackages = with pkgs; [
