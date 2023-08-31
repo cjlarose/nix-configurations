@@ -57,6 +57,9 @@ au BufNewFile,BufRead *.tsx setlocal filetype=typescript.tsx
 " Set the statusline of terminal buffers to the term title
 autocmd TermOpen * setlocal statusline=%{b:term_title}
 
+" Change indentation settings for kotlin files
+autocmd Filetype kotlin setlocal tabstop=4 shiftwidth=4
+
 " Disable scrolloff because it makes curses-like programs jump around in
 " terminal buffers
 " https://github.com/neovim/neovim/issues/11072
