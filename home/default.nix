@@ -21,6 +21,7 @@
     };
     clientVariables = {
       DOCKER_HOST = "tcp://local.picktrace.dev:2376";
+      DOCKER_BUILDKIT = "1";
     };
   in commonVariables // (if server then serverVariables else clientVariables);
 
