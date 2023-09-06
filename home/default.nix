@@ -126,6 +126,17 @@
       "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
       "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
 
+      "remote.origin" = {
+        tagopt = "--tags";
+        prune = true;
+        pruneTags = true;
+      };
+      "remote.upstream" = {
+        tagopt = "--tags";
+        prune = true;
+        pruneTags = true;
+      };
+
       # syntax highlighting in diffs
       core.pager = "delta";
       diff.colorMoved = "default";
