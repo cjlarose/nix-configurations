@@ -110,6 +110,7 @@ in nixpkgs.lib.nixosSystem {
           wal_level = "minimal";
           maintenance_work_mem = "1 GB";
           synchronous_commit = "on";
+          max_connections = "1000";
         };
       };
 
