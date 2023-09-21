@@ -78,14 +78,6 @@ in nixpkgs.lib.nixosSystem {
 
       programs.zsh.enable = true;
 
-      services.avahi = {
-        enable = true;
-        publish = {
-          enable = true;
-          addresses = true;
-        };
-      };
-
       services.postgresql = {
         enable = true;
         enableTCPIP = true;
