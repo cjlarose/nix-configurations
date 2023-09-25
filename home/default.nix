@@ -69,7 +69,9 @@
       pkgs.yq-go
     ];
     serverPackages = [];
-    clientPackages = [];
+    clientPackages = [
+      pkgs._1password
+    ];
   in commonPackages ++ (if server then serverPackages else clientPackages);
 
   home.shellAliases = {

@@ -36,6 +36,9 @@ in {
           config.permittedInsecurePackages = [
             "nodejs-16.20.0"
           ];
+          config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+            "1password-cli"
+          ];
         };
         users.users.chrislarose = {
           home = "/Users/chrislarose";
