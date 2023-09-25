@@ -28,7 +28,6 @@
   home.packages = let
     commonPackages = [
       pkgs.csvtool
-      pkgs.delta
       pkgs.dig
       pkgs.docker
       pkgs.docker-compose
@@ -144,12 +143,6 @@
         prune = true;
         pruneTags = true;
       };
-
-      # syntax highlighting in diffs
-      core.pager = "delta";
-      diff.colorMoved = "default";
-      interactive.diffFilter = "delta --color-only";
-      merge.conflictstyle = "diff3";
     };
     ignores = [
       "[._]*.s[a-w][a-z]"
