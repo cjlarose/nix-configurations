@@ -25,48 +25,52 @@
     };
   in commonVariables // (if server then serverVariables else clientVariables);
 
-  home.packages = [
-    pkgs.csvtool
-    pkgs.delta
-    pkgs.dig
-    pkgs.docker
-    pkgs.docker-compose
-    pkgs.fluxctl
-    pkgs.git-absorb
-    pkgs.git-filter-repo
-    pkgs.google-cloud-sdk
-    pkgs.gopls
-    pkgs.gradle
-    pkgs.htop
-    pkgs.jdk11
-    pkgs.jq
-    pkgs.kotlin-language-server
-    pkgs.kubectl
-    pkgs.kubernetes-helm
-    pkgs.kubeseal
-    pkgs.kustomize
-    pkgs.neovim-remote
-    pkgs.nodePackages.bash-language-server
-    pkgs.nodePackages.pyright
-    pkgs.nodePackages.typescript-language-server
-    pkgs.parallel
-    pkgs.postgresql
-    pkgs.ripgrep
-    pkgs.ruby
-    pkgs.shellcheck
-    pkgs.socat
-    pkgs.speedtest-cli
-    pkgs.stack
-    pkgs.teleport
-    pkgs.tfenv
-    pkgs.tmux
-    pkgs.tree
-    pkgs.unixtools.watch
-    pkgs.wget
-    pkgs.wrk
-    pkgs.yarn
-    pkgs.yq-go
-  ];
+  home.packages = let
+    commonPackages = [
+      pkgs.csvtool
+      pkgs.delta
+      pkgs.dig
+      pkgs.docker
+      pkgs.docker-compose
+      pkgs.fluxctl
+      pkgs.git-absorb
+      pkgs.git-filter-repo
+      pkgs.google-cloud-sdk
+      pkgs.gopls
+      pkgs.gradle
+      pkgs.htop
+      pkgs.jdk11
+      pkgs.jq
+      pkgs.kotlin-language-server
+      pkgs.kubectl
+      pkgs.kubernetes-helm
+      pkgs.kubeseal
+      pkgs.kustomize
+      pkgs.neovim-remote
+      pkgs.nodePackages.bash-language-server
+      pkgs.nodePackages.pyright
+      pkgs.nodePackages.typescript-language-server
+      pkgs.parallel
+      pkgs.postgresql
+      pkgs.ripgrep
+      pkgs.ruby
+      pkgs.shellcheck
+      pkgs.socat
+      pkgs.speedtest-cli
+      pkgs.stack
+      pkgs.teleport
+      pkgs.tfenv
+      pkgs.tmux
+      pkgs.tree
+      pkgs.unixtools.watch
+      pkgs.wget
+      pkgs.wrk
+      pkgs.yarn
+      pkgs.yq-go
+    ];
+    serverPackages = [];
+    clientPackages = [];
+  in commonPackages ++ (if server then serverPackages else clientPackages);
 
   home.shellAliases = {
     gs = "git status";
