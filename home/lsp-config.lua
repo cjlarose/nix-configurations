@@ -52,5 +52,9 @@ require('lspconfig')['tsserver'].setup{
   on_attach = on_attach,
 }
 
+require('lspconfig')['eslint'].setup{
+  on_attach = on_attach,
+}
+
 -- Format go files on write
 vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.format { async = false }]]
