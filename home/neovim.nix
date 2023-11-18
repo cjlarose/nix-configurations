@@ -48,6 +48,7 @@
         type = "lua";
       }
       vim-unimpaired
+      vim-grepper
     ];
     extraConfig = builtins.readFile ./init.vim;
   };

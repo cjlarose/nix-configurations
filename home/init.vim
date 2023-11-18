@@ -197,3 +197,10 @@ command! -nargs=0 LogbookList :call s:logbook_list()
 " Key maps
 nmap <leader>bn :LogbookNew<space>
 nmap <leader>bl :LogbookList<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-grepper configuration                                                    "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+nnoremap <leader>gr :Grepper -tool rg<cr>
+nnoremap <leader>* :Grepper -tool rg -cword -noprompt<cr>
