@@ -34,6 +34,7 @@
       pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
+      pkgs.gnused
       pkgs.google-cloud-sdk
       pkgs.gopls
       pkgs.gradle
