@@ -20,7 +20,7 @@ This work is heavily influenced by [Mitchell Hasimoto's config](https://github.c
 
 ## Server Setup
 
-First, create a new VM in proxmox. Use OVMF rather than SeaBIOS and attach the NixOS installation ISO. On the EFI disk, remove the preenrolled keys. Configure the EFI boot order to boot from the CD/DVD drive before the hard disk. When the VM boots up, identify the block device to use for installation using `lsblk` (it's `/dev/vda` in my example below). We'll clone the repo and perform the initial install onto that block device.
+First, create a new VM in proxmox. Use OVMF rather than SeaBIOS and attach the NixOS installation ISO. On the EFI disk, remove the preenrolled keys. Configure the EFI boot order to boot from the CD/DVD drive before the hard disk. When the VM boots up, identify the block device to use for installation using `lsblk` (it's `/dev/sda` in my example below). We'll clone the repo and perform the initial install onto that block device.
 
 ```sh
 sudo su -
