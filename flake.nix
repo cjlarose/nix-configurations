@@ -18,10 +18,10 @@
     };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv }: {
+  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv, nixos-generators }: {
     nixosConfigurations = (
       import ./nixos-configurations {
-        inherit nixpkgs home-manager fzfVim fzfProject tfenv;
+        inherit nixpkgs home-manager fzfVim fzfProject tfenv nixos-generators;
       }
     );
     darwinConfigurations = (
