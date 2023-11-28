@@ -47,6 +47,7 @@
       pkgs.kubeseal
       pkgs.kustomize
       pkgs.neovim-remote
+      pkgs.nil
       pkgs.nodePackages.bash-language-server
       pkgs.nodePackages.pyright
       pkgs.nodePackages.typescript-language-server
