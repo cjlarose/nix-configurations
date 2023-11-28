@@ -12,6 +12,10 @@
     fzfProject.url = "github:cjlarose/fzf-project";
     fzfProject.inputs.nixpkgs.follows = "nixpkgs";
     tfenv.url = "github:cjlarose/tfenv-nix";
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv }: {
