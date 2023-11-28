@@ -8,6 +8,12 @@ in nixpkgs.lib.nixosSystem {
       imports = [
         nixos-generators.nixosModules.all-formats
       ];
+
+      formatConfigs.proxmox = { config, ... }: {
+        proxmox.qemuConf = {
+          name = "nixos-builder";
+        };
+      };
     })
     ({ pkgs, ... }: {
       networking.hostName = "builder";
