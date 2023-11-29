@@ -16,6 +16,8 @@ in nixpkgs.lib.nixosSystem {
           bios = "ovmf";
         };
       };
+
+      boot.loader.systemd-boot.enable = true;
     })
     (import ./configuration.nix { inherit nixpkgs fzfProject fzfVim tfenv; })
     home-manager.nixosModules.home-manager {
