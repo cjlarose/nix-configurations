@@ -1,6 +1,7 @@
 { nixpkgs, sharedOverlays, darwin, home-manager }:
 let
   system = "x86_64-darwin";
+  stateVersion = "23.05";
 in {
   "LaRose-MacBook-Pro" = darwin.lib.darwinSystem {
     inherit system;
@@ -46,7 +47,7 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users.chrislarose = import ../home;
         home-manager.extraSpecialArgs = {
-          inherit system;
+          inherit system stateVersion;
           server = false;
         };
       }

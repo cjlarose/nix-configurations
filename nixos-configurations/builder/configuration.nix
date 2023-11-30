@@ -1,7 +1,7 @@
-{ nixpkgs, sharedOverlays, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, ... }: { pkgs, ... }: {
   networking.hostName = "builder";
 
-  system.stateVersion = "23.05";
+  system.stateVersion = stateVersion;
 
   nix = {
     package = pkgs.nixFlakes;
