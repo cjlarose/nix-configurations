@@ -1,4 +1,4 @@
-{ nixpkgs, home-manager, fzfVim, fzfProject, tfenv, ... }:
+{ nixpkgs, sharedOverlays, home-manager, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -34,11 +34,7 @@ in nixpkgs.lib.nixosSystem {
         registry.nixpkgs.flake = nixpkgs;
       };
 
-      nixpkgs.overlays = [
-        fzfProject.overlay
-        fzfVim.overlay
-        tfenv.overlays.default
-      ];
+      nixpkgs.overlays = sharedOverlays;
 
       security.sudo.wheelNeedsPassword = false;
       security.pam.loginLimits = [

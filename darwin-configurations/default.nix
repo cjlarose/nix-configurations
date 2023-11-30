@@ -1,4 +1,4 @@
-{ nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv }:
+{ nixpkgs, sharedOverlays, darwin, home-manager }:
 let
   system = "x86_64-darwin";
 in {
@@ -25,10 +25,7 @@ in {
           registry.nixpkgs.flake = nixpkgs;
         };
         nixpkgs = {
-          overlays = [
-            fzfProject.overlay
-            fzfVim.overlay
-            tfenv.overlays.default
+          overlays = sharedOverlays ++ [
             (final: prev: {
               nodejs = prev.nodejs_16;
             })

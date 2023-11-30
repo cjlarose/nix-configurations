@@ -18,16 +18,24 @@
     };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv, nixos-generators }: {
-    nixosConfigurations = (
-      import ./nixos-configurations {
-        inherit nixpkgs home-manager fzfVim fzfProject tfenv nixos-generators;
-      }
-    );
-    darwinConfigurations = (
-      import ./darwin-configurations {
-        inherit nixpkgs darwin home-manager fzfVim fzfProject tfenv;
-      }
-    );
-  };
+  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv, nixos-generators }:
+    let
+      sharedOverlays = [
+        fzfProject.overlay
+        fzfVim.overlay
+        tfenv.overlays.default
+      ];
+    in {
+      nixosConfigurations = (
+        import ./nixos-configurations {
+          inherit nixpkgs sharedOverlays home-manager nixos-generators;
+        }
+      );
+
+      darwinConfigurations = (
+        import ./darwin-configurations {
+          inherit nixpkgs sharedOverlays darwin home-manager;
+        }
+      );
+    };
 }

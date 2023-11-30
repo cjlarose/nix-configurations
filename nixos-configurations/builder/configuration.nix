@@ -1,4 +1,4 @@
-{ nixpkgs, fzfVim, fzfProject, tfenv, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, ... }: { pkgs, ... }: {
   networking.hostName = "builder";
 
   system.stateVersion = "23.05";
@@ -11,11 +11,7 @@
     registry.nixpkgs.flake = nixpkgs;
   };
 
-  nixpkgs.overlays = [
-    fzfProject.overlay
-    fzfVim.overlay
-    tfenv.overlays.default
-  ];
+  nixpkgs.overlays = sharedOverlays;
 
   security.sudo.wheelNeedsPassword = false;
 

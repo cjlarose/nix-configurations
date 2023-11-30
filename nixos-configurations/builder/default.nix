@@ -1,4 +1,4 @@
-{ nixpkgs, fzfProject, fzfVim, home-manager, tfenv, nixos-generators, ... }:
+{ nixpkgs, sharedOverlays, home-manager, nixos-generators, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -19,7 +19,7 @@ in nixpkgs.lib.nixosSystem {
 
       boot.loader.systemd-boot.enable = true;
     })
-    (import ./configuration.nix { inherit nixpkgs fzfProject fzfVim tfenv; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays; })
     home-manager.nixosModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
