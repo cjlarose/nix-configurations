@@ -1,4 +1,4 @@
-{ pkgs, system, stateVersion, server, ... }: {
+{ pkgs, stateVersion, server, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
