@@ -1,4 +1,4 @@
-{ nixpkgs, home-manager, fzfVim, fzfProject, tfenv, ... }:
+{ nixpkgs, stateVersion, sharedOverlays, home-manager, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -12,7 +12,7 @@ in nixpkgs.lib.nixosSystem {
       boot.loader.systemd-boot.enable = true;
       boot.loader.efi.canTouchEfiVariables = true;
 
-      system.stateVersion = "22.05";
+      system.stateVersion = stateVersion;
 
       networking.firewall.allowedTCPPorts = [
         80 # ingress-nginx
@@ -29,11 +29,7 @@ in nixpkgs.lib.nixosSystem {
         registry.nixpkgs.flake = nixpkgs;
       };
 
-      nixpkgs.overlays = [
-        fzfProject.overlay
-        fzfVim.overlay
-        tfenv.overlays.default
-      ];
+      nixpkgs.overlays = sharedOverlays;
 
       security.sudo.wheelNeedsPassword = false;
       security.pam.loginLimits = [
@@ -97,7 +93,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = import ../home;
       home-manager.extraSpecialArgs = {
-        inherit system;
+        inherit system stateVersion;
         server = true;
       };
     }

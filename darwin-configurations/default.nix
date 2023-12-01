@@ -1,6 +1,7 @@
-{ nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv }:
+{ nixpkgs, sharedOverlays, darwin, home-manager }:
 let
   system = "x86_64-darwin";
+  stateVersion = "23.05";
 in {
   "LaRose-MacBook-Pro" = darwin.lib.darwinSystem {
     inherit system;
@@ -25,10 +26,7 @@ in {
           registry.nixpkgs.flake = nixpkgs;
         };
         nixpkgs = {
-          overlays = [
-            fzfProject.overlay
-            fzfVim.overlay
-            tfenv.overlays.default
+          overlays = sharedOverlays ++ [
             (final: prev: {
               nodejs = prev.nodejs_16;
             })
@@ -49,7 +47,7 @@ in {
         home-manager.useUserPackages = true;
         home-manager.users.chrislarose = import ../home;
         home-manager.extraSpecialArgs = {
-          inherit system;
+          inherit system stateVersion;
           server = false;
         };
       }

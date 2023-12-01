@@ -1,10 +1,10 @@
-{ pkgs, system, server, ... }: {
+{ pkgs, stateVersion, server, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
   ];
 
-  home.stateVersion = "22.05";
+  home.stateVersion = stateVersion;
 
   home.sessionPath = [
     "$HOME/go/bin"
