@@ -3,6 +3,9 @@
 
   inputs = {
     nixpkgs = {
+      url = "github:nixos/nixpkgs/release-23.11";
+    };
+    nixpkgs-23-05 = {
       url = "github:nixos/nixpkgs/release-23.05";
     };
     darwin = {
@@ -10,7 +13,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.05";
+      url = "github:nix-community/home-manager/release-23.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     fzfVim = {
@@ -30,8 +33,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, fzfVim, fzfProject, tfenv, nixos-generators }:
+  outputs = { self, nixpkgs, nixpkgs-23-05, darwin, home-manager, fzfVim, fzfProject, tfenv, nixos-generators }:
     let
+      additionalPackages = system: {
+        go_1_18 = nixpkgs-23-05.legacyPackages.${system}.go_1_18;
+        nodejs_16 = nixpkgs-23-05.legacyPackages.${system}.nodejs_16;
+      };
       sharedOverlays = [
         fzfProject.overlay
         fzfVim.overlay
@@ -40,13 +47,13 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs sharedOverlays home-manager nixos-generators;
+          inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators;
         }
       );
 
       darwinConfigurations = (
         import ./darwin-configurations {
-          inherit nixpkgs sharedOverlays darwin home-manager;
+          inherit nixpkgs sharedOverlays additionalPackages darwin home-manager;
         }
       );
     };

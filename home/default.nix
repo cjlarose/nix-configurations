@@ -1,4 +1,4 @@
-{ pkgs, stateVersion, server, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, server, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -180,7 +180,7 @@
 
   programs.go = {
     enable = true;
-    package = pkgs.go_1_18;
+    package = (additionalPackages system).go_1_18;
     goPrivate = [
       "bitbucket.org/picktrace"
       "github.com/picktrace"

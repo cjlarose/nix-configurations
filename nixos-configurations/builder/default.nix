@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, home-manager, nixos-generators, stateVersion, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, nixos-generators, stateVersion, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -25,7 +25,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = import ../../home;
       home-manager.extraSpecialArgs = {
-        inherit system stateVersion;
+        inherit system stateVersion additionalPackages;
         server = true;
       };
     }
