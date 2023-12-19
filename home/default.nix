@@ -53,6 +53,7 @@
       pkgs.nodePackages.pyright
       pkgs.nodePackages.typescript-language-server
       pkgs.nodePackages.vscode-langservers-extracted
+      pkgs.nodejs
       pkgs.parallel
       pkgs.postgresql
       pkgs.ripgrep
