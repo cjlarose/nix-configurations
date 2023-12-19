@@ -7,6 +7,7 @@
   home.stateVersion = stateVersion;
 
   home.sessionPath = [
+    "$HOME/.yarn/bin"
     "$HOME/go/bin"
     "$HOME/Library/Android/sdk/platform-tools"
     "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
