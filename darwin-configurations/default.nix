@@ -29,11 +29,8 @@ in {
         nixpkgs = {
           overlays = sharedOverlays ++ [
             (final: prev: {
-              nodejs = additionalPackagesForSystem.nodejs_16;
+              nodejs = additionalPackagesForSystem.nodejs_20;
             })
-          ];
-          config.permittedInsecurePackages = [
-            "nodejs-16.20.2"
           ];
           config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
             "1password-cli"

@@ -37,7 +37,7 @@
     let
       additionalPackages = system: {
         go_1_18 = nixpkgs-23-05.legacyPackages.${system}.go_1_18;
-        nodejs_16 = nixpkgs-23-05.legacyPackages.${system}.nodejs_16;
+        nodejs_20 = nixpkgs.legacyPackages.${system}.nodejs_20;
       };
       sharedOverlays = [
         fzfProject.overlay
