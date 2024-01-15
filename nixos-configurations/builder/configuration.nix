@@ -1,4 +1,8 @@
 { nixpkgs, sharedOverlays, stateVersion, ... }: { pkgs, ... }: {
+  imports = [
+    ./hardware-configuration.nix
+  ];
+
   networking.hostName = "builder";
 
   system.stateVersion = stateVersion;
