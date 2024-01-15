@@ -5,6 +5,12 @@
       stateVersion = "23.05";
     }
   );
+  "bots" = (
+    import ./bots {
+      inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators;
+      stateVersion = "23.11";
+    }
+  );
   "pt-dev" = (
     import ./pt-dev.nix {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
