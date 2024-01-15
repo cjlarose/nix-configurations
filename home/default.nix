@@ -29,6 +29,7 @@
   home.packages = let
     commonPackages = [
       pkgs.csvtool
+      pkgs.bundix
       pkgs.dig
       pkgs.docker
       pkgs.docker-compose
