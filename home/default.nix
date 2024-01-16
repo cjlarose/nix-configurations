@@ -31,7 +31,7 @@
       pkgs.csvtool
       pkgs.bundix
       pkgs.dig
-      pkgs.docker
+      pkgs.docker-client
       pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
