@@ -35,6 +35,8 @@
     iotop
     lsof
     tigervnc
+    xorg.xauth
+    xterm
   ];
 
   services.openssh = {
@@ -43,12 +45,6 @@
       PasswordAuthentication = false;
       PermitRootLogin = "no";
     };
-  };
-
-  services.xserver = {
-    enable = true;
-    displayManager.sddm.enable = true;
-    desktopManager.plasma5.enable = true;
   };
 
   programs.ssh.startAgent = true;
