@@ -32,7 +32,6 @@
       pkgs.bundix
       pkgs.dig
       pkgs.docker
-      pkgs.docker-compose
       pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
