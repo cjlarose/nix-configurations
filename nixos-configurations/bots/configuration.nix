@@ -53,7 +53,8 @@
     serviceConfig = {
       StandardError = "journal";
       ExecStart = ''
-        ${pkgs.bash}/bin/bash -c 'trap "exit 0" USR1; \
+        ${pkgs.bash}/bin/bash -c '${pkgs.xorg.xauth}/bin/xauth -f ~/.Xauthority source - <<< "add :1 . $(${pkgs.util-linux}/bin/mcookie)" ; \
+        trap "exit 0" USR1; \
         (trap "" USR1 && exec ${pkgs.tigervnc}/bin/Xvnc :1 -rfbauth ~/.vnc/passwd -desktop :1 -geometry 1600x1200) & wait ; \
         exit 1'
       '';
