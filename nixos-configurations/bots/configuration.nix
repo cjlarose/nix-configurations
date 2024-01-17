@@ -47,6 +47,23 @@
     };
   };
 
+  systemd.services."tigervnc-server" = {
+    description = "TigerVNC Server";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      StandardError = "journal";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c 'trap "exit 0" USR1; \
+        (trap "" USR1 && exec ${pkgs.tigervnc}/bin/Xvnc :1 -rfbauth ~/.vnc/passwd -desktop :1 -geometry 1600x1200) & wait ; \
+        exit 1'
+      '';
+      Type = "forking";
+      User = "cjlarose";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
