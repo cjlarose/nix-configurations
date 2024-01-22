@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, nixos-generators, stateVersion, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, nixos-generators, stateVersion, pce, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -19,7 +19,7 @@ in nixpkgs.lib.nixosSystem {
 
       boot.loader.systemd-boot.enable = true;
     })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system; })
     home-manager.nixosModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;

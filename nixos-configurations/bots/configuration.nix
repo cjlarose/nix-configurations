@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, pce, system, ... }: { pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -59,6 +59,42 @@
         exit 1'
       '';
       Type = "forking";
+      User = "cjlarose";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
+  systemd.services."pce-discord-bot" = {
+    description = "Pixel Cat's End discord bot";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      StandardInput = "null";
+      StandardOutput = "journal";
+      StandardError = "journal";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c 'source /etc/pce/.env; \
+        exec ${pce.packages.${system}.default}/bin/discord_bot'
+      '';
+      Type = "exec";
+      User = "cjlarose";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
+  systemd.services."pce-worker" = {
+    description = "Pixel Cat's End worker process";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      StandardInput = "null";
+      StandardOutput = "journal";
+      StandardError = "journal";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c 'source /etc/pce/.env; \
+        exec ${pce.packages.${system}.default}/bin/worker'
+      '';
+      Type = "exec";
       User = "cjlarose";
       Restart = "always";
       RestartSec = "10s";
