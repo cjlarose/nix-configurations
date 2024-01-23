@@ -1,8 +1,14 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, nixos-generators, ... }: {
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, nixos-generators, pce, ... }: {
   "builder" = (
     import ./builder {
       inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators;
       stateVersion = "23.05";
+    }
+  );
+  "bots" = (
+    import ./bots {
+      inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators pce;
+      stateVersion = "23.11";
     }
   );
   "pt-dev" = (

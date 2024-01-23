@@ -150,6 +150,29 @@
         "type": "github"
       }
     },
+    "pce": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "dir": "pixel_cats_end",
+        "lastModified": 1705906729,
+        "narHash": "sha256-xeVTqAxKjKKRYNZrAdWAde5SWvguw07ki+3vr7iXA7U=",
+        "ref": "nix",
+        "rev": "1219e27f13861e3b500898771d9951bcda2dbb4d",
+        "revCount": 111,
+        "type": "git",
+        "url": "ssh://git@github.com/monicahung/flightrising?dir=pixel_cats_end"
+      },
+      "original": {
+        "dir": "pixel_cats_end",
+        "ref": "nix",
+        "type": "git",
+        "url": "ssh://git@github.com/monicahung/flightrising?dir=pixel_cats_end"
+      }
+    },
     "root": {
       "inputs": {
         "darwin": "darwin",
@@ -159,6 +182,7 @@
         "nixos-generators": "nixos-generators",
         "nixpkgs": "nixpkgs",
         "nixpkgs-23-05": "nixpkgs-23-05",
+        "pce": "pce",
         "tfenv": "tfenv"
       }
     },
