@@ -47,7 +47,7 @@
         exit 1'
       '';
       Type = "forking";
-      User = "cjlarose";
+      User = "bot";
       Restart = "always";
       RestartSec = "10s";
     };
@@ -65,7 +65,7 @@
         exec ${pce.packages.${system}.default}/bin/discord_bot'
       '';
       Type = "exec";
-      User = "cjlarose";
+      User = "bot";
       Restart = "always";
       RestartSec = "10s";
     };
@@ -83,7 +83,7 @@
         exec ${pce.packages.${system}.default}/bin/worker'
       '';
       Type = "exec";
-      User = "cjlarose";
+      User = "bot";
       Restart = "always";
       RestartSec = "10s";
     };
