@@ -105,4 +105,9 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
     ];
   };
+
+  users.users.bot = {
+    isNormalUser = true;
+    home = "/home/bot";
+  };
 }
