@@ -13,18 +13,6 @@
       experimental-features = nix-command flakes
     '';
     registry.nixpkgs.flake = nixpkgs;
-    buildMachines = [
-      {
-        hostName = "builder";
-        system = "x86_64-linux";
-        protocol = "ssh-ng";
-        maxJobs = 4;
-        speedFactor = 2;
-        supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
-        mandatoryFeatures = [ ];
-      }
-    ];
-    distributedBuilds = true;
   };
 
   nixpkgs.overlays = sharedOverlays;
