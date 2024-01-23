@@ -158,11 +158,11 @@
       },
       "locked": {
         "dir": "pixel_cats_end",
-        "lastModified": 1705906729,
-        "narHash": "sha256-xeVTqAxKjKKRYNZrAdWAde5SWvguw07ki+3vr7iXA7U=",
+        "lastModified": 1705986947,
+        "narHash": "sha256-Zg76cUyWNTPpRZ6jpWG9X5pYZaxuMWjw8WCsWrl+fGc=",
         "ref": "nix",
-        "rev": "1219e27f13861e3b500898771d9951bcda2dbb4d",
-        "revCount": 111,
+        "rev": "913aa4f81e452a9842bde6c57e52ca23d19b68f2",
+        "revCount": 112,
         "type": "git",
         "url": "ssh://git@github.com/monicahung/flightrising?dir=pixel_cats_end"
       },
