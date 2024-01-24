@@ -11,6 +11,12 @@
       stateVersion = "23.11";
     }
   );
+  "palworld" = (
+    import ./palworld {
+      inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators;
+      stateVersion = "23.11";
+    }
+  );
   "pt-dev" = (
     import ./pt-dev.nix {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
