@@ -7,6 +7,10 @@
 
   system.stateVersion = stateVersion;
 
+  networking.firewall.allowedUDPPorts = [
+    8211 # palworld game server
+  ];
+
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
