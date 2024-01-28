@@ -35,9 +35,24 @@
       url = "git+ssh://git@github.com/monicahung/flightrising?ref=nix&dir=pixel_cats_end";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impermanence = {
+      url = "github:nix-community/impermanence";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-23-05, darwin, home-manager, fzfVim, fzfProject, tfenv, nixos-generators, pce }:
+  outputs = {
+    darwin,
+    fzfProject,
+    fzfVim,
+    home-manager,
+    impermanence,
+    nixos-generators,
+    nixpkgs,
+    nixpkgs-23-05,
+    pce,
+    self,
+    tfenv,
+  }:
     let
       additionalPackages = system: {
         go_1_18 = nixpkgs-23-05.legacyPackages.${system}.go_1_18;
@@ -51,7 +66,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators pce;
+          inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators pce impermanence;
         }
       );
 
