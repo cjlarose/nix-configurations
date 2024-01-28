@@ -61,7 +61,7 @@
       StandardOutput = "journal";
       StandardError = "journal";
       ExecStart = ''
-        ${pkgs.bash}/bin/bash -c 'source ~/.pce-env; \
+        ${pkgs.bash}/bin/bash -c 'source ~/.pce-env && \
         exec ${pce.packages.${system}.default}/bin/discord_bot'
       '';
       Type = "exec";
@@ -79,7 +79,7 @@
       StandardOutput = "journal";
       StandardError = "journal";
       ExecStart = ''
-        ${pkgs.bash}/bin/bash -c 'source ~/.pce-env; \
+        ${pkgs.bash}/bin/bash -c 'source ~/.pce-env && \
         exec ${pce.packages.${system}.default}/bin/worker'
       '';
       Type = "exec";
