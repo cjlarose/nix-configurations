@@ -29,10 +29,8 @@ in nixpkgs.lib.nixosSystem {
         users.bot = {
           directories = [
             ".config/chromium/pixel-cats-end"
+            ".config/pce"
             ".vnc"
-          ];
-          files = [
-            ".pce-env"
           ];
         };
       };
