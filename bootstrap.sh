@@ -26,40 +26,10 @@ mount_block_devices() {
   mount /dev/disk/by-label/boot /mnt/boot
 }
 
-write_nixos_config() {
-  nixos-generate-config --root /mnt
-  cat > /mnt/etc/nixos/configuration.nix <<EOF
-{ config, pkgs, ... }:
-
-{
-  imports = [ ./hardware-configuration.nix ];
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  system.stateVersion = "22.05";
-
-  services.openssh = {
-    enable = true;
-    passwordAuthentication = true;
-    permitRootLogin = "yes";
-  };
-  users.users.root.initialPassword = "root";
-
-  nix = {
-    package = pkgs.nixFlakes;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-  };
-}
-EOF
-}
-
 main() {
   local blockdevice=$1
   partition_and_format "$blockdevice"
   mount_block_devices
-  write_nixos_config
 }
 
 main "$1"
