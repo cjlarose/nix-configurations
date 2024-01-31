@@ -40,6 +40,13 @@
     };
   };
 
+  services.cron = {
+    enable = true;
+    systemCronJobs = [
+      "0 */6 * * * root ${pkgs.systemd}/bin/systemctl try-restart palworld-server"
+    ];
+  };
+
   systemd.services."palworld-server" = {
     description = "Palworld server";
     wantedBy = [ "multi-user.target" ];
