@@ -40,6 +40,26 @@
     };
   };
 
+  systemd.services."palworld-server" = {
+    description = "Palworld server";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "exec";
+      StandardInput = "null";
+      StandardOutput = "journal";
+      StandardError = "journal";
+      WorkingDirectory = "/home/pals/palworld";
+      ExecStart = ''
+        ${pkgs.docker}/bin/docker compose up --remove-orphans
+      '';
+      ExecStop = ''
+        ${pkgs.docker}/bin/docker compose down
+      '';
+      User = "pals";
+      Restart = "always";
+    };
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
@@ -55,5 +75,11 @@
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
     ];
+  };
+
+  users.users.pals = {
+    isNormalUser = true;
+    home = "/home/pals";
+    extraGroups = [ "docker" ];
   };
 }
