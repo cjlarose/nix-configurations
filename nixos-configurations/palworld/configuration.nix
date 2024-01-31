@@ -43,7 +43,7 @@
   services.cron = {
     enable = true;
     systemCronJobs = [
-      "0 */6 * * * root ${pkgs.systemd}/bin/systemctl try-restart palworld-server"
+      "0 2,8,14,20 * * * root ${pkgs.systemd}/bin/systemctl try-restart palworld-server"
     ];
   };
 
