@@ -197,6 +197,60 @@ with lib;
     supportBios = partitionTableType == "legacy" || partitionTableType == "hybrid" || partitionTableType == "legacy+gpt";
     hasBootPartition = partitionTableType == "efi" || partitionTableType == "hybrid";
     hasNoFsPartition = partitionTableType == "hybrid" || partitionTableType == "legacy+gpt";
+
+    vma = (pkgs.qemu_kvm.override {
+      alsaSupport = false;
+      pulseSupport = false;
+      sdlSupport = false;
+      jackSupport = false;
+      gtkSupport = false;
+      vncSupport = false;
+      smartcardSupport = false;
+      spiceSupport = false;
+      ncursesSupport = false;
+      libiscsiSupport = false;
+      tpmSupport = false;
+      numaSupport = false;
+      seccompSupport = false;
+      guestAgentSupport = false;
+    }).overrideAttrs ( super: rec {
+
+      version = "7.2.1";
+      src = pkgs.fetchurl {
+        url= "https://download.qemu.org/qemu-${version}.tar.xz";
+        sha256 = "sha256-jIVpms+dekOl/immTN1WNwsMLRrQdLr3CYqCTReq1zs=";
+      };
+      patches = [
+        # Proxmox' VMA tool is published as a particular patch upon QEMU
+        (pkgs.fetchpatch {
+          url =
+            let
+              rev = "abb04bb6272c1202ca9face0827917552b9d06f6";
+              path = "debian/patches/pve/0027-PVE-Backup-add-vma-backup-format-code.patch";
+            in "https://git.proxmox.com/?p=pve-qemu.git;a=blob_plain;hb=${rev};f=${path}";
+          hash = "sha256-3d0HHdvaExCry6zcULnziYnWIAnn24vECkI4sjj2BMg=";
+        })
+
+        # Proxmox' VMA tool uses O_DIRECT which fails on tmpfs
+        # Filed to upstream issue tracker: https://bugzilla.proxmox.com/show_bug.cgi?id=4710
+        (pkgs.writeText "inline.patch" ''
+            --- a/vma-writer.c   2023-05-01 15:11:13.361341177 +0200
+            +++ b/vma-writer.c   2023-05-01 15:10:51.785293129 +0200
+            @@ -306,7 +306,7 @@
+                         /* try to use O_NONBLOCK */
+                         fcntl(vmaw->fd, F_SETFL, fcntl(vmaw->fd, F_GETFL)|O_NONBLOCK);
+                     } else  {
+            -            oflags = O_NONBLOCK|O_DIRECT|O_WRONLY|O_EXCL;
+            +            oflags = O_NONBLOCK|O_WRONLY|O_EXCL;
+                         vmaw->fd = qemu_create(filename, oflags, 0644, errp);
+                     }
+        '')
+      ];
+
+      buildInputs = super.buildInputs ++ [ pkgs.libuuid ];
+      nativeBuildInputs = super.nativeBuildInputs ++ [ pkgs.perl ];
+
+    });
   in {
     assertions = [
       {
@@ -219,63 +273,7 @@ with lib;
     system.build.VMA = import ../../lib/make-disk-image.nix {
       name = "proxmox-${cfg.filenameSuffix}";
       inherit (cfg) partitionTableType;
-      postVM = let
-        # Build qemu with PVE's patch that adds support for the VMA format
-        vma = (pkgs.qemu_kvm.override {
-          alsaSupport = false;
-          pulseSupport = false;
-          sdlSupport = false;
-          jackSupport = false;
-          gtkSupport = false;
-          vncSupport = false;
-          smartcardSupport = false;
-          spiceSupport = false;
-          ncursesSupport = false;
-          libiscsiSupport = false;
-          tpmSupport = false;
-          numaSupport = false;
-          seccompSupport = false;
-          guestAgentSupport = false;
-        }).overrideAttrs ( super: rec {
-
-          version = "7.2.1";
-          src = pkgs.fetchurl {
-            url= "https://download.qemu.org/qemu-${version}.tar.xz";
-            sha256 = "sha256-jIVpms+dekOl/immTN1WNwsMLRrQdLr3CYqCTReq1zs=";
-          };
-          patches = [
-            # Proxmox' VMA tool is published as a particular patch upon QEMU
-            (pkgs.fetchpatch {
-              url =
-                let
-                  rev = "abb04bb6272c1202ca9face0827917552b9d06f6";
-                  path = "debian/patches/pve/0027-PVE-Backup-add-vma-backup-format-code.patch";
-                in "https://git.proxmox.com/?p=pve-qemu.git;a=blob_plain;hb=${rev};f=${path}";
-              hash = "sha256-3d0HHdvaExCry6zcULnziYnWIAnn24vECkI4sjj2BMg=";
-            })
-
-            # Proxmox' VMA tool uses O_DIRECT which fails on tmpfs
-            # Filed to upstream issue tracker: https://bugzilla.proxmox.com/show_bug.cgi?id=4710
-            (pkgs.writeText "inline.patch" ''
-                --- a/vma-writer.c   2023-05-01 15:11:13.361341177 +0200
-                +++ b/vma-writer.c   2023-05-01 15:10:51.785293129 +0200
-                @@ -306,7 +306,7 @@
-                             /* try to use O_NONBLOCK */
-                             fcntl(vmaw->fd, F_SETFL, fcntl(vmaw->fd, F_GETFL)|O_NONBLOCK);
-                         } else  {
-                -            oflags = O_NONBLOCK|O_DIRECT|O_WRONLY|O_EXCL;
-                +            oflags = O_NONBLOCK|O_WRONLY|O_EXCL;
-                             vmaw->fd = qemu_create(filename, oflags, 0644, errp);
-                         }
-            '')
-          ];
-
-          buildInputs = super.buildInputs ++ [ pkgs.libuuid ];
-          nativeBuildInputs = super.nativeBuildInputs ++ [ pkgs.perl ];
-
-        });
-      in
-      ''
+      postVM = ''
         ${vma}/bin/vma create "vzdump-qemu-${cfg.filenameSuffix}.vma" \
           -c ${cfgFile "qemu-server.conf" (cfg.qemuConf // cfg.qemuExtraConf)}/qemu-server.conf drive-virtio0=$diskImage
         rm $diskImage
