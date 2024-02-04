@@ -3,7 +3,10 @@
     ./hardware-configuration.nix
   ];
 
-  networking.hostName = "bots";
+  networking = {
+    hostName = "bots";
+    hostId = "d202c7d5";
+  };
 
   system.stateVersion = stateVersion;
 
@@ -27,6 +30,8 @@
     xorg.xauth
     xterm
   ];
+
+  services.zfs.expandOnBoot = "all";
 
   services.openssh = {
     enable = true;

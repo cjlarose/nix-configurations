@@ -11,12 +11,17 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-label/nixos";
-      fsType = "ext4";
+    { device = "tank/root";
+      fsType = "zfs";
+    };
+
+  fileSystems."/nix" =
+    { device = "tank/nix";
+      fsType = "zfs";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-label/ESP";
+    { device = "/dev/disk/by-partlabel/disk-main-ESP";
       fsType = "vfat";
     };
 

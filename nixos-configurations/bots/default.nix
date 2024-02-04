@@ -4,8 +4,14 @@ let
 in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
-    ({ pkgs, ... }: {
-      boot.loader.systemd-boot.enable = true;
+    ({ pkgs, lib, ... }: {
+      boot = {
+        loader.systemd-boot.enable = true;
+        zfs.devNodes = "/dev/disk/by-label/tank";
+        initrd.postDeviceCommands = lib.mkAfter ''
+          zfs rollback -r tank/root@blank
+        '';
+      };
     })
     (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system; })
     ({ pkgs, ... } : {
