@@ -27,6 +27,7 @@ in nixpkgs.lib.nixosSystem {
           experimental-features = nix-command flakes
         '';
         registry.nixpkgs.flake = nixpkgs;
+        nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
       };
 
       nixpkgs.overlays = sharedOverlays;
