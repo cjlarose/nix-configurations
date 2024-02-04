@@ -28,7 +28,7 @@ nix build .#nixosConfigurations.builder.config.system.build.VMA
 
 Copy the image into the `dump` directroy of a proxmox directory configured for VM backups (e.g. `/var/lib/vz/dump`). From the PVE web UI, restore the VM from the backup, taking care to select "Unique" to autogenerate a new MAC.
 
-## Server Setup
+## Server Setup (using NixOS installation ISO)
 
 First, create a new VM in proxmox. Use OVMF rather than SeaBIOS and attach the NixOS installation ISO. On the EFI disk, remove the preenrolled keys. Configure the EFI boot order to boot from the CD/DVD drive before the hard disk. When the VM boots up, identify the block device to use for installation using `lsblk` (it's `/dev/sda` in my example below). We'll clone the repo and perform the initial install onto that block device.
 
@@ -53,6 +53,24 @@ From here, I normally clone the repo again to my home directory. If I make any c
 
 ```
 sudo nixos-rebuild switch --flake '.#pt-dev'
+```
+
+## Server Setup (using VM disk image)
+
+To build the image
+
+```sh
+nix build .#nixosConfigurations.bootstrap.config.system.build.VMA
+```
+
+Copy the image into the `dump` directroy of a proxmox directory configured for VM backups (e.g. `/var/lib/vz/dump`). From the PVE web UI, restore the VM from the backup, taking care to select "Unique" to autogenerate a new MAC.
+
+Log in via SSH and switch configurations
+
+```
+sudo su -
+nix-channel --update
+nixos-rebuild switch --flake 'github:cjlarose/nixos-dev-env#bots'
 ```
 
 ## Client Setup (Mac)

@@ -90,34 +90,6 @@ with lib;
           VM name
         '';
       };
-      additionalSpace = mkOption {
-        type = types.str;
-        default = "512M";
-        example = "2048M";
-        description = lib.mdDoc ''
-          additional disk space to be added to the image if diskSize "auto"
-          is used.
-        '';
-      };
-      bootSize = mkOption {
-        type = types.str;
-        default = "256M";
-        example = "512M";
-        description = lib.mdDoc ''
-          Size of the boot partition. Is only used if partitionTableType is
-          either "efi" or "hybrid".
-        '';
-      };
-      diskSize = mkOption {
-        type = types.str;
-        default = "auto";
-        example = "20480";
-        description = lib.mdDoc ''
-          The size of the disk, in megabytes.
-          if "auto" size is calculated based on the contents copied to it and
-          additionalSpace is taken into account.
-        '';
-      };
       net0 = mkOption {
         type = types.commas;
         default = "virtio=00:00:00:00:00:00,bridge=vmbr0,firewall=1";
@@ -193,10 +165,6 @@ with lib;
       #qmdump#map:virtio0:drive-virtio0:${virtio0Storage}:raw:
     '';
     inherit (cfg) partitionTableType;
-    supportEfi = partitionTableType == "efi" || partitionTableType == "hybrid";
-    supportBios = partitionTableType == "legacy" || partitionTableType == "hybrid" || partitionTableType == "legacy+gpt";
-    hasBootPartition = partitionTableType == "efi" || partitionTableType == "hybrid";
-    hasNoFsPartition = partitionTableType == "hybrid" || partitionTableType == "legacy+gpt";
 
     vma = (pkgs.qemu_kvm.override {
       alsaSupport = false;
@@ -270,51 +238,22 @@ with lib;
         message = "'legacy+gpt' disk partitioning requires 'seabios' bios";
       }
     ];
-    system.build.VMA = import ../../lib/make-disk-image.nix {
+
+    system.build.VMA = pkgs.stdenv.mkDerivation {
       name = "proxmox-${cfg.filenameSuffix}";
-      inherit (cfg) partitionTableType;
-      postVM = ''
+      src = config.system.build.diskoImages;
+      buildPhase = ''
+        diskImage=main.raw
+
         ${vma}/bin/vma create "vzdump-qemu-${cfg.filenameSuffix}.vma" \
           -c ${cfgFile "qemu-server.conf" (cfg.qemuConf // cfg.qemuExtraConf)}/qemu-server.conf drive-virtio0=$diskImage
         rm $diskImage
         ${pkgs.zstd}/bin/zstd "vzdump-qemu-${cfg.filenameSuffix}.vma"
-        mv "vzdump-qemu-${cfg.filenameSuffix}.vma.zst" $out/
-
-        mkdir -p $out/nix-support
-        echo "file vma $out/vzdump-qemu-${cfg.filenameSuffix}.vma.zst" >> $out/nix-support/hydra-build-products
       '';
-      inherit (cfg.qemuConf) additionalSpace diskSize bootSize;
-      format = "raw";
-      inherit config lib pkgs;
-    };
-
-    boot = {
-      growPartition = true;
-      kernelParams = [ "console=ttyS0" ];
-      loader.grub = {
-        device = lib.mkDefault (if (hasNoFsPartition || supportBios) then
-          # Even if there is a separate no-fs partition ("/dev/disk/by-partlabel/no-fs" i.e. "/dev/vda2"),
-          # which will be used the bootloader, do not set it as loader.grub.device.
-          # GRUB installation fails, unless the whole disk is selected.
-          "/dev/vda"
-        else
-          "nodev");
-        efiSupport = lib.mkDefault supportEfi;
-        efiInstallAsRemovable = lib.mkDefault supportEfi;
-      };
-
-      loader.timeout = 0;
-      initrd.availableKernelModules = [ "uas" "virtio_blk" "virtio_pci" ];
-    };
-
-    fileSystems."/" = {
-      device = "/dev/disk/by-label/nixos";
-      autoResize = true;
-      fsType = "ext4";
-    };
-    fileSystems."/boot" = lib.mkIf hasBootPartition {
-      device = "/dev/disk/by-label/ESP";
-      fsType = "vfat";
+      installPhase = ''
+        mkdir $out
+        mv "vzdump-qemu-${cfg.filenameSuffix}.vma.zst" $out
+      '';
     };
 
     services.qemuGuest.enable = lib.mkDefault true;

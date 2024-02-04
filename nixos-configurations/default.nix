@@ -1,8 +1,14 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, pce, impermanence, ... }: {
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, pce, impermanence, disko, ... }: {
   "builder" = (
     import ./builder {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
       stateVersion = "23.05";
+    }
+  );
+  "bootstrap" = (
+    import ./bootstrap {
+      inherit nixpkgs sharedOverlays disko;
+      stateVersion = "23.11";
     }
   );
   "bots" = (

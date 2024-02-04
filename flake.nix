@@ -34,10 +34,15 @@
     impermanence = {
       url = "github:nix-community/impermanence";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     darwin,
+    disko,
     fzfProject,
     fzfVim,
     home-manager,
@@ -61,7 +66,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs sharedOverlays additionalPackages home-manager pce impermanence;
+          inherit nixpkgs sharedOverlays additionalPackages home-manager pce impermanence disko;
         }
       );
 
