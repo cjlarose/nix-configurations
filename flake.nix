@@ -32,7 +32,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     pce = {
-      url = "git+ssh://git@github.com/monicahung/flightrising?ref=nix&dir=pixel_cats_end";
+      url = "git+ssh://git@github.com/monicahung/flightrising?dir=pixel_cats_end";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence = {
