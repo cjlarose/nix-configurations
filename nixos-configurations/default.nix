@@ -13,7 +13,7 @@
   );
   "palworld" = (
     import ./palworld {
-      inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators;
+      inherit nixpkgs sharedOverlays additionalPackages home-manager;
       stateVersion = "23.11";
     }
   );
