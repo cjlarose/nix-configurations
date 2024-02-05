@@ -23,7 +23,7 @@ This work is heavily influenced by [Mitchell Hasimoto's config](https://github.c
 To build the image
 
 ```sh
-nix build .#nixosConfigurations.builder.config.formats.proxmox
+nix build .#nixosConfigurations.builder.config.system.build.VMA
 ```
 
 Copy the image into the `dump` directroy of a proxmox directory configured for VM backups (e.g. `/var/lib/vz/dump`). From the PVE web UI, restore the VM from the backup, taking care to select "Unique" to autogenerate a new MAC.
