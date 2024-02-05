@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, nixos-generators, pce, impermanence, ... }: {
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, pce, impermanence, ... }: {
   "builder" = (
     import ./builder {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;

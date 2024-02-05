@@ -27,10 +27,6 @@
     tfenv = {
       url = "github:cjlarose/tfenv-nix";
     };
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     pce = {
       url = "git+ssh://git@github.com/monicahung/flightrising?dir=pixel_cats_end";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -46,7 +42,6 @@
     fzfVim,
     home-manager,
     impermanence,
-    nixos-generators,
     nixpkgs,
     nixpkgs-23-05,
     pce,
@@ -66,7 +61,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators pce impermanence;
+          inherit nixpkgs sharedOverlays additionalPackages home-manager pce impermanence;
         }
       );
 
