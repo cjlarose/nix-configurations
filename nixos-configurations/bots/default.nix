@@ -26,12 +26,21 @@ in nixpkgs.lib.nixosSystem {
       ];
       environment.persistence."/persistence" = {
         hideMounts = true;
-        users.bot = {
-          directories = [
-            ".config/chromium/pixel-cats-end"
-            ".config/pce"
-            ".vnc"
-          ];
+        users = {
+          bot = {
+            directories = [
+              ".config/chromium/pixel-cats-end"
+              ".config/pce"
+              ".vnc"
+            ];
+          };
+          cjlarose = {
+            directories = [
+              ".config/chromium/pixel-cats-end"
+              ".ssh"
+              "workspace"
+            ];
+          };
         };
       };
     })
