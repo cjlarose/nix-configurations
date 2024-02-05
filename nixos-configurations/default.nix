@@ -7,7 +7,7 @@
   );
   "bots" = (
     import ./bots {
-      inherit nixpkgs sharedOverlays additionalPackages home-manager nixos-generators pce impermanence;
+      inherit nixpkgs sharedOverlays additionalPackages home-manager pce impermanence;
       stateVersion = "23.11";
     }
   );
