@@ -52,6 +52,25 @@
     ];
   };
 
+  services.postgresql = {
+    enable = true;
+    enableTCPIP = true;
+    authentication = ''
+      # Allow any user on the local system to connect to any database with
+      # any database user name using Unix-domain sockets (the default for local
+      # connections).
+      #
+      # TYPE  DATABASE        USER            ADDRESS                 METHOD
+      local   all             all                                     trust
+
+      # Require password authentication when accessing over TCP/IP, all addresses
+      #
+      # TYPE  DATABASE        USER            ADDRESS                 METHOD
+      host    all             all             0.0.0.0/0               scram-sha-256
+    '';
+    dataDir = "/persistence/postgresql";
+  };
+
   systemd.services."tigervnc-server" = {
     description = "TigerVNC Server";
     wantedBy = [ "multi-user.target" ];
