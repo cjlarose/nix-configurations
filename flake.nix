@@ -3,10 +3,10 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/release-23.11";
+      url = "github:nixos/nixpkgs/nixos-23.11";
     };
     nixpkgs-23-05 = {
-      url = "github:nixos/nixpkgs/release-23.05";
+      url = "github:nixos/nixpkgs/nixos-23.05";
     };
     darwin = {
       url = "github:lnl7/nix-darwin/master";
