@@ -28,7 +28,7 @@
       url = "github:cjlarose/tfenv-nix";
     };
     pce = {
-      url = "git+ssh://git@github.com/monicahung/flightrising?dir=pixel_cats_end";
+      url = "git+ssh://git@github.com/cjlarose/pixel-cats-end-automation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence = {
