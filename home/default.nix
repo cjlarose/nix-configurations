@@ -17,6 +17,7 @@
     commonVariables = {
       EDITOR = "nvr-edit-in-split-window";
       LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
+      THOR_MERGE = "nvr -s -d";
     };
     serverVariables = {
     };
