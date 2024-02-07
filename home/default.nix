@@ -29,8 +29,8 @@
 
   home.packages = let
     commonPackages = [
+      (additionalPackages system).bundix
       pkgs.csvtool
-      pkgs.bundix
       pkgs.dig
       pkgs.docker-client
       pkgs.fluxctl

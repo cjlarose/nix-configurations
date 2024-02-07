@@ -38,9 +38,14 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    bundix = {
+      url = "github:nix-community/bundix";
+      flake = false;
+    };
   };
 
   outputs = {
+    bundix,
     darwin,
     disko,
     fzfProject,
@@ -57,6 +62,7 @@
       additionalPackages = system: {
         go_1_18 = nixpkgs-23-05.legacyPackages.${system}.go_1_18;
         nodejs_20 = nixpkgs.legacyPackages.${system}.nodejs_20;
+        bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
       };
       sharedOverlays = [
         fzfProject.overlay
