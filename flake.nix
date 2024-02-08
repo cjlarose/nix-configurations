@@ -39,7 +39,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     bundix = {
-      url = "github:nix-community/bundix";
+      url = "github:cjlarose/bundix";
       flake = false;
     };
   };
