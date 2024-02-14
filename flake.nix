@@ -62,6 +62,7 @@
       additionalPackages = system: {
         go_1_18 = nixpkgs-23-05.legacyPackages.${system}.go_1_18;
         bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
+        python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
       };
       sharedOverlays = [
         fzfProject.overlay

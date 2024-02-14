@@ -57,6 +57,17 @@
       pkgs.nodejs_20
       pkgs.parallel
       pkgs.postgresql
+      ((additionalPackages system).python39.withPackages (python-pkgs: with python-pkgs; [
+        faker
+        google-cloud-firestore
+        google-cloud-pubsub
+        ipython
+        psycopg2
+        pytz
+        requests
+        setuptools
+        shortuuid
+      ]))
       pkgs.ripgrep
       pkgs.ruby
       pkgs.shellcheck
