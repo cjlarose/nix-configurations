@@ -2,7 +2,6 @@
 let
   system = "x86_64-darwin";
   stateVersion = "23.05";
-  additionalPackagesForSystem = additionalPackages system;
 in {
   "LaRose-MacBook-Pro" = darwin.lib.darwinSystem {
     inherit system;
@@ -29,7 +28,7 @@ in {
         nixpkgs = {
           overlays = sharedOverlays ++ [
             (final: prev: {
-              nodejs = additionalPackagesForSystem.nodejs_20;
+              nodejs = nixpkgs.legacyPackages.${system}.nodejs_20;
             })
           ];
           config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
