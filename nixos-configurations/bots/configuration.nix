@@ -31,10 +31,10 @@
     acceptTerms = true;
     defaults.email = "cjlarose@gmail.com";
     certs = {
-      "bots.toothyshouse.com" = {
+      "pixelcatsend.toothyshouse.com" = {
         dnsPropagationCheck = false;
         dnsProvider = "digitalocean";
-        domain = "bots.toothyshouse.com";
+        domain = "pixelcatsend.toothyshouse.com";
         environmentFile = "/persistence/acme/digitalocean.secret";
       };
     };
@@ -91,7 +91,7 @@
   services.nginx = {
     enable = true;
     virtualHosts = {
-      "bots.toothyshouse.com" = {
+      "pixelcatsend.toothyshouse.com" = {
         enableACME = true;
         acmeRoot = null;
         forceSSL = true;
