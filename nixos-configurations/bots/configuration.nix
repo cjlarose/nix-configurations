@@ -23,6 +23,20 @@
 
   security.sudo.wheelNeedsPassword = false;
 
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+    defaults.server = "https://acme-staging-v02.api.letsencrypt.org/directory";
+    certs = {
+      "bots.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        domain = "bots.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+    };
+  };
+
   environment.systemPackages = with pkgs; [
     iotop
     lsof
