@@ -6,6 +6,10 @@
   networking = {
     hostName = "bots";
     hostId = "d202c7d5";
+    firewall.allowedTCPPorts = [
+      80 # nginx
+      443 # nginx
+    ];
   };
 
   system.stateVersion = stateVersion;
