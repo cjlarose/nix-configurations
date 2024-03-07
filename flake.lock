@@ -220,11 +220,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1709799825,
-        "narHash": "sha256-dh4Kn4jsz7lvB2sFjecuZUO9jhxdU92NKd7eNL8z7Uk=",
+        "lastModified": 1709834263,
+        "narHash": "sha256-ZTdUUmYF5LRYkg3tlG4FnTlo0dyUi72Gqo6GHlT4smg=",
         "ref": "refs/heads/main",
-        "rev": "14702c5a6f316e3daa2162f46b9dfffebab23369",
-        "revCount": 224,
+        "rev": "7e76d561f33e67393c10bae0386493d8880b61aa",
+        "revCount": 229,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
