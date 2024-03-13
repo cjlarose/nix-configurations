@@ -8,6 +8,9 @@
     nixpkgs-23-05 = {
       url = "github:nixos/nixpkgs/nixos-23.05";
     };
+    nixpkgs-unstable = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
     darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,13 +57,14 @@
     impermanence,
     nixpkgs,
     nixpkgs-23-05,
+    nixpkgs-unstable,
     pce,
     self,
     tfenv,
   }:
     let
       additionalPackages = system: {
-        go_1_18 = nixpkgs-23-05.legacyPackages.${system}.go_1_18;
+        go_1_22 = nixpkgs-unstable.legacyPackages.${system}.go_1_22;
         bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
         python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
       };
