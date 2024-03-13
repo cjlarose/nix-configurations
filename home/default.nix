@@ -30,6 +30,7 @@
   home.packages = let
     commonPackages = [
       pkgs.abduco
+      pkgs.atlas
       (additionalPackages system).bundix
       pkgs.csvtool
       pkgs.dig
