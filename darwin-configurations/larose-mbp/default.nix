@@ -47,7 +47,7 @@ in darwin.lib.darwinSystem {
     home-manager.darwinModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.chrislarose = import ../../home;
+      home-manager.users.chrislarose = import ../../home/cjlarose;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
         server = false;

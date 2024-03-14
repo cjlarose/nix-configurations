@@ -21,7 +21,7 @@ in nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.cjlarose = import ../../home;
+      home-manager.users.cjlarose = import ../../home/cjlarose;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
         server = true;
