@@ -11,7 +11,6 @@
       vim-commentary
       vim-sensible
       vim-nix
-      kotlin-vim
       vim-python-pep8-indent
       vim-terraform
       {
