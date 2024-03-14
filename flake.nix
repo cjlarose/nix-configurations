@@ -45,6 +45,10 @@
       url = "github:cjlarose/bundix";
       flake = false;
     };
+    omnisharpVim = {
+      url = "github:OmniSharp/omnisharp-vim";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -58,6 +62,7 @@
     nixpkgs,
     nixpkgs-23-05,
     nixpkgs-unstable,
+    omnisharpVim,
     pce,
     self,
     tfenv,
@@ -72,6 +77,14 @@
         fzfProject.overlay
         fzfVim.overlay
         tfenv.overlays.default
+        (final: prev: {
+          vimPlugins = prev.vimPlugins // {
+            omnisharpVim = with final; vimUtils.buildVimPlugin {
+              name = "omnisharp-vim";
+              src = omnisharpVim;
+            };
+          };
+        })
       ];
     in {
       nixosConfigurations = (

@@ -33,6 +33,7 @@
     pkgs.nodePackages.typescript-language-server
     pkgs.nodePackages.vscode-langservers-extracted
     pkgs.nodejs_20
+    pkgs.omnisharp-roslyn
     pkgs.parallel
     pkgs.ripgrep
     pkgs.ruby

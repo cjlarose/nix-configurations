@@ -8,6 +8,7 @@
     vimAlias = true;
     vimdiffAlias = true;
     plugins = with pkgs.vimPlugins; [
+      omnisharpVim
       vim-commentary
       vim-sensible
       vim-nix
