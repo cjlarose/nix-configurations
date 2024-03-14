@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, disko, ... }:
+{ nixpkgs, sharedOverlays, stateVersion, disko, impermanence, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -22,27 +22,46 @@ in nixpkgs.lib.nixosSystem {
         enableConfig = false; # disable setting filesystems.* automatically
         extraRootModules = [ "zfs" ];
         devices = {
-          disk.main = {
-            imageSize = "4G";
-            device = "/dev/vda";
-            type = "disk";
-            content = {
-              type = "gpt";
-              partitions = {
-                ESP = {
-                  type = "EF00";
-                  size = "500M";
-                  content = {
-                    type = "filesystem";
-                    format = "vfat";
-                    mountpoint = "/boot";
+          disk = {
+            main = {
+              imageSize = "4G";
+              device = "/dev/vda";
+              type = "disk";
+              content = {
+                type = "gpt";
+                partitions = {
+                  ESP = {
+                    type = "EF00";
+                    size = "500M";
+                    content = {
+                      type = "filesystem";
+                      format = "vfat";
+                      mountpoint = "/boot";
+                    };
+                  };
+                  zfs = {
+                    size = "100%";
+                    content = {
+                      type = "zfs";
+                      pool = "tank";
+                    };
                   };
                 };
-                zfs = {
-                  size = "100%";
-                  content = {
-                    type = "zfs";
-                    pool = "tank";
+              };
+            };
+            persistence = {
+              device = "/dev/vdb";
+              type = "disk";
+              content = {
+                type = "gpt";
+                partitions = {
+                  main = {
+                    size = "100%";
+                    content = {
+                      type = "filesystem";
+                      format = "ext4";
+                      mountpoint = "/persistence";
+                    };
                   };
                 };
               };
@@ -70,6 +89,22 @@ in nixpkgs.lib.nixosSystem {
                 };
               };
             };
+          };
+        };
+      };
+    })
+    ({ pkgs, ... } : {
+      imports = [
+        impermanence.nixosModules.impermanence
+      ];
+      environment.persistence."/persistence" = {
+        hideMounts = true;
+        users = {
+          cjlarose = {
+            directories = [
+              ".ssh"
+              "workspace"
+            ];
           };
         };
       };

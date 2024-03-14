@@ -7,7 +7,7 @@
   );
   "bootstrap" = (
     import ./bootstrap {
-      inherit nixpkgs sharedOverlays disko;
+      inherit nixpkgs sharedOverlays disko impermanence;
       stateVersion = "23.11";
     }
   );
