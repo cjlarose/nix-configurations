@@ -4,4 +4,9 @@
       inherit additionalPackages darwin home-manager nixpkgs sharedOverlays;
     }
   );
+  "Monica-MacBook-Pro" = (
+    import ./monica-mbp {
+      inherit additionalPackages darwin home-manager nixpkgs sharedOverlays;
+    }
+  );
 }
