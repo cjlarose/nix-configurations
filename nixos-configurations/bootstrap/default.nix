@@ -56,6 +56,7 @@ in nixpkgs.lib.nixosSystem {
                 type = "gpt";
                 partitions = {
                   main = {
+                    label = "persistence";
                     size = "100%";
                     content = {
                       type = "filesystem";

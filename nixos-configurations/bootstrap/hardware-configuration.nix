@@ -26,7 +26,7 @@
     };
 
   fileSystems."/persistence" =
-    { device = "/dev/disk/by-label/persistence";
+    { device = "/dev/disk/by-partlabel/persistence";
       neededForBoot = true;
       fsType = "ext4";
     };
