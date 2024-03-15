@@ -90,5 +90,27 @@
         };
       };
     };
+
+    fileSystems."/" =
+      { device = "tank/root";
+        fsType = "zfs";
+      };
+
+    fileSystems."/nix" =
+      { device = "tank/nix";
+        fsType = "zfs";
+      };
+
+    fileSystems."/boot" =
+      { device = "/dev/disk/by-partlabel/disk-main-ESP";
+        fsType = "vfat";
+      };
+
+    fileSystems."/persistence" =
+      { device = "/dev/disk/by-partlabel/persistence";
+        neededForBoot = true;
+        fsType = "ext4";
+      };
+
   };
 }
