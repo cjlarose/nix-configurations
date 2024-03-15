@@ -17,6 +17,12 @@
       stateVersion = "23.11";
     }
   );
+  "dns" = (
+    import ./dns {
+      inherit nixpkgs sharedOverlays additionalPackages disko impermanence home-manager;
+      stateVersion = "23.11";
+    }
+  );
   "palworld" = (
     import ./palworld {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
