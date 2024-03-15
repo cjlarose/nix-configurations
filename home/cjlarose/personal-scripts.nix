@@ -28,8 +28,8 @@ let
   trueColorTest = pkgs.stdenv.mkDerivation {
     name = "true-color-test";
     src = fetchGit {
-      url = "https://gist.github.com/09a44b8cf0f9397465614e622979107f.git";
-      rev = "d89f28711c037e53f03e312f6fef11bcc75006f8";
+      url = "https://gist.github.com/db6c5654fa976be33808b8b33a6eb861.git";
+      rev = "1875ff9b84a014214d0ce9d922654bb34001198e";
     };
     buildPhase = ''
       chmod +x 24-bit-color.sh
