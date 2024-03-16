@@ -1,5 +1,8 @@
 { pkgs, ... }: {
-  home.packages = [ pkgs.asdf-vm ];
+  home.packages = [
+    pkgs.asdf-vm
+    pkgs.libyaml # for installing ruby versions
+  ];
 
   programs.zsh = {
     initExtra = ''
