@@ -11,6 +11,11 @@
       allowedTCPPorts = [ 53 ];
       allowedUDPPorts = [ 53 ];
     };
+    nameservers = [ "192.168.2.1" ];
+    defaultGateway = {
+      address = "192.168.2.1";
+      interface = "ens18";
+    };
   };
 
   system.stateVersion = stateVersion;
