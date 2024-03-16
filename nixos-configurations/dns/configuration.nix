@@ -6,6 +6,11 @@
   networking = {
     hostName = "dns";
     hostId = "d202c7d5";
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 53 ];
+      allowedUDPPorts = [ 53 ];
+    };
   };
 
   system.stateVersion = stateVersion;
