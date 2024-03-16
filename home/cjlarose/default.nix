@@ -1,5 +1,6 @@
 { system, pkgs, additionalPackages, stateVersion, server, ... }: {
   imports = [
+    ./asdf.nix
     ./personal-scripts.nix
     ./neovim.nix
   ];
