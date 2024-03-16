@@ -59,7 +59,7 @@
     mutableSettings = false;
     settings = {
       dns = {
-        bind_hosts = ["0.0.0.0"];
+        bind_hosts = ["192.168.2.104"];
         port = 53;
         bootstrap_dns = ["1.1.1.1" "1.0.0.1"];
       };
