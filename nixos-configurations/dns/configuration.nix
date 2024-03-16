@@ -44,6 +44,18 @@
     ];
   };
 
+  services.adguardhome = {
+    enable = true;
+    mutableSettings = false;
+    settings = {
+      dns = {
+        bind_hosts = ["0.0.0.0"];
+        port = 53;
+        bootstrap_dns = ["1.1.1.1" "1.0.0.1"];
+      };
+    };
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
