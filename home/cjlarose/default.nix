@@ -29,9 +29,9 @@
 
   home.packages = let
     commonPackages = [
+      (additionalPackages system).bundix
       pkgs.abduco
       pkgs.atlas
-      (additionalPackages system).bundix
       pkgs.csvtool
       pkgs.dig
       pkgs.docker-client
