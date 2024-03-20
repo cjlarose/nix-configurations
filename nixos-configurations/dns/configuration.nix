@@ -66,6 +66,20 @@
     };
   };
 
+  services.dnsmasq = {
+    enable = true;
+    resolveLocalQueries = false;
+    settings = {
+      addn-hosts = "/persistence/dnsmasq/extra_hosts";
+      bind-interfaces = true;
+      bogus-priv = true;
+      domain-needed = true;
+      listen-address = ["192.168.2.105"];
+      no-resolv = true;
+      server = [];
+    };
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
