@@ -40,7 +40,6 @@
       pkgs.git-filter-repo
       pkgs.gnused
       pkgs.google-cloud-sdk
-      pkgs.gopls
       pkgs.gradle
       pkgs.htop
       pkgs.jdk11
