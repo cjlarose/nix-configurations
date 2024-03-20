@@ -111,6 +111,7 @@
     extraConfig = {
       color.ui = true;
       commit.verbose = true;
+      init.defaultBranch = "main";
       pull.ff = "only";
       rebase.autosquash = true;
       "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
