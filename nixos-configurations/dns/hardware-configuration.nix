@@ -18,6 +18,10 @@
         address = "192.168.2.104";
         prefixLength = 24;
       }
+      {
+        address = "192.168.2.105";
+        prefixLength = 24;
+      }
     ];
   };
 
