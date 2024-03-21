@@ -133,6 +133,22 @@
         "type": "github"
       }
     },
+    "intranetHosts": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1710945991,
+        "narHash": "sha256-6t1Kd8OZ8JV7jNfUAzJr5pT1bFoxCoDZqDEDhvwwI/4=",
+        "ref": "refs/heads/main",
+        "rev": "ab321569c80e88417e7ed59df19330077c26c920",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@github.com/cjlarose/intranet-hosts"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/cjlarose/intranet-hosts"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1707091808,
@@ -210,6 +226,7 @@
         "fzfVim": "fzfVim",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
+        "intranetHosts": "intranetHosts",
         "nixpkgs": "nixpkgs",
         "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-unstable": "nixpkgs-unstable",

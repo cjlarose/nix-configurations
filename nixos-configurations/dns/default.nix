@@ -44,7 +44,7 @@ in nixpkgs.lib.nixosSystem {
         };
       };
     })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
     home-manager.nixosModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;

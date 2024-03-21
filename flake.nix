@@ -45,6 +45,10 @@
       url = "github:cjlarose/bundix";
       flake = false;
     };
+    intranetHosts = {
+      url = "git+ssh://git@github.com/cjlarose/intranet-hosts";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -55,6 +59,7 @@
     fzfVim,
     home-manager,
     impermanence,
+    intranetHosts,
     nixpkgs,
     nixpkgs-23-05,
     nixpkgs-unstable,
@@ -67,6 +72,7 @@
         go_1_22 = nixpkgs-unstable.legacyPackages.${system}.go_1_22;
         bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
         python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
+        inherit intranetHosts;
       };
       sharedOverlays = [
         fzfProject.overlay

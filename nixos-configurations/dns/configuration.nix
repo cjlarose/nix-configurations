@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, system, additionalPackages, ... }: { pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -74,7 +74,7 @@
     enable = true;
     resolveLocalQueries = false;
     settings = {
-      addn-hosts = "/persistence/dnsmasq/extra_hosts";
+      addn-hosts = "${(additionalPackages system).intranetHosts}/hosts";
       bind-interfaces = true;
       bogus-priv = true;
       domain-needed = true;
