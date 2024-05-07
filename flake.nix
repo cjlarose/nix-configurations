@@ -47,6 +47,9 @@
     };
     intranetHosts = {
       url = "git+ssh://git@github.com/cjlarose/intranet-hosts";
+    };
+    omnisharpVim = {
+      url = "github:OmniSharp/omnisharp-vim";
       flake = false;
     };
   };
@@ -63,6 +66,7 @@
     nixpkgs,
     nixpkgs-23-05,
     nixpkgs-unstable,
+    omnisharpVim,
     pce,
     self,
     tfenv,
@@ -78,6 +82,14 @@
         fzfProject.overlay
         fzfVim.overlay
         tfenv.overlays.default
+        (final: prev: {
+          vimPlugins = prev.vimPlugins // {
+            omnisharpVim = with final; vimUtils.buildVimPlugin {
+              name = "omnisharp-vim";
+              src = omnisharpVim;
+            };
+          };
+        })
       ];
     in {
       nixosConfigurations = (
