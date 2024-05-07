@@ -22,6 +22,7 @@ in darwin.lib.darwinSystem {
         };
       };
       services.nix-daemon.enable = true;
+      programs.zsh.enable = true;
       system.stateVersion = 4;
       nix = {
         extraOptions = ''

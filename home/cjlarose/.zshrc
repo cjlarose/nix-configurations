@@ -35,7 +35,6 @@ function set-kubeconfig {
   fi
 }
 
-autoload -U add-zsh-hook
 add-zsh-hook precmd set-kubeconfig
 
 if [ -f ~/.zshlocalrc ]; then
