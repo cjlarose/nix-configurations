@@ -48,6 +48,18 @@
 
   home.shellAliases = {
     gs = "git status";
+    defaultnix = "$EDITOR ~/workspace/cjlarose/nixos-dev-env/home/monicahung/default.nix";
+    rebuild = "darwin-rebuild switch --flake '.#Monica-MacBook-Pro'";
+    rmswp = "find . -type f -name \".*.swp\" -exec rm -f {} \;";
+    git-branch-date2 = "git branch --sort=-committerdate | tail -r | tail -10";
+    git-branch-date = "git branch --sort=committerdate | tail -10";
+    gbd = "git branch -D";
+    gpoh = "git push -u origin HEAD";
+    gd = "git diff";
+    grbc = "git rebase --continue";
+    gc = "git commit -m";
+    gcp = "git cherry-pick";
+    gdn = "git diff --name-only";
   };
 
   programs.zsh = {
