@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, disko, impermanence, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, stateVersion, disko, impermanence, home-manager, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -45,5 +45,14 @@ in nixpkgs.lib.nixosSystem {
       };
     })
     (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system; })
+    home-manager.nixosModules.home-manager {
+      home-manager.useGlobalPkgs = true;
+      home-manager.useUserPackages = true;
+      home-manager.users.cjlarose = import ../../home/cjlarose;
+      home-manager.extraSpecialArgs = {
+        inherit system stateVersion additionalPackages;
+        server = true;
+      };
+    }
   ];
 }

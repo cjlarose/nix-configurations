@@ -7,7 +7,7 @@
   );
   "bootstrap" = (
     import ./bootstrap {
-      inherit nixpkgs sharedOverlays disko impermanence;
+      inherit nixpkgs sharedOverlays additionalPackages disko impermanence home-manager;
       stateVersion = "23.11";
     }
   );
