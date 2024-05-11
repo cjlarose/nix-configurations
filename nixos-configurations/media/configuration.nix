@@ -49,6 +49,14 @@
     ];
   };
 
+  services.openvpn.servers = {
+    pia = {
+      config = ''
+        config /persistence/openvpn/us_california.ovpn
+      '';
+    };
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
