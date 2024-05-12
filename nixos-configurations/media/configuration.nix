@@ -49,11 +49,29 @@
     ];
   };
 
-  services.openvpn.servers = {
-    pia = {
-      config = ''
-        config /persistence/openvpn/us_california.ovpn
-      '';
+  virtualisation.oci-containers = {
+    backend = "docker";
+    containers = {
+      transmission = {
+        image = "haugene/transmission-openvpn";
+        environment = {
+          OPENVPN_PROVIDER = "PIA";
+          OPENVPN_CONFIG = "us_california";
+        };
+        environmentFiles = [
+          "/persistence/transmission-openvpn/.env"
+        ];
+        ports = [
+          "9091:9091"
+        ];
+        volumes = [
+          "/persistence/transmission-openvpn/data:/data"
+          "/persistence/transmission-openvpn/config:/config"
+        ];
+        extraOptions = [
+          "--cap-add=NET_ADMIN"
+        ];
+      };
     };
   };
 
