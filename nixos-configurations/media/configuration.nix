@@ -67,7 +67,7 @@
         image = "haugene/transmission-openvpn";
         environment = {
           OPENVPN_PROVIDER = "PIA";
-          OPENVPN_CONFIG = "us_california";
+          OPENVPN_CONFIG = "ca_ontario";
         };
         environmentFiles = [
           "/persistence/transmission-openvpn/.env"
