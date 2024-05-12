@@ -19,7 +19,12 @@
     nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
   };
 
-  nixpkgs.overlays = sharedOverlays;
+  nixpkgs = {
+    overlays = sharedOverlays;
+    config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+      "plexmediaserver"
+    ];
+  };
 
   environment.systemPackages = with pkgs; [
     git
@@ -47,6 +52,12 @@
         bits = 4096;
       }
     ];
+  };
+
+  services.plex = {
+    enable = true;
+    openFirewall = true;
+    dataDir = "/persistence/plex";
   };
 
   virtualisation.oci-containers = {
