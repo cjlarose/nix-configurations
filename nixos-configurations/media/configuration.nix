@@ -58,6 +58,15 @@
     enable = true;
     openFirewall = true;
     dataDir = "/persistence/plex";
+    package = pkgs.plex.override {
+      plexRaw = pkgs.plexRaw.overrideAttrs (finalAttrs: previousAttrs: {
+        version = "1.40.2.8395-c67dce28e";
+        src = pkgs.fetchurl {
+          url = "https://downloads.plex.tv/plex-media-server-new/${finalAttrs.version}/debian/plexmediaserver_${finalAttrs.version}_amd64.deb";
+          hash = "sha256-gYRhQIf6RaXgFTaigFW1yJ7ndxRmOP6oJSNnr8o0EBM=";
+        };
+      });
+    };
   };
 
   virtualisation.oci-containers = {
