@@ -34,6 +34,7 @@
       "pixelcatsend.toothyshouse.com" = {
         dnsPropagationCheck = false;
         dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
         domain = "pixelcatsend.toothyshouse.com";
         environmentFile = "/persistence/acme/digitalocean.secret";
       };
