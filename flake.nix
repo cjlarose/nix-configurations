@@ -47,6 +47,7 @@
     };
     intranetHosts = {
       url = "git+ssh://git@github.com/cjlarose/intranet-hosts";
+      flake = false;
     };
     omnisharpVim = {
       url = "github:OmniSharp/omnisharp-vim";
