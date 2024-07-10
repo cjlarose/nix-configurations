@@ -53,6 +53,10 @@
       url = "github:OmniSharp/omnisharp-vim";
       flake = false;
     };
+    trueColorTest = {
+      url = "git+https://gist.github.com/db6c5654fa976be33808b8b33a6eb861.git";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -71,6 +75,7 @@
     pce,
     self,
     tfenv,
+    trueColorTest,
   }:
     let
       additionalPackages = system: {
@@ -78,6 +83,19 @@
         bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
         python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
         inherit intranetHosts;
+        trueColorTest = let
+          pkgs = import nixpkgs { inherit system; };
+        in pkgs.stdenv.mkDerivation {
+          name = "true-color-test";
+          src = trueColorTest;
+          buildPhase = ''
+            chmod +x 24-bit-color.sh
+          '';
+          installPhase = ''
+            mkdir -p $out/bin
+            cp 24-bit-color.sh $out/bin
+          '';
+        };
       };
       sharedOverlays = [
         fzfProject.overlay

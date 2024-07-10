@@ -79,6 +79,7 @@
       pkgs.tfenv
       pkgs.tmux
       pkgs.tree
+      (additionalPackages system).trueColorTest
       pkgs.unixtools.watch
       pkgs.wget
       pkgs.wrk
