@@ -60,10 +60,10 @@
     dataDir = "/persistence/plex";
     package = pkgs.plex.override {
       plexRaw = pkgs.plexRaw.overrideAttrs (finalAttrs: previousAttrs: {
-        version = "1.40.3.8555-fef15d30c";
+        version = "1.40.4.8679-424562606";
         src = pkgs.fetchurl {
           url = "https://downloads.plex.tv/plex-media-server-new/${finalAttrs.version}/debian/plexmediaserver_${finalAttrs.version}_amd64.deb";
-          hash = "sha256-mJZHvK2dEaeDmmDwimBn606Ur89yPs/pitzuTFVPS1Q=";
+          hash = "sha256-wVyA70xqZ9T8brPlzjov2j4C9W+RJYo99hO3VtNBVqw=";
         };
       });
     };
