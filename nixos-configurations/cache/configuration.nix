@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { pkgs, config, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -6,6 +6,10 @@
   networking = {
     hostName = "cache";
     hostId = "d202c7d5";
+    firewall.allowedTCPPorts = [
+      80 # nginx
+      443 # nginx
+    ];
   };
 
   system.stateVersion = stateVersion;
@@ -47,6 +51,40 @@
         bits = 4096;
       }
     ];
+  };
+
+  services.nix-serve = {
+    enable = true;
+    secretKeyFile = "/persistence/binary-cache/cache-priv-key.pem";
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+    certs = {
+      "nixcache.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "nixcache.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+    };
+  };
+
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    virtualHosts = {
+      "nixcache.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
+        };
+      };
+    };
   };
 
   programs.ssh.startAgent = true;
