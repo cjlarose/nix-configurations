@@ -3,28 +3,18 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-23.11";
+      url = "github:nixos/nixpkgs/nixos-24.05";
     };
     nixpkgs-23-05 = {
       url = "github:nixos/nixpkgs/nixos-23.05";
-    };
-    nixpkgs-24-05 = {
-      url = "github:nixos/nixpkgs/nixos-24.05";
-    };
-    nixpkgs-unstable = {
-      url = "github:nixos/nixpkgs/nixos-unstable";
     };
     darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    home-manager-24-05 = {
       url = "github:nix-community/home-manager/release-24.05";
-      inputs.nixpkgs.follows = "nixpkgs-24-05";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     fzfVim = {
       url = "github:cjlarose/fzf.vim";
@@ -73,13 +63,10 @@
     fzfProject,
     fzfVim,
     home-manager,
-    home-manager-24-05,
     impermanence,
     intranetHosts,
     nixpkgs,
     nixpkgs-23-05,
-    nixpkgs-24-05,
-    nixpkgs-unstable,
     omnisharpVim,
     pce,
     self,
@@ -88,7 +75,6 @@
   }:
     let
       additionalPackages = system: {
-        go_1_22 = nixpkgs-unstable.legacyPackages.${system}.go_1_22;
         bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
         python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
         inherit intranetHosts;
@@ -122,7 +108,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs nixpkgs-24-05 sharedOverlays additionalPackages home-manager home-manager-24-05 pce impermanence disko;
+          inherit nixpkgs sharedOverlays additionalPackages home-manager pce impermanence disko;
         }
       );
 

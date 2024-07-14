@@ -161,7 +161,7 @@
 
   programs.go = {
     enable = true;
-    package = (additionalPackages system).go_1_22;
+    package = pkgs.go_1_22;
     goPrivate = [
       "bitbucket.org/picktrace"
       "github.com/picktrace"
