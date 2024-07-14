@@ -24,7 +24,7 @@
     };
     home-manager-24-05 = {
       url = "github:nix-community/home-manager/release-24.05";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-24-05";
     };
     fzfVim = {
       url = "github:cjlarose/fzf.vim";

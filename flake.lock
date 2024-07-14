@@ -121,7 +121,7 @@
     "home-manager-24-05": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-24-05"
         ]
       },
       "locked": {
