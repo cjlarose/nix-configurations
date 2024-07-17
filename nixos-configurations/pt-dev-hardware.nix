@@ -21,7 +21,7 @@
     };
 
   fileSystems."/pt-postgresql" =
-    { device = "/dev/disk/by-label/pt-postgresql";
+    { device = "/dev/disk/by-label/pt-dev-postgres";
       fsType = "ext4";
       options = [ "nofail" ];
     };

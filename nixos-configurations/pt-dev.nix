@@ -118,13 +118,6 @@ in nixpkgs.lib.nixosSystem {
         enable = true;
       };
 
-      services.openiscsi = {
-        enable = true;
-        name = "iqn.2020-08.org.linux-iscsi.toothyshouse:pt-dev";
-        enableAutoLoginOut = true;
-        discoverPortal = "192.168.2.102";
-      };
-
       users.mutableUsers = false;
 
       users.users.cjlarose = {
