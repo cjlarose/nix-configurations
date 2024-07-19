@@ -51,7 +51,7 @@ in nixpkgs.lib.nixosSystem {
         enable = true;
         name = "iqn.2020-08.org.linux-iscsi.toothyshouse:photos";
         enableAutoLoginOut = true;
-        discoverPortal = "192.168.2.102";
+        discoverPortal = "192.168.2.102:3261";
         extraConfigFile = "/home/cjlarose/workspace/cjlarose/nixos-dev-env/iscsid.conf";
       };
 
