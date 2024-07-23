@@ -32,6 +32,14 @@ in darwin.lib.darwinSystem {
           experimental-features = nix-command flakes
         '';
         registry.nixpkgs.flake = nixpkgs;
+        settings = {
+          substituters = [
+            "https://nixcache.toothyshouse.com"
+          ];
+          trusted-public-keys = [
+            "nixcache.toothyshouse.com:kAyteiBuGtyLHPkrYNjDY8G5nNT/LHYgClgTwyVCnNQ="
+          ];
+        };
       };
       nixpkgs = {
         overlays = sharedOverlays ++ [
