@@ -181,6 +181,26 @@
         "type": "github"
       }
     },
+    "nvr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1722368791,
+        "narHash": "sha256-BKKT+/6NtIPS2PfK9c5mjrJQuDXWs12KwVUQ5CVDphs=",
+        "owner": "cjlarose",
+        "repo": "nvr",
+        "rev": "243102eef34ff039946ab6e7f273724579dc518e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cjlarose",
+        "repo": "nvr",
+        "type": "github"
+      }
+    },
     "omnisharpVim": {
       "flake": false,
       "locked": {
@@ -229,6 +249,7 @@
         "intranetHosts": "intranetHosts",
         "nixpkgs": "nixpkgs",
         "nixpkgs-23-05": "nixpkgs-23-05",
+        "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
         "tfenv": "tfenv",

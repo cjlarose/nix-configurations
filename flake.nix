@@ -54,6 +54,10 @@
       url = "git+https://gist.github.com/db6c5654fa976be33808b8b33a6eb861.git";
       flake = false;
     };
+    nvr = {
+      url = "github:cjlarose/nvr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -72,6 +76,7 @@
     self,
     tfenv,
     trueColorTest,
+    nvr,
   }:
     let
       additionalPackages = system: {
@@ -91,6 +96,7 @@
             cp 24-bit-color.sh $out/bin
           '';
         };
+        nvr = nvr.packages.${system}.default;
       };
       sharedOverlays = [
         fzfProject.overlay

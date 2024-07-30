@@ -15,7 +15,7 @@
 
   home.sessionVariables = let
     commonVariables = {
-      EDITOR = "nvr-edit-in-split-window";
+      EDITOR = "${(additionalPackages system).nvr}/bin/nvr";
       LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
       THOR_MERGE = "nvr -s -d";
     };
