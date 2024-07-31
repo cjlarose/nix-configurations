@@ -32,6 +32,7 @@
       pkgs.abduco
       pkgs.atlas
       (additionalPackages system).bundix
+      pkgs.corepack
       pkgs.csvtool
       pkgs.dig
       pkgs.docker-client
@@ -83,7 +84,6 @@
       pkgs.unixtools.watch
       pkgs.wget
       pkgs.wrk
-      pkgs.yarn
       pkgs.yq-go
     ];
     serverPackages = [];
