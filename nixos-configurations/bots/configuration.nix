@@ -216,5 +216,17 @@
       isNormalUser = true;
       home = "/home/bot";
     };
+
+    monicahung = {
+      uid = 1002;
+      isNormalUser = true;
+      home = "/home/monicahung";
+      extraGroups = [ "docker" "wheel" ];
+      shell = pkgs.zsh;
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG4F5vSpsdOEj+mVilVSSfr5pTaVklYg4IWRZwpjTUHh monica.hung11@gmail.com"
+      ];
+    };
   };
 }

@@ -43,6 +43,12 @@ in nixpkgs.lib.nixosSystem {
               "workspace"
             ];
           };
+          monicahung = {
+            directories = [
+              ".ssh"
+              "workspace"
+            ];
+          };
         };
       };
     })
@@ -50,6 +56,15 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = import ../../home/cjlarose;
+      home-manager.extraSpecialArgs = {
+        inherit system stateVersion additionalPackages;
+        server = true;
+      };
+    }
+    home-manager.nixosModules.home-manager {
+      home-manager.useGlobalPkgs = true;
+      home-manager.useUserPackages = true;
+      home-manager.users.monicahung = import ../../home/monicahung;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
         server = true;
