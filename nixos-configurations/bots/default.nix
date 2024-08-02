@@ -13,7 +13,7 @@ in nixpkgs.lib.nixosSystem {
         '';
       };
     })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system additionalPackages; })
     ({ pkgs, ... } : {
       imports = [
         impermanence.nixosModules.impermanence

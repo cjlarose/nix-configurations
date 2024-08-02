@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, pce, system, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, ... }: { pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -184,6 +184,44 @@
       ExecStart = ''
         ${pkgs.bash}/bin/bash -c 'source ~/.config/pce/.pce-env && \
         exec ${pce.packages.${system}.default}/bin/rails server --pid /run/pce-rails/server.id'
+      '';
+      Type = "exec";
+      User = "bot";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
+  systemd.services."cs-discord-bot" = {
+    description = "Chicken Smoothie Automation discord bot";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      StandardInput = "null";
+      StandardOutput = "journal";
+      StandardError = "journal";
+      WorkingDirectory = "${(additionalPackages system).chicken-smoothie-automation}";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c 'source ~/.config/chicken-smoothie-automation/.env && \
+        exec ${(additionalPackages system).chicken-smoothie-automation}/bin/discord_bot'
+      '';
+      Type = "exec";
+      User = "bot";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
+  systemd.services."cs-worker" = {
+    description = "Chicken Smoothie Automation worker process";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      StandardInput = "null";
+      StandardOutput = "journal";
+      StandardError = "journal";
+      WorkingDirectory = "${(additionalPackages system).chicken-smoothie-automation}";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c 'source ~/.config/chicken-smoothie-automation/.env && \
+        exec ${(additionalPackages system).chicken-smoothie-automation}/bin/rake solid_queue:start'
       '';
       Type = "exec";
       User = "bot";

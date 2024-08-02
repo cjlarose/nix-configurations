@@ -31,6 +31,9 @@
       url = "git+ssh://git@github.com/cjlarose/pixel-cats-end-automation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    chicken-smoothie-automation = {
+      url = "git+ssh://git@github.com/cjlarose/chicken-smoothie-automation";
+    };
     impermanence = {
       url = "github:nix-community/impermanence";
     };
@@ -77,6 +80,7 @@
     tfenv,
     trueColorTest,
     nvr,
+    chicken-smoothie-automation,
   }:
     let
       additionalPackages = system: {
@@ -97,6 +101,7 @@
           '';
         };
         nvr = nvr.packages.${system}.default;
+        chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
       };
       sharedOverlays = [
         fzfProject.overlay
