@@ -182,7 +182,7 @@
       RuntimeDirectory = "pce-rails";
       PIDFile = "/run/pce-rails/server.pid";
       ExecStart = ''
-        ${pkgs.bash}/bin/bash -c 'echo "RUNTIME_DIRECTORY: $RUNTIME_DIRECTORY"; source ~/.config/pce/.pce-env && \
+        ${pkgs.bash}/bin/bash -c 'source ~/.config/pce/.pce-env && \
         exec ${pce.packages.${system}.default}/bin/rails server --pid /run/pce-rails/server.id'
       '';
       Type = "exec";
