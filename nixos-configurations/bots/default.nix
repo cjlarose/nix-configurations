@@ -31,6 +31,7 @@ in nixpkgs.lib.nixosSystem {
         users = {
           bot = {
             directories = [
+              ".config/chicken-smoothie-automation"
               ".config/chromium/pixel-cats-end"
               ".config/pce"
               ".vnc"
