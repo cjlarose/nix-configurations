@@ -76,7 +76,7 @@
       pkgs.socat
       pkgs.speedtest-cli
       pkgs.stack
-      pkgs.teleport
+      pkgs.teleport_14
       pkgs.tfenv
       pkgs.tmux
       pkgs.tree
