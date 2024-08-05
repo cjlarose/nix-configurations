@@ -23,7 +23,6 @@ in nixpkgs.lib.nixosSystem {
         6443 # k8s API
         8080 # device-sync
         10250 # k8s node API
-        34000 # teleport
       ];
 
       nix = {
