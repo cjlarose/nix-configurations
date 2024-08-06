@@ -21,11 +21,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1722907289,
-        "narHash": "sha256-IspjwUf9Pd/c5B474pUnInjBxcP3qv4Qx5K/E+3IehU=",
+        "lastModified": 1722996760,
+        "narHash": "sha256-9NCVyokfCNZqip3O60dAS5M+j4Sa5RX0pXj7TWK1Kv4=",
         "ref": "refs/heads/main",
-        "rev": "86fbf3fb326797133171568828beaa3800be691f",
-        "revCount": 56,
+        "rev": "cce1a0ca6588705ece126e68c4ca9d820e9cb669",
+        "revCount": 61,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/chicken-smoothie-automation"
       },
@@ -258,11 +258,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1721157592,
-        "narHash": "sha256-gntAWz5T6ucU0c1eh2qPuLLcE6nv0bF4ZHGSCwhmMFw=",
+        "lastModified": 1722978484,
+        "narHash": "sha256-aHr7HahDrkY0AJPJHZkD+TpS2Irb8fRxyWzrznZFlxs=",
         "ref": "refs/heads/main",
-        "rev": "fc3b74874abebe8ae3366b172cdbb0b5d93343c6",
-        "revCount": 242,
+        "rev": "8e31a518a107992cae1d1d2dbc9800e560f39c5b",
+        "revCount": 243,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
