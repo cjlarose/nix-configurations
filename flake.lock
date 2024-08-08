@@ -21,11 +21,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1722996760,
-        "narHash": "sha256-9NCVyokfCNZqip3O60dAS5M+j4Sa5RX0pXj7TWK1Kv4=",
+        "lastModified": 1723077102,
+        "narHash": "sha256-CKAmpaXNEpYFHnHUArRYgyyhKOtTJr79vSRHIwCLjig=",
         "ref": "refs/heads/main",
-        "rev": "cce1a0ca6588705ece126e68c4ca9d820e9cb669",
-        "revCount": 61,
+        "rev": "330cf5a5f12870cbe6f29fe6272cbfd4948be0dc",
+        "revCount": 62,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/chicken-smoothie-automation"
       },
