@@ -29,7 +29,6 @@
     };
     pce = {
       url = "git+ssh://git@github.com/cjlarose/pixel-cats-end-automation";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     chicken-smoothie-automation = {
       url = "git+ssh://git@github.com/cjlarose/chicken-smoothie-automation";
