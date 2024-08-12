@@ -37,10 +37,16 @@
                   };
                 };
                 zfs = {
-                  size = "100%";
+                  end = "-8G";
                   content = {
                     type = "zfs";
                     pool = "tank";
+                  };
+                };
+                swap = {
+                  size = "100%";
+                  content = {
+                    type = "swap";
                   };
                 };
               };
@@ -111,6 +117,10 @@
         neededForBoot = true;
         fsType = "ext4";
       };
+
+    swapDevices = [
+      { device = "/dev/disk/by-partlabel/disk-main-swap"; }
+    ];
 
   };
 }
