@@ -111,7 +111,11 @@
     extraConfig = {
       color.ui = true;
       commit.verbose = true;
+      diff.tool = "nvr";
+      difftool.nvr.cmd = "${pkgs.neovim-remote}/bin/nvr -s -d $LOCAL $REMOTE";
       init.defaultBranch = "main";
+      merge.tool = "nvr";
+      mergetool.nvr.cmd = "${pkgs.neovim-remote}/bin/nvr -s -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd J | wincmd ='";
       pull.ff = "only";
       rebase.autosquash = true;
       "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
