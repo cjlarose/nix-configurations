@@ -17,6 +17,14 @@
     '';
     registry.nixpkgs.flake = nixpkgs;
     nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
+    settings = {
+      substituters = [
+        "https://nixcache.toothyshouse.com"
+      ];
+      trusted-public-keys = [
+        "nixcache.toothyshouse.com:kAyteiBuGtyLHPkrYNjDY8G5nNT/LHYgClgTwyVCnNQ="
+      ];
+    };
   };
 
   nixpkgs.overlays = sharedOverlays;
