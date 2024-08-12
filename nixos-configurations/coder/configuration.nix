@@ -75,6 +75,15 @@
     '';
   };
 
+  services.k3s = {
+    enable = true;
+    role = "server";
+    extraFlags = toString [
+      "--disable traefik"
+      "--disable servicelb"
+    ];
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;

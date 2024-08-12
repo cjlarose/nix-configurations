@@ -27,10 +27,16 @@ in nixpkgs.lib.nixosSystem {
             group = "postgres";
             mode = "0700";
           }
+          "/var/lib/rancher"
+          {
+            directory = "/var/lib/kubelet";
+            mode = "0750";
+          }
         ];
         users = {
           cjlarose = {
             directories = [
+              ".kube"
               ".ssh"
               "workspace"
             ];
