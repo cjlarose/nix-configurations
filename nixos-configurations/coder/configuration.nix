@@ -7,6 +7,7 @@
     hostName = "coder";
     hostId = "d202c7d5";
     firewall.allowedTCPPorts = [
+      80 # coder
       5432 # postgresql
       10250 # k8s node API
     ];
