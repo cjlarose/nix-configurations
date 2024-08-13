@@ -61,7 +61,8 @@ in darwin.lib.darwinSystem {
       home-manager.users.chrislarose = import ../../home/cjlarose;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
-        server = false;
+        include1Password = true;
+        useRemoteDockerHost = true;
       };
     }
   ];

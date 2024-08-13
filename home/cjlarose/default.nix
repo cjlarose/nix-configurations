@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, server, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, include1Password, useRemoteDockerHost, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -19,13 +19,11 @@
       LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
       THOR_MERGE = "nvr -s -d";
     };
-    serverVariables = {
-    };
-    clientVariables = {
+    dockerClientVariables = {
       DOCKER_HOST = "tcp://local.picktrace.dev:2376";
       DOCKER_BUILDKIT = "1";
     };
-  in commonVariables // (if server then serverVariables else clientVariables);
+  in commonVariables // (if useRemoteDockerHost then dockerClientVariables else {});
 
   home.packages = let
     commonPackages = [
@@ -86,11 +84,7 @@
       pkgs.wrk
       pkgs.yq-go
     ];
-    serverPackages = [];
-    clientPackages = [
-      pkgs._1password
-    ];
-  in commonPackages ++ (if server then serverPackages else clientPackages);
+  in commonPackages ++ (if include1Password then [pkgs._1password] else []);
 
   home.shellAliases = {
     gs = "git status";

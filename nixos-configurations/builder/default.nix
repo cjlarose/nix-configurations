@@ -24,7 +24,8 @@ in nixpkgs.lib.nixosSystem {
       home-manager.users.cjlarose = import ../../home/cjlarose;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
-        server = true;
+        include1Password = false;
+        useRemoteDockerHost = true;
       };
     }
   ];
