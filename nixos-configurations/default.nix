@@ -20,6 +20,7 @@
   "cache" = (
     import ./cache {
       inherit nixpkgs home-manager sharedOverlays additionalPackages impermanence;
+      stateVersion = "24.05";
     }
   );
   "coder" = (
