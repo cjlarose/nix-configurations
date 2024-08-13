@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, disko, impermanence, ... }:
+{ nixpkgs, sharedOverlays, stateVersion, disko, impermanence, nixos-generators, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -6,6 +6,11 @@ in nixpkgs.lib.nixosSystem {
   modules = [
     (import ../../nixos-modules/disk-config.nix {
       inherit disko;
+    })
+    ({ pkgs, ... } : {
+      imports = [
+        nixos-generators.nixosModules.all-formats
+      ];
     })
     ({ pkgs, ... } : {
       imports = [

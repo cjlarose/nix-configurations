@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, pce, impermanence, disko, ... }: {
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, pce, impermanence, disko, nixos-generators, ... }: {
   "builder" = (
     import ./builder {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
@@ -7,7 +7,7 @@
   );
   "bootstrap" = (
     import ./bootstrap {
-      inherit nixpkgs sharedOverlays disko impermanence;
+      inherit nixpkgs sharedOverlays disko impermanence nixos-generators;
       stateVersion = "23.11";
     }
   );
