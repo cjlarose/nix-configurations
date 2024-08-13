@@ -63,6 +63,9 @@
       url = "github:cstyles/nvr";
       flake = false;
     };
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+    };
   };
 
   outputs = {

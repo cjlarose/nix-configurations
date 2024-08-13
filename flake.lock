@@ -167,6 +167,40 @@
         "url": "ssh://git@github.com/cjlarose/intranet-hosts"
       }
     },
+    "nixlib": {
+      "locked": {
+        "lastModified": 1728176478,
+        "narHash": "sha256-px3Q0W//c+mZ4kPMXq4poztsjtXM1Ja1rN+825YMDUQ=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "b61309c3c1b6013d36299bc8285612865b3b9e4c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "nixos-generators": {
+      "inputs": {
+        "nixlib": "nixlib",
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1728522165,
+        "narHash": "sha256-UQpsJ0Ev6JBGsCYRlS2oOVvb+eWcDD0xTV3RVlqbeVU=",
+        "owner": "nix-community",
+        "repo": "nixos-generators",
+        "rev": "40c8d30c490414910fc63626ad1b67af7db40cd3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixos-generators",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1722087241,
@@ -217,6 +251,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1728440485,
+        "narHash": "sha256-IHtBawbxDcFDcAPWa30tVkzdcScUUuzCDkLs3WhDoBA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2b58bfe2c0d73341362870a0f1e50b2b8f2e4b84",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1728193676,
         "narHash": "sha256-PbDWAIjKJdlVg+qQRhzdSor04bAPApDqIv2DofTyynk=",
         "owner": "nixos",
@@ -231,7 +281,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
+    "nixpkgs_4": {
       "locked": {
         "lastModified": 1722087241,
         "narHash": "sha256-2ShmEaFi0kJVOEEu5gmlykN5dwjWYWYUJmlRTvZQRpU=",
@@ -281,7 +331,7 @@
     },
     "pce": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1728708288,
@@ -308,7 +358,8 @@
         "home-manager": "home-manager",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
-        "nixpkgs": "nixpkgs_2",
+        "nixos-generators": "nixos-generators",
+        "nixpkgs": "nixpkgs_3",
         "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nvr": "nvr",
