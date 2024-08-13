@@ -6,6 +6,9 @@
   networking = {
     hostName = "coder";
     hostId = "d202c7d5";
+    firewall.allowedTCPPorts = [
+      10250 # k8s node API
+    ];
   };
 
   system.stateVersion = stateVersion;
