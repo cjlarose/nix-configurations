@@ -84,7 +84,6 @@
     role = "server";
     extraFlags = toString [
       "--disable traefik"
-      "--disable servicelb"
     ];
   };
 
