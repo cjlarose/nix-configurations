@@ -199,6 +199,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1723637854,
+        "narHash": "sha256-med8+5DSWa2UnOqtdICndjDAEjxr5D7zaIiK4pn0Q7c=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "c3aa7b8938b17aebd2deecf7be0636000d62a2b9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1720954236,
@@ -298,6 +314,7 @@
         "intranetHosts": "intranetHosts",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-23-05": "nixpkgs-23-05",
+        "nixpkgs-unstable": "nixpkgs-unstable",
         "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",

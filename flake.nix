@@ -8,6 +8,9 @@
     nixpkgs-23-05 = {
       url = "github:nixos/nixpkgs/nixos-23.05";
     };
+    nixpkgs-unstable = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
     darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -73,6 +76,7 @@
     intranetHosts,
     nixpkgs,
     nixpkgs-23-05,
+    nixpkgs-unstable,
     omnisharpVim,
     pce,
     self,
@@ -101,6 +105,7 @@
         };
         nvr = nvr.packages.${system}.default;
         chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
+        atlas = nixpkgs-unstable.legacyPackages.${system}.atlas;
       };
       sharedOverlays = [
         fzfProject.overlay
