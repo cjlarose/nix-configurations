@@ -137,7 +137,6 @@ in nixpkgs.lib.nixosSystem {
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
         include1Password = false;
-        useRemoteDockerHost = false;
       };
     }
   ];

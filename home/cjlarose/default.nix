@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, include1Password, useRemoteDockerHost, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, include1Password, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -13,17 +13,11 @@
     "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
   ];
 
-  home.sessionVariables = let
-    commonVariables = {
-      EDITOR = "${(additionalPackages system).nvr}/bin/nvr";
-      LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
-      THOR_MERGE = "nvr -s -d";
-    };
-    dockerClientVariables = {
-      DOCKER_HOST = "tcp://local.picktrace.dev:2376";
-      DOCKER_BUILDKIT = "1";
-    };
-  in commonVariables // (if useRemoteDockerHost then dockerClientVariables else {});
+  home.sessionVariables = {
+    EDITOR = "${(additionalPackages system).nvr}/bin/nvr";
+    LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
+    THOR_MERGE = "nvr -s -d";
+  };
 
   home.packages = let
     commonPackages = [
