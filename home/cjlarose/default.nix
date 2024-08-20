@@ -36,7 +36,7 @@
       pkgs.gradle
       pkgs.htop
       pkgs.jdk11
-      pkgs.jq
+      (additionalPackages system).wrappedJq
       pkgs.kotlin-language-server
       pkgs.kubectl
       pkgs.kubernetes-helm

@@ -115,6 +115,15 @@
             ${pkgs.ripgrep}/bin/rg --sort path "$@"
           fi
         '';
+        wrappedJq = let
+          pkgs = import nixpkgs { inherit system; };
+        in pkgs.writeShellScriptBin "jq" ''
+          if [ -t 1 ]; then
+            ${pkgs.jq}/bin/jq --color-output "$@" | less
+          else
+            ${pkgs.jq}/bin/jq "$@"
+          fi
+        '';
       };
       sharedOverlays = [
         fzfProject.overlay
