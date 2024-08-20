@@ -106,6 +106,15 @@
         nvr = nvr.packages.${system}.default;
         chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
         atlas = nixpkgs-unstable.legacyPackages.${system}.atlas;
+        wrappedRg = let
+          pkgs = import nixpkgs { inherit system; };
+        in pkgs.writeShellScriptBin "rg" ''
+          if [ -t 1 ]; then
+            ${pkgs.ripgrep}/bin/rg --pretty --sort path "$@" | less
+          else
+            ${pkgs.ripgrep}/bin/rg --sort path "$@"
+          fi
+        '';
       };
       sharedOverlays = [
         fzfProject.overlay

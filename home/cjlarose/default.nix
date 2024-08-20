@@ -62,7 +62,7 @@
         setuptools
         shortuuid
       ]))
-      pkgs.ripgrep
+      (additionalPackages system).wrappedRg
       pkgs.ruby
       pkgs.shellcheck
       pkgs.socat
