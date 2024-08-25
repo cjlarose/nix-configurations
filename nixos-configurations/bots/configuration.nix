@@ -171,6 +171,32 @@
     };
   };
 
+  systemd.timers."pce-shop-dispatcher" = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = [
+        "*-*-* 03:05:00 America/New_York"
+        "*-*-* 09:05:00 America/New_York"
+        "*-*-* 15:05:00 America/New_York"
+        "*-*-* 21:05:00 America/New_York"
+      ];
+      Unit = "pce-shop-dispatcher.service";
+    };
+  };
+
+  systemd.services."pce-shop-dispatcher" = {
+    script = ''
+      set -eu
+
+      source ~/.config/pce/.pce-env
+      exec ${pce.packages.${system}.default}/bin/enqueue_shop_inventory_snapshot_dispatch_worker
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "bot";
+    };
+  };
+
   systemd.services."pce-rails" = {
     description = "Pixel Cat's End Rails server";
     wantedBy = [ "multi-user.target" ];
