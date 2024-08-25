@@ -175,10 +175,10 @@
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = [
-        "*-*-* 03:05:00 America/New_York"
-        "*-*-* 09:05:00 America/New_York"
-        "*-*-* 15:05:00 America/New_York"
-        "*-*-* 21:05:00 America/New_York"
+        "*-*-* 00:05:00 America/New_York"
+        "*-*-* 06:05:00 America/New_York"
+        "*-*-* 12:05:00 America/New_York"
+        "*-*-* 18:05:00 America/New_York"
       ];
       Unit = "pce-shop-dispatcher.service";
     };
