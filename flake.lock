@@ -288,11 +288,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1723436376,
-        "narHash": "sha256-wYzxMOTWVkxXDaSqBGpQMKq/VX5V42it6y7Lr/kZc2M=",
+        "lastModified": 1724608616,
+        "narHash": "sha256-l2nW/KK2Lz8PgFxppH9wOiXFwDKJZB1KhsDA5uW512U=",
         "ref": "refs/heads/main",
-        "rev": "db9d3d3149a9736b1badd7633a2155a81bf493bb",
-        "revCount": 255,
+        "rev": "e3c88f0c454c4f7fe033e02e581988cac7b1260c",
+        "revCount": 264,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
