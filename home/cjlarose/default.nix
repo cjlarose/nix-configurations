@@ -96,6 +96,9 @@
     enable = true;
     userName = "Chris LaRose";
     userEmail = "cjlarose@gmail.com";
+    aliases = {
+      switchoc = "!f() { git switch $1 2>/dev/null || git switch -c $1; }; f";
+    };
     extraConfig = {
       color.ui = true;
       commit.verbose = true;
