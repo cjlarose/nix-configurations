@@ -62,6 +62,7 @@ in darwin.lib.darwinSystem {
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
         include1Password = true;
+        includeDockerClient = false;
       };
     }
   ];

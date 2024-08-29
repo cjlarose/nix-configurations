@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, include1Password, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -27,7 +27,6 @@
       pkgs.corepack
       pkgs.csvtool
       pkgs.dig
-      pkgs.docker-client
       pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
@@ -78,7 +77,9 @@
       pkgs.wrk
       pkgs.yq-go
     ];
-  in commonPackages ++ (if include1Password then [pkgs._1password] else []);
+    onePasswordPackages = (if include1Password then [pkgs._1password] else []);
+    dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
+  in commonPackages ++ onePasswordPackages ++ dockerClientPackages;
 
   home.shellAliases = {
     gs = "git status";
