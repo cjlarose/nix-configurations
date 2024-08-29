@@ -153,5 +153,7 @@
           inherit nixpkgs sharedOverlays additionalPackages darwin home-manager;
         }
       );
+
+      packages = additionalPackages;
     };
 }
