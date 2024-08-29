@@ -14,7 +14,7 @@
   ];
 
   home.sessionVariables = {
-    EDITOR = "${(additionalPackages system).nvr}/bin/nvr";
+    EDITOR = "${additionalPackages.${system}.nvr}/bin/nvr";
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     THOR_MERGE = "nvr -s -d";
   };
@@ -22,8 +22,8 @@
   home.packages = let
     commonPackages = [
       pkgs.abduco
-      (additionalPackages system).atlas
-      (additionalPackages system).bundix
+      additionalPackages.${system}.atlas
+      additionalPackages.${system}.bundix
       pkgs.corepack
       pkgs.csvtool
       pkgs.dig
@@ -35,7 +35,7 @@
       pkgs.gradle
       pkgs.htop
       pkgs.jdk11
-      (additionalPackages system).wrappedJq
+      additionalPackages.${system}.wrappedJq
       pkgs.kotlin-language-server
       pkgs.kubectl
       pkgs.kubernetes-helm
@@ -50,7 +50,7 @@
       pkgs.nodejs_20
       pkgs.parallel
       pkgs.postgresql
-      ((additionalPackages system).python39.withPackages (python-pkgs: with python-pkgs; [
+      (additionalPackages.${system}.python39.withPackages (python-pkgs: with python-pkgs; [
         faker
         google-cloud-firestore
         google-cloud-pubsub
@@ -61,7 +61,7 @@
         setuptools
         shortuuid
       ]))
-      (additionalPackages system).wrappedRg
+      additionalPackages.${system}.wrappedRg
       pkgs.ruby
       pkgs.shellcheck
       pkgs.socat
@@ -71,7 +71,7 @@
       pkgs.tfenv
       pkgs.tmux
       pkgs.tree
-      (additionalPackages system).trueColorTest
+      additionalPackages.${system}.trueColorTest
       pkgs.unixtools.watch
       pkgs.wget
       pkgs.wrk

@@ -225,10 +225,10 @@
       StandardInput = "null";
       StandardOutput = "journal";
       StandardError = "journal";
-      WorkingDirectory = "${(additionalPackages system).chicken-smoothie-automation}";
+      WorkingDirectory = "${additionalPackages.${system}.chicken-smoothie-automation}";
       ExecStart = ''
         ${pkgs.bash}/bin/bash -c 'source ~/.config/chicken-smoothie-automation/.env && \
-        exec ${(additionalPackages system).chicken-smoothie-automation}/bin/discord_bot'
+        exec ${additionalPackages.${system}.chicken-smoothie-automation}/bin/discord_bot'
       '';
       Type = "exec";
       User = "bot";
@@ -244,10 +244,10 @@
       StandardInput = "null";
       StandardOutput = "journal";
       StandardError = "journal";
-      WorkingDirectory = "${(additionalPackages system).chicken-smoothie-automation}";
+      WorkingDirectory = "${additionalPackages.${system}.chicken-smoothie-automation}";
       ExecStart = ''
         ${pkgs.bash}/bin/bash -c 'source ~/.config/chicken-smoothie-automation/.env && \
-        exec ${(additionalPackages system).chicken-smoothie-automation}/bin/rake solid_queue:start'
+        exec ${additionalPackages.${system}.chicken-smoothie-automation}/bin/rake solid_queue:start'
       '';
       Type = "exec";
       User = "bot";

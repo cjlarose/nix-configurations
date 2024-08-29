@@ -74,7 +74,7 @@
     enable = true;
     resolveLocalQueries = false;
     settings = {
-      addn-hosts = "${(additionalPackages system).intranetHosts}/hosts";
+      addn-hosts = "${additionalPackages.${system}.intranetHosts}/hosts";
       bind-interfaces = true;
       bogus-priv = true;
       domain-needed = true;

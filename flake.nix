@@ -86,45 +86,48 @@
     chicken-smoothie-automation,
   }:
     let
-      additionalPackages = system: {
-        bundix = import "${bundix}/default.nix" { pkgs = nixpkgs.legacyPackages.${system}; };
-        python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
-        inherit intranetHosts;
-        trueColorTest = let
-          pkgs = import nixpkgs { inherit system; };
-        in pkgs.stdenv.mkDerivation {
-          name = "true-color-test";
-          src = trueColorTest;
-          buildPhase = ''
-            chmod +x 24-bit-color.sh
+      supportedPlatforms = [
+        "x86_64-linux"
+        "x86_64-darwin"
+      ];
+
+      additionalPackages = nixpkgs.lib.genAttrs supportedPlatforms (system:
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in {
+          atlas = nixpkgs-unstable.legacyPackages.${system}.atlas;
+          chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
+          bundix = import "${bundix}/default.nix" { inherit pkgs; };
+          intranetHosts = intranetHosts;
+          nvr = nvr.packages.${system}.default;
+          python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
+          trueColorTest = pkgs.stdenv.mkDerivation {
+            name = "true-color-test";
+            src = trueColorTest;
+            buildPhase = ''
+              chmod +x 24-bit-color.sh
+            '';
+            installPhase = ''
+              mkdir -p $out/bin
+              cp 24-bit-color.sh $out/bin
+            '';
+          };
+          wrappedJq = pkgs.writeShellScriptBin "jq" ''
+            if [ -t 1 ]; then
+              ${pkgs.jq}/bin/jq --color-output "$@" | less
+            else
+              ${pkgs.jq}/bin/jq "$@"
+            fi
           '';
-          installPhase = ''
-            mkdir -p $out/bin
-            cp 24-bit-color.sh $out/bin
+          wrappedRg = pkgs.writeShellScriptBin "rg" ''
+            if [ -t 1 ]; then
+              ${pkgs.ripgrep}/bin/rg --pretty --sort path "$@" | less
+            else
+              ${pkgs.ripgrep}/bin/rg --sort path "$@"
+            fi
           '';
-        };
-        nvr = nvr.packages.${system}.default;
-        chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
-        atlas = nixpkgs-unstable.legacyPackages.${system}.atlas;
-        wrappedRg = let
-          pkgs = import nixpkgs { inherit system; };
-        in pkgs.writeShellScriptBin "rg" ''
-          if [ -t 1 ]; then
-            ${pkgs.ripgrep}/bin/rg --pretty --sort path "$@" | less
-          else
-            ${pkgs.ripgrep}/bin/rg --sort path "$@"
-          fi
-        '';
-        wrappedJq = let
-          pkgs = import nixpkgs { inherit system; };
-        in pkgs.writeShellScriptBin "jq" ''
-          if [ -t 1 ]; then
-            ${pkgs.jq}/bin/jq --color-output "$@" | less
-          else
-            ${pkgs.jq}/bin/jq "$@"
-          fi
-        '';
-      };
+        }
+      );
+
       sharedOverlays = [
         fzfProject.overlay
         fzfVim.overlay
