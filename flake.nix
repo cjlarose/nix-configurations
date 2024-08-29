@@ -60,8 +60,8 @@
       flake = false;
     };
     nvr = {
-      url = "github:cjlarose/nvr";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:cstyles/nvr";
+      flake = false;
     };
   };
 
@@ -98,7 +98,15 @@
           chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
           bundix = import "${bundix}/default.nix" { inherit pkgs; };
           intranetHosts = intranetHosts;
-          nvr = nvr.packages.${system}.default;
+          nvr = let
+            manifest = (pkgs.lib.importTOML "${nvr.outPath}/Cargo.toml").package;
+          in
+            pkgs.rustPlatform.buildRustPackage {
+              pname = manifest.name;
+              version = manifest.version;
+              cargoLock.lockFile = "${nvr.outPath}/Cargo.lock";
+              src = pkgs.lib.cleanSource nvr.outPath;
+            };
           python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
           trueColorTest = pkgs.stdenv.mkDerivation {
             name = "true-color-test";

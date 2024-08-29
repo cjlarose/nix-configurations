@@ -248,21 +248,17 @@
       }
     },
     "nvr": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
+      "flake": false,
       "locked": {
-        "lastModified": 1722368791,
-        "narHash": "sha256-BKKT+/6NtIPS2PfK9c5mjrJQuDXWs12KwVUQ5CVDphs=",
-        "owner": "cjlarose",
+        "lastModified": 1724721228,
+        "narHash": "sha256-zh1t2WlPipZ5+8DAkGVZ4pitrOaq5y1vxk/uKT9aYJI=",
+        "owner": "cstyles",
         "repo": "nvr",
-        "rev": "243102eef34ff039946ab6e7f273724579dc518e",
+        "rev": "1560b20db77fa0b0e03190f976f658e9f1365000",
         "type": "github"
       },
       "original": {
-        "owner": "cjlarose",
+        "owner": "cstyles",
         "repo": "nvr",
         "type": "github"
       }
