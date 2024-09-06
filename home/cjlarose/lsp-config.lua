@@ -52,7 +52,7 @@ require('lspconfig')['eslint'].setup{
   on_attach = on_attach,
 }
 
-require('lspconfig')['nil_ls'].setup{
+require('lspconfig')['nil_ls'].setup{ -- nix files
   on_attach = on_attach,
 }
 
