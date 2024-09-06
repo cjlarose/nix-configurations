@@ -58,20 +58,3 @@ require('lspconfig')['nil_ls'].setup{ -- nix files
 
 -- Format go files on write
 vim.cmd [[autocmd BufWritePre *.go lua vim.lsp.buf.format { async = false }]]
-
--- Invoke prettier on write
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = { "*.js", "*.ts", "*.jsx", "*.tsx", "*.css", "*.scss", "*.html", "*.json", "*.md" },
-  callback = function()
-    -- Check if .prettierrc exists in the current directory or its parents
-    if vim.fn.findfile('.prettierrc', '.;') ~= '' then
-      local result = vim.fn.system('prettier --write ' .. vim.fn.expand('%'))
-      if vim.v.shell_error ~= 0 then
-        print("Prettier error: " .. result)
-      else
-        -- Reload the buffer to reflect changes
-        vim.cmd("edit!")
-      end
-    end
-  end,
-})
