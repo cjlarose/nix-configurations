@@ -55,6 +55,7 @@
         config = ''
           let g:prettier#autoformat = 1
           let g:prettier#autoformat_require_pragma = 0
+          let g:prettier#config#trailing_comma = 'all'
         '';
       }
     ];
