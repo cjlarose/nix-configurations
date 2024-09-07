@@ -13,7 +13,7 @@ __kube_ps1() {
 
 setopt prompt_subst
 . "${GIT_PACKAGE_DIR}"/share/git/contrib/completion/git-prompt.sh
-PROMPT='[%m] %~ %F{green}$(__git_ps1 "%s ")%f$(__kube_ps1)$ '
+PROMPT='[%m] %~ %F{green}$(GIT_PS1_SHOWCOLORHINTS=1 GIT_PS1_SHOWUPSTREAM=git GIT_PS1_SHOWDIRTYSTATE=1 __git_ps1 "%s ")%f$(__kube_ps1)$ '
 
 # Allow command line editing in an external editor
 autoload -Uz edit-command-line
