@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -31,7 +31,6 @@
       pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
-      pkgs.gnused
       pkgs.google-cloud-sdk
       pkgs.gradle
       pkgs.htop
@@ -80,7 +79,8 @@
     ];
     onePasswordPackages = (if include1Password then [pkgs._1password] else []);
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
-  in commonPackages ++ onePasswordPackages ++ dockerClientPackages;
+    gnuSedPackages = (if includeGnuSed then [pkgs.gnused] else []);
+  in commonPackages ++ onePasswordPackages ++ dockerClientPackages ++ gnuSedPackages;
 
   home.shellAliases = {
     gs = "git status";

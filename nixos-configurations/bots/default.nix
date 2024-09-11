@@ -61,6 +61,7 @@ in nixpkgs.lib.nixosSystem {
         inherit system stateVersion additionalPackages;
         include1Password = false;
         includeDockerClient = false;
+        includeGnuSed = true;
       };
     }
     home-manager.nixosModules.home-manager {

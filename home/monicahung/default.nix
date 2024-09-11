@@ -23,7 +23,6 @@
     pkgs.dig
     pkgs.docker-client
     pkgs.git-absorb
-    pkgs.gnused
     pkgs.htop
     pkgs.jq
     pkgs.neovim-remote

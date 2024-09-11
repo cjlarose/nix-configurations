@@ -63,6 +63,7 @@ in darwin.lib.darwinSystem {
         inherit system stateVersion additionalPackages;
         include1Password = true;
         includeDockerClient = false;
+        includeGnuSed = false;
       };
     }
   ];
