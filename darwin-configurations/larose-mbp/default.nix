@@ -40,6 +40,10 @@ in darwin.lib.darwinSystem {
             "nixcache.toothyshouse.com:kAyteiBuGtyLHPkrYNjDY8G5nNT/LHYgClgTwyVCnNQ="
           ];
         };
+        nixPath = [
+          "nixpkgs=${nixpkgs}"
+          "darwin=${darwin}"
+        ];
       };
       nixpkgs = {
         overlays = sharedOverlays ++ [
