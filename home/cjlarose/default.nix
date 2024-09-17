@@ -42,6 +42,7 @@
       pkgs.kubernetes-helm
       pkgs.kubeseal
       pkgs.kustomize
+      additionalPackages.${system}.latex2html
       pkgs.neovim-remote
       pkgs.nil
       pkgs.nodePackages.bash-language-server

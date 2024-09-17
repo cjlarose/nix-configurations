@@ -98,6 +98,22 @@
           chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
           bundix = import "${bundix}/default.nix" { inherit pkgs; };
           intranetHosts = intranetHosts;
+          latex2html = pkgs.latex2html.overrideAttrs {
+            configurePhase = ''
+              ./configure \
+                --prefix="$out" \
+                --without-mktexlsr \
+                --with-texpath=$out/share/texmf/tex/latex/html \
+                --with-tex=${pkgs.texliveFull}/bin/tex \
+                --with-latex=${pkgs.texliveFull}/bin/latex \
+                --with-pdflatex=${pkgs.texliveFull}/bin/pdflatex \
+                --with-lualatex=${pkgs.texliveFull}/bin/lualatex \
+                --with-dvilualatex=${pkgs.texliveFull}/bin/dvilualatex \
+                --with-dvips=${pkgs.texliveFull}/bin/dvips \
+                --with-dvipng=${pkgs.texliveFull}/bin/dvipng \
+                --with-pdftocairo=${pkgs.poppler_utils}/bin/pdftocairo
+            '';
+          };
           nvr = let
             manifest = (pkgs.lib.importTOML "${nvr.outPath}/Cargo.toml").package;
           in
