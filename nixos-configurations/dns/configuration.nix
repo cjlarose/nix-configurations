@@ -63,6 +63,7 @@
         port = 53;
         bootstrap_dns = ["1.1.1.1" "1.0.0.1"];
         upstream_dns = [
+          "https://dns.cloudflare.com/dns-query"
           "[/picktrace.dev/]192.168.2.105"
           "[/toothyshouse.com/]192.168.2.105"
         ];
