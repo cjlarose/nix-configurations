@@ -78,11 +78,19 @@
       commit.verbose = true;
       pull.ff = "only";
       rebase.autosquash = true;
+      gpg.format = "ssh";
+      "gpg \"ssh\"" = {
+        program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+      };
     };
     ignores = [
       "[._]*.s[a-w][a-z]"
       "[._]s[a-w][a-z]"
     ];
+    signing = {
+      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE4ftRm9tJtFBks5PtRi+gf7yFMhjaZ3zxGHd/B/tcBb";
+      signByDefault = true;
+    };
   };
 
   programs.ssh = {
