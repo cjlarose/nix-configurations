@@ -99,6 +99,12 @@
       AddKeysToAgent = "yes";
     };
     extraConfig = "IdentityAgent \"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\"";
+    matchBlocks = {
+      "gitlab gitlab.1password.io ssh.gitlab.1password.io" = {
+        hostname = "ssh.gitlab.1password.io";
+        port = 2227;
+      };
+    };
   };
 
   programs.fzf = {
