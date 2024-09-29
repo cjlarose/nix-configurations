@@ -58,6 +58,7 @@ in darwin.lib.darwinSystem {
       home-manager.users."monica.hung" = import ../../home/monicahung;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
+        configurationName = "Monica-MacBook-Pro-Work";
       };
     }
   ];

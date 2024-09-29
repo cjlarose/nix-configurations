@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, configurationName, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -48,7 +48,7 @@
   home.shellAliases = {
     gs = "git status";
     defaultnix = "$EDITOR ~/workspace/cjlarose/nixos-dev-env/home/monicahung/default.nix";
-    rebuild = "darwin-rebuild switch --flake '.#Monica-MacBook-Pro'";
+    rebuild = "darwin-rebuild switch --flake '.#${configurationName}'";
     rmswp = "find . -type f -name \".*.swp\" -exec rm -f {} \;";
     git-branch-date2 = "git branch --sort=-committerdate | tail -r | tail -10";
     git-branch-date = "git branch --sort=committerdate | tail -10";
