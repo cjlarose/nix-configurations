@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, configurationName, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, configurationName, email, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -72,7 +72,7 @@
   programs.git = {
     enable = true;
     userName = "Monica Hung";
-    userEmail = "monica.hung11@gmail.com";
+    userEmail = email;
     extraConfig = {
       color.ui = true;
       commit.verbose = true;

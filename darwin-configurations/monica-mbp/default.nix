@@ -59,6 +59,7 @@ in darwin.lib.darwinSystem {
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
         configurationName = "Monica-MacBook-Pro-Home";
+        email = "monica.hung11@gmail.com";
       };
     }
   ];
