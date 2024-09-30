@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, configurationName, email, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, configurationName, email, yarnOverride, ... }: {
   imports = [
     ./personal-scripts.nix
     ./neovim.nix
@@ -50,21 +50,25 @@
     pkgs._1password
   ];
 
-  home.shellAliases = {
-    gs = "git status";
-    defaultnix = "$EDITOR ~/workspace/cjlarose/nixos-dev-env/home/monicahung/default.nix";
-    rebuild = "darwin-rebuild switch --flake '.#${configurationName}'";
-    rmswp = "find . -type f -name \".*.swp\" -exec rm -f {} \;";
-    git-branch-date2 = "git branch --sort=-committerdate | tail -r | tail -10";
-    git-branch-date = "git branch --sort=committerdate | tail -10";
-    gbd = "git branch -D";
-    gpoh = "git push -u origin HEAD";
-    gd = "git diff";
-    grbc = "git rebase --continue";
-    gc = "git commit -m";
-    gcp = "git cherry-pick";
-    gdn = "git diff --name-only";
-  };
+  home.shellAliases = let
+    standardAliases = {
+      gs = "git status";
+      defaultnix = "$EDITOR ~/workspace/cjlarose/nixos-dev-env/home/monicahung/default.nix";
+      rebuild = "darwin-rebuild switch --flake '.#${configurationName}'";
+      rmswp = "find . -type f -name \".*.swp\" -exec rm -f {} \;";
+      git-branch-date2 = "git branch --sort=-committerdate | tail -r | tail -10";
+      git-branch-date = "git branch --sort=committerdate | tail -10";
+      gbd = "git branch -D";
+      gpoh = "git push -u origin HEAD";
+      gd = "git diff";
+      grbc = "git rebase --continue";
+      gc = "git commit -m";
+      gcp = "git cherry-pick";
+      gdn = "git diff --name-only";
+      cdb5 = "cd ~/go/src/go.1password.io/b5";
+    };
+    yarnAliases = (if yarnOverride then {yarn="op run --account agilebits --no-masking -- yarn";} else {});
+  in standardAliases // yarnAliases;
 
   programs.zsh = {
     enable = true;

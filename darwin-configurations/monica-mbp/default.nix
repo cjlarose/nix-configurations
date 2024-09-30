@@ -63,6 +63,7 @@ in darwin.lib.darwinSystem {
         inherit system stateVersion additionalPackages;
         configurationName = "Monica-MacBook-Pro-Home";
         email = "monica.hung11@gmail.com";
+        yarnOverride = false;
       };
     }
   ];
