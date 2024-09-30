@@ -8,6 +8,8 @@
 
   home.sessionPath = [
     "$HOME/.yarn/bin"
+    "$HOME/.config/yarn/global/node_modules/.bin"
+    "$HOME/go/bin"
     "$HOME/Library/Android/sdk/platform-tools"
     "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
   ];
@@ -16,6 +18,7 @@
     EDITOR = "nvr-edit-in-split-window";
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     THOR_MERGE = "nvr -s -d";
+    GOPATH = "$HOME/go";
   };
 
   home.packages = [
@@ -43,6 +46,7 @@
     pkgs.wget
     pkgs.wrk
     pkgs.yarn
+    pkgs.gnupg
   ];
 
   home.shellAliases = {
@@ -111,5 +115,10 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.go = {
+    enable = true;
+    package = pkgs.go_1_21;
   };
 }
