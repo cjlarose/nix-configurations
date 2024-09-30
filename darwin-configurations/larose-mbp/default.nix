@@ -6,7 +6,7 @@
   sharedOverlays
 }:
 let
-  system = "x86_64-darwin";
+  system = "aarch64-darwin";
   stateVersion = "23.05";
 in darwin.lib.darwinSystem {
   inherit system;
