@@ -75,8 +75,14 @@ nixos-rebuild switch --flake 'github:cjlarose/nixos-dev-env#bots'
 
 ## Client Setup (Mac)
 
-Install [nix-darwin](https://github.com/LnL7/nix-darwin). Clone this repo. To rebuild,
+Clone this repo. To build for the first time,
 
+```sh
+nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake '.#LaRose-MacBook-Pro'
 ```
-darwin-rebuild switch --flake .
+
+For subsequent builds,
+
+```sh
+darwin-rebuild switch --flake '.#LaRose-MacBook-Pro'
 ```
