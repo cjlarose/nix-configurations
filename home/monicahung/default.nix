@@ -47,6 +47,7 @@
     pkgs.wrk
     pkgs.yarn
     pkgs.gnupg
+    pkgs._1password
   ];
 
   home.shellAliases = {

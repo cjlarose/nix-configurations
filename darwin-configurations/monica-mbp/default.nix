@@ -47,6 +47,9 @@ in darwin.lib.darwinSystem {
             nodejs = nixpkgs.legacyPackages.${system}.nodejs_20;
           })
         ];
+        config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+          "1password-cli"
+        ];
       };
       users.users.monicahung = {
         home = "/Users/monicahung";
