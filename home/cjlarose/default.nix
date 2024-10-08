@@ -1,8 +1,10 @@
 { system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, ... }: {
-  imports = [
-    ./personal-scripts.nix
-    ./neovim.nix
-  ];
+  imports = let
+    baseImports = [
+      ./personal-scripts.nix
+      ./neovim.nix
+    ];
+  in baseImports ++ (if include1Password then [./1password.nix] else []);
 
   home.stateVersion = stateVersion;
 
@@ -78,10 +80,9 @@
       pkgs.wrk
       pkgs.yq-go
     ];
-    onePasswordPackages = (if include1Password then [pkgs._1password] else []);
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
     gnuSedPackages = (if includeGnuSed then [pkgs.gnused] else []);
-  in commonPackages ++ onePasswordPackages ++ dockerClientPackages ++ gnuSedPackages;
+  in commonPackages ++ dockerClientPackages ++ gnuSedPackages;
 
   home.shellAliases = {
     gs = "git status";
@@ -124,13 +125,6 @@
   programs.ssh = {
     enable = true;
     addKeysToAgent = "yes";
-    extraConfig = (
-      if include1Password
-      then ''
-        IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-      ''
-      else ""
-    );
   };
 
   programs.direnv = {
