@@ -17,7 +17,6 @@ in nixpkgs.lib.nixosSystem {
       networking.firewall.allowedTCPPorts = [
         80 # ingress-nginx
         443 # ingress-nginx
-        2376 # docker daemon
         3000 # web-client
         5432 # postgresql
         6443 # k8s API
