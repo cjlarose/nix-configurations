@@ -120,6 +120,9 @@
       "[._]*.s[a-w][a-z]"
       "[._]s[a-w][a-z]"
     ];
+    delta = {
+      enable = true;
+    };
   };
 
   programs.ssh = {
