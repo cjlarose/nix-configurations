@@ -1,88 +1,28 @@
-# NixOS Development Environment
+# nix-configurations
 
-This repository contains the configuration for my daily driver development environment. Using NixOS forces me to define the configuration for the system in code. This is great for a number of resasons, in particular,
+This repository contains a [Nix](https://nixos.org/) [flake](https://nixos.wiki/wiki/Flakes) that describe the configurations for several NixOS VMs and a few [`nix-darwin`](https://github.com/LnL7/nix-darwin) machines I use. Most of the work in this repository is not usable out-of-the-box for anyone but myself, but the patterns contained within can be of use to anyone looking to learn how to organize a bunch of Nix configurations or how to set up their own NixOS or `nix-darwin` machines.
 
-1. I can set up a new machine for software development quickly
-1. I can review the history of the rationale for changes I make to my development environment (assuming I wrote myself nice commit messages)
-1. I can experiment with new approaches easily and rollback if I want to
+## NixOs Configurations
 
-## How I work
+Some NixOS configurations in the repository of note:
 
-I split development work between an Apple Silion Mac and an x86 server. I use graphical applications, including my web browser, directly on my Mac. I also have a terminal emulator installed ([wezterm](https://wezfurlong.org/wezterm/)) on my Mac. From the terminal emulator, I edit files on my Mac in `neovim`. When I want to actually run a service, I build container images remotely (docker client running on the Mac, docker server running on the remote machine), and deploy them to a kubernetes cluster running on the server.
+* `.#nixosConfigurations.bootstrap` is used to set up new NixOS VMs. It contains a [disko](https://github.com/nix-community/disko) configuration that describes a disk layout I like, an [impermanence](https://github.com/nix-community/impermanence) configuration, some SSH server config so I can log in, and not much else. As soon as I can SSH into a VM built with this config, I'll switch to the config I actually want to use.
+* `.#nixosConfigurations.cache` is used as a Nix [substituter (binary cache)](https://nixos.wiki/wiki/Binary_Cache). I have many machines on my LAN that download the same set of packages, and they're all configured to use this machine as a cache before hitting `cache.nixos.org`.
+* `.#nixosConfigurations.dns` provides two DNS servers on two different addresses. One is an [Adguard Home](https://github.com/AdguardTeam/AdGuardHome) instance and the other is Dnsmasq server that acts as the authority for hosts on my LAN.
+* `.#nixosConfigurations.media` runs Plex and `transmission`.
+* `.#nixosConfigurations.photos` runs [Photoprism](https://www.photoprism.app/) inside a single-node k3s cluster.
 
-Why do I prefer to edit the files on the Mac instead of just editing them over an `ssh` connection? I have in the past just edited files on the remote machine, but I could never really get copy/paste working in a way I was happy with. Also, I really like to have my editor configured correctly on the Mac itself for when I just want to open up a local log file or CSV file or something and mess with it quickly.
+## nix-darwin Configurations
 
-This work is heavily influenced by [Mitchell Hasimoto's config](https://github.com/mitchellh/nixos-config), but has some major differences, including
+`.#darwinConfigurations.LaRose-MacBook-Pro` is the configuration for my daily driver macOS machine. It doesn't do anything too fancy: it just sets up my shell, the Nix package manager, and my user/home directory configuration (described in the next section).
 
-1. That project configures the NixOS machine as VM installed on a hypervisor running on the Mac. I prefer instead to run the VM on a remote proxmox server.
-1. In this project, the VM itself does not have any graphical tools installed (no desktop environment, window manager, etc). If I ever need console access to it, I usually just use `ssh`.
-1. This config is fully [flake](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html)-based.
+## Home Manager configuration
 
-## NixOS binary cache (substituter) and remote builder
+My [Home Manager](https://github.com/nix-community/home-manager) configuration is available at [`home/cjlarose/default.nix`](home/cjlarose/default.nix). It manages
 
-To build the image
+* My Nix profile, including all of the programs I want to be available on my `$PATH`
+* My `neovim` configuration, together with all of my plugins, themselves managed via Nix
+* My `git` configuration
+* My `zsh` configuration, including my `$PATH`, prompt, aliases, and some environment variables
 
-```sh
-nix build .#nixosConfigurations.builder.config.system.build.VMA
-```
-
-Copy the image into the `dump` directroy of a proxmox directory configured for VM backups (e.g. `/var/lib/vz/dump`). From the PVE web UI, restore the VM from the backup, taking care to select "Unique" to autogenerate a new MAC.
-
-## Server Setup (using NixOS installation ISO)
-
-First, create a new VM in proxmox. Use OVMF rather than SeaBIOS and attach the NixOS installation ISO. On the EFI disk, remove the preenrolled keys. Configure the EFI boot order to boot from the CD/DVD drive before the hard disk. When the VM boots up, identify the block device to use for installation using `lsblk` (it's `/dev/sda` in my example below). We'll clone the repo and perform the initial install onto that block device.
-
-```sh
-sudo su -
-cd /tmp
-curl -L  https://github.com/cjlarose/nixos-dev-env/tarball/main -o nixos-dev-env.tar.gz
-tar -zxvf nixos-dev-env.tar.gz
-cd cjlarose-nixos-dev-env*
-./bootstrap.sh /dev/sda
-nixos-install --no-root-password --flake '.#pt-dev'
-shutdown -h now
-```
-
-Remove the installation media from the VM and login over SSH.
-
-```sh
-ssh cjlarose@pt-dev.local
-```
-
-From here, I normally clone the repo again to my home directory. If I make any changes, I execute the following to realize those changes:
-
-```
-sudo nixos-rebuild switch --flake '.#pt-dev'
-```
-
-## Server Setup (using VM disk image)
-
-To build the image
-
-```sh
-nix build .#nixosConfigurations.bootstrap.config.system.build.VMA
-```
-
-Copy the image into the `dump` directroy of a proxmox directory configured for VM backups (e.g. `/var/lib/vz/dump`). From the PVE web UI, restore the VM from the backup, taking care to select "Unique" to autogenerate a new MAC.
-
-Log in via SSH and switch configurations
-
-```
-sudo su -
-nix-channel --update
-nixos-rebuild switch --flake 'github:cjlarose/nixos-dev-env#bots'
-```
-
-## Client Setup (Mac)
-
-Clone this repo. To build for the first time,
-
-```sh
-nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake '.#LaRose-MacBook-Pro'
-```
-
-For subsequent builds,
-
-```sh
-darwin-rebuild switch --flake '.#LaRose-MacBook-Pro'
-```
+I use the same home configuration on all of my NixOS VMs as well as on my Mac, so I have a consistent experience across all machines I interact with regularly.
