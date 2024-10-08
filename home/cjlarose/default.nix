@@ -123,9 +123,7 @@
 
   programs.ssh = {
     enable = true;
-    extraOptionOverrides = {
-      AddKeysToAgent = "yes";
-    };
+    addKeysToAgent = "yes";
     extraConfig = (
       if include1Password
       then ''
