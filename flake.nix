@@ -164,6 +164,10 @@
         }
       );
 
+      diskoConfigurations = (
+        import ./disko-configurations {}
+      );
+
       packages = additionalPackages;
     };
 }
