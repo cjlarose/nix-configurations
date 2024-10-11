@@ -53,6 +53,12 @@
       stateVersion = "23.05";
     }
   );
+  "pt-docker" = (
+    import ./pt-docker {
+      inherit nixpkgs home-manager sharedOverlays additionalPackages impermanence;
+      stateVersion = "24.05";
+    }
+  );
   "photos" = (
     import ./photos.nix {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
