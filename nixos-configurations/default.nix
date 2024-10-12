@@ -37,7 +37,7 @@
   );
   "media" = (
     import ./media {
-      inherit nixpkgs sharedOverlays additionalPackages disko impermanence home-manager;
+      inherit nixpkgs sharedOverlays additionalPackages impermanence home-manager;
       stateVersion = "23.11";
     }
   );
