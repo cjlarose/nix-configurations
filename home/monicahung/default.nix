@@ -70,12 +70,10 @@
     yarnAliases = (if yarnOverride then {yarn="op run --account agilebits --no-masking -- yarn";} else {});
   in standardAliases // yarnAliases;
 
-  programs.zsh = {
+
+  programs.fzf = {
     enable = true;
-    envExtra = ''
-      export GIT_PACKAGE_DIR=${pkgs.git}
-    '';
-    initExtra = builtins.readFile ./.zshrc;
+    enableZshIntegration = true;
   };
 
   programs.git = {
@@ -103,6 +101,11 @@
     };
   };
 
+  programs.go = {
+    enable = true;
+    package = pkgs.go_1_22;
+  };
+
   programs.ssh = {
     enable = true;
     extraOptionOverrides = {
@@ -117,13 +120,11 @@
     };
   };
 
-  programs.fzf = {
+  programs.zsh = {
     enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.go = {
-    enable = true;
-    package = pkgs.go_1_22;
+    envExtra = ''
+      export GIT_PACKAGE_DIR=${pkgs.git}
+    '';
+    initExtra = builtins.readFile ./.zshrc;
   };
 }
