@@ -32,6 +32,10 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>ft', vim.lsp.buf.formatting, bufopts)
 end
 
+require('lspconfig')['gopls'].setup{
+  on_attach = on_attach,
+}
+
 require('lspconfig')['bashls'].setup{
   on_attach = on_attach,
 }
