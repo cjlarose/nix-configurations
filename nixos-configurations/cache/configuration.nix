@@ -91,6 +91,10 @@
 
   programs.zsh.enable = true;
 
+  virtualisation.podman = {
+    enable = true;
+  };
+
   users.mutableUsers = false;
 
   users.users = {
