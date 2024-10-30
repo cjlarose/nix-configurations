@@ -1,4 +1,4 @@
-{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, includeCoder, ... }: {
   imports = let
     baseImports = [
       ./personal-scripts.nix
@@ -82,7 +82,8 @@
     ];
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
     gnuSedPackages = (if includeGnuSed then [pkgs.gnused] else []);
-  in commonPackages ++ dockerClientPackages ++ gnuSedPackages;
+    coderPackages = (if includeCoder then [pkgs.coder] else []);
+  in commonPackages ++ dockerClientPackages ++ gnuSedPackages ++ coderPackages;
 
   home.shellAliases = {
     gs = "git status";

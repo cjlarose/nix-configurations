@@ -53,6 +53,7 @@ in nixpkgs.lib.nixosSystem {
         include1Password = false;
         includeDockerClient = false;
         includeGnuSed = true;
+        includeCoder = false;
       };
     }
   ];

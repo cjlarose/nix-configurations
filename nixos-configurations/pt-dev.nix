@@ -138,6 +138,7 @@ in nixpkgs.lib.nixosSystem {
         include1Password = false;
         includeDockerClient = true;
         includeGnuSed = true;
+        includeCoder = false;
       };
     }
   ];

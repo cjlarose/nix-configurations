@@ -53,6 +53,8 @@ in darwin.lib.darwinSystem {
         ];
         config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
           "1password-cli"
+          "coder"
+          "terraform"
         ];
       };
       users.users.chrislarose = {
@@ -68,6 +70,7 @@ in darwin.lib.darwinSystem {
         include1Password = true;
         includeDockerClient = false;
         includeGnuSed = false;
+        includeCoder = true;
       };
     }
   ];
