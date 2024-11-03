@@ -21,6 +21,7 @@
     EDITOR = "${additionalPackages.${system}.nvr}/bin/nvr";
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     THOR_MERGE = "nvr -s -d";
+    CODER_SSH_CONFIG_FILE = "~/.ssh/config-coder";
   };
 
   home.packages = let
@@ -129,6 +130,9 @@
   programs.ssh = {
     enable = true;
     addKeysToAgent = "yes";
+    includes = [
+      "config-coder"
+    ];
   };
 
   programs.direnv = {
