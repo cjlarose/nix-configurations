@@ -57,6 +57,14 @@ in darwin.lib.darwinSystem {
           "terraform"
         ];
       };
+
+      services.yabai = {
+        enable = true;
+        config = {
+          layout = "stack";
+        };
+      };
+
       users.users.chrislarose = {
         home = "/Users/chrislarose";
       };
