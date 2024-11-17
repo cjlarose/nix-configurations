@@ -14,6 +14,7 @@
     "$HOME/Library/Android/sdk/platform-tools"
     "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
     "/Applications/Inkscape.app/Contents/MacOS"
+    "/Applications/WezTerm.app/Contents/MacOS"
     "node_modules/.bin"
   ];
 
