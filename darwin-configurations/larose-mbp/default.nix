@@ -63,6 +63,9 @@ in darwin.lib.darwinSystem {
         config = {
           layout = "stack";
         };
+        extraConfig = ''
+          yabai -m rule --add app="System Settings" manage=off
+        '';
       };
 
       users.users.chrislarose = {
