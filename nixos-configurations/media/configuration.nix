@@ -86,7 +86,7 @@
           "/persistence/transmission-openvpn/.env"
         ];
         ports = [
-          "9091:9091"
+          "127.0.0.1:9091:9091"
         ];
         volumes = [
           "/persistence/transmission-openvpn/data:/data"
@@ -110,6 +110,13 @@
         domain = "media.toothyshouse.com";
         environmentFile = "/persistence/acme/digitalocean.secret";
       };
+      "transmission.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "transmission.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
     };
   };
 
@@ -119,6 +126,7 @@
       enable = true;
       virtualHosts = [
         "media.toothyshouse.com"
+        "transmission.toothyshouse.com"
       ];
     };
     virtualHosts = {
@@ -132,6 +140,15 @@
           autoindex_localtime on; # show file timestamps in local time
           charset utf-8; # serve the page using utf-8, since some filenames have special characters
         '';
+      };
+      "transmission.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations."/" = {
+          recommendedProxySettings = true;
+          proxyPass = "http://127.0.0.1:9091";
+        };
       };
     };
   };
