@@ -136,6 +136,12 @@
     };
   };
 
+  services.tailscale = {
+    enable = true;
+    authKeyFile = "/persistence/tailscale/auth-key";
+    openFirewall = true;
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
