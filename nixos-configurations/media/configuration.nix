@@ -95,6 +95,20 @@
     };
   };
 
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+    certs = {
+      "media.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "media.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+    };
+  };
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
