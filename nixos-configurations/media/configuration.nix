@@ -115,6 +115,12 @@
 
   services.nginx = {
     enable = true;
+    tailscaleAuth = {
+      enable = true;
+      virtualHosts = [
+        "media.toothyshouse.com"
+      ];
+    };
     virtualHosts = {
       "media.toothyshouse.com" = {
         enableACME = true;
