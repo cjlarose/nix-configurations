@@ -125,6 +125,7 @@
           location / {
             autoindex on;
             autoindex_localtime on; # show file timestamps in local time
+            charset utf-8; # serve the page using utf-8, since some filenames have special characters
           }
         '';
       };
