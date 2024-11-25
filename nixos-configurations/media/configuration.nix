@@ -138,7 +138,6 @@
 
   services.tailscale = {
     enable = true;
-    authKeyFile = "/persistence/tailscale/auth-key";
     openFirewall = true;
   };
 
