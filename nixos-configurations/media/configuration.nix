@@ -6,6 +6,10 @@
   networking = {
     hostName = "media";
     hostId = "d202c7d5";
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
   };
 
   system.stateVersion = stateVersion;
@@ -105,6 +109,24 @@
         dnsResolver = "1.1.1.1:53";
         domain = "media.toothyshouse.com";
         environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+    };
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      "media.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        root = "/persistence/media";
+        extraConfig = ''
+          location / {
+            autoindex on;
+            autoindex_localtime on; # show file timestamps in local time
+          }
+        '';
       };
     };
   };
