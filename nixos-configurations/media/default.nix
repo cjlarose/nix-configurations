@@ -26,6 +26,12 @@ in nixpkgs.lib.nixosSystem {
             group = "acme";
             mode = "0755";
           }
+          {
+            directory = "/var/lib/tailscale";
+            user = "root";
+            group = "root";
+            mode = "0700";
+          }
         ];
         users = {
           cjlarose = {
