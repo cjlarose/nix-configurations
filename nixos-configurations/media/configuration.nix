@@ -6,6 +6,10 @@
   networking = {
     hostName = "media";
     hostId = "d202c7d5";
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
   };
 
   system.stateVersion = stateVersion;
@@ -107,6 +111,35 @@
         environmentFile = "/persistence/acme/digitalocean.secret";
       };
     };
+  };
+
+  services.nginx = {
+    enable = true;
+    tailscaleAuth = {
+      enable = true;
+      virtualHosts = [
+        "media.toothyshouse.com"
+      ];
+    };
+    virtualHosts = {
+      "media.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        root = "/persistence/media";
+        locations."/".extraConfig = ''
+          autoindex on;
+          autoindex_localtime on; # show file timestamps in local time
+          charset utf-8; # serve the page using utf-8, since some filenames have special characters
+        '';
+      };
+    };
+  };
+
+  services.tailscale = {
+    enable = true;
+    authKeyFile = "/persistence/tailscale/auth-key";
+    openFirewall = true;
   };
 
   programs.ssh.startAgent = true;
