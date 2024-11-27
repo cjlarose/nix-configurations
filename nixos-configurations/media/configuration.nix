@@ -131,24 +131,42 @@
 
   services.nginx = {
     enable = true;
-    tailscaleAuth = {
-      enable = true;
-      virtualHosts = [
-        "media.toothyshouse.com"
-      ];
-    };
     virtualHosts = {
       "media.toothyshouse.com" = {
         enableACME = true;
         acmeRoot = null;
         forceSSL = true;
         root = "/persistence/media";
-        locations."/".extraConfig = ''
-          autoindex on;
-          autoindex_localtime on; # show file timestamps in local time
-          charset utf-8; # serve the page using utf-8, since some filenames have special characters
-        '';
+        locations = {
+          "/oauth2/" = {
+            proxyPass = config.services.oauth2-proxy.httpAddress;
+            extraConfig = ''
+              proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
+            '';
+            recommendedProxySettings = true;
+          };
+
+          "= /oauth2/auth" = {
+            proxyPass = config.services.oauth2-proxy.httpAddress;
+            extraConfig = ''
+              proxy_set_header Content-Length   "";
+              proxy_pass_request_body           off;
+            '';
+            recommendedProxySettings = true;
+          };
+
+          "/" = {
+            extraConfig = ''
+              auth_request /oauth2/auth;
+              error_page 401 =403 /oauth2/sign_in;
+              autoindex on;
+              autoindex_localtime on; # show file timestamps in local time
+              charset utf-8; # serve the page using utf-8, since some filenames have special characters
+            '';
+          };
+        };
       };
+
       "transmission.toothyshouse.com" = {
         enableACME = true;
         acmeRoot = null;
