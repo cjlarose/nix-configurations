@@ -117,6 +117,13 @@
         domain = "transmission.toothyshouse.com";
         environmentFile = "/persistence/acme/digitalocean.secret";
       };
+      "plex.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "plex.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
     };
   };
 
@@ -195,6 +202,18 @@
               auth_request /oauth2/auth;
               error_page 401 =403 /oauth2/sign_in;
             '';
+            recommendedProxySettings = true;
+          };
+        };
+      };
+
+      "plex.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations = {
+          "/" = {
+            proxyPass = "http://127.0.0.1:32400";
             recommendedProxySettings = true;
           };
         };
