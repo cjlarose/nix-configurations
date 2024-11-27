@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { config, pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -120,13 +120,21 @@
     };
   };
 
+  services.oauth2-proxy = {
+    enable = true;
+    keyFile = "/persistence/oauth2-proxy/.env";
+    reverseProxy = true;
+    email = {
+      domains = ["*"];
+    };
+  };
+
   services.nginx = {
     enable = true;
     tailscaleAuth = {
       enable = true;
       virtualHosts = [
         "media.toothyshouse.com"
-        "transmission.toothyshouse.com"
       ];
     };
     virtualHosts = {
@@ -145,9 +153,32 @@
         enableACME = true;
         acmeRoot = null;
         forceSSL = true;
-        locations."/" = {
-          recommendedProxySettings = true;
-          proxyPass = "http://127.0.0.1:9091";
+        locations = {
+          "/oauth2/" = {
+            proxyPass = config.services.oauth2-proxy.httpAddress;
+            extraConfig = ''
+              proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
+            '';
+            recommendedProxySettings = true;
+          };
+
+          "= /oauth2/auth" = {
+            proxyPass = config.services.oauth2-proxy.httpAddress;
+            extraConfig = ''
+              proxy_set_header Content-Length   "";
+              proxy_pass_request_body           off;
+            '';
+            recommendedProxySettings = true;
+          };
+
+          "/" = {
+            proxyPass = "http://127.0.0.1:9091";
+            extraConfig = ''
+              auth_request /oauth2/auth;
+              error_page 401 =403 /oauth2/sign_in;
+            '';
+            recommendedProxySettings = true;
+          };
         };
       };
     };
