@@ -60,7 +60,6 @@
 
   services.plex = {
     enable = true;
-    openFirewall = true;
     dataDir = "/persistence/plex";
     package = pkgs.plex.override {
       plexRaw = pkgs.plexRaw.overrideAttrs (finalAttrs: previousAttrs: {
