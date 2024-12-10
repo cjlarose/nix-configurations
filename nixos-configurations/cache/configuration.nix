@@ -53,6 +53,10 @@
     ];
   };
 
+  services.tailscale = {
+    enable = true;
+  };
+
   services.nix-serve = {
     enable = true;
     secretKeyFile = "/persistence/binary-cache/cache-priv-key.pem";
