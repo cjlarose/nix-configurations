@@ -134,6 +134,11 @@
     includes = [
       "config-coder"
     ];
+    matchBlocks = {
+      "*.toothyshouse.com" = {
+        forwardAgent = true;
+      };
+    };
   };
 
   programs.direnv = {
