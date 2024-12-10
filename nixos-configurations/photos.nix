@@ -63,6 +63,10 @@ in nixpkgs.lib.nixosSystem {
         };
       };
 
+      services.tailscale = {
+        enable = true;
+      };
+
       programs.ssh.startAgent = true;
 
       programs.zsh.enable = true;
