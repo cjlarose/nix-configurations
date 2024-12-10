@@ -21,6 +21,9 @@ in darwin.lib.darwinSystem {
           '';
         };
       };
+      environment.systemPackages = [
+        additionalPackages.${system}.wrappedTailscale
+      ];
       services.nix-daemon.enable = true;
       programs.zsh = {
         enable = true;

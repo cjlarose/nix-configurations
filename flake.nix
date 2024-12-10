@@ -135,6 +135,9 @@
               ${pkgs.ripgrep}/bin/rg --sort path "$@"
             fi
           '';
+          wrappedTailscale = pkgs.writeShellScriptBin "tailscale" ''
+            exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
+          '';
         }
       );
 
