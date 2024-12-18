@@ -63,6 +63,7 @@ in nixpkgs.lib.nixosSystem {
         includeDockerClient = false;
         includeGnuSed = true;
         includeCoder = false;
+        includeCopilotVim = false;
       };
     }
     home-manager.nixosModules.home-manager {

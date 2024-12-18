@@ -57,6 +57,7 @@ in darwin.lib.darwinSystem {
         config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
           "1password-cli"
           "coder"
+          "copilot.vim"
           "terraform"
         ];
       };
@@ -85,6 +86,7 @@ in darwin.lib.darwinSystem {
         includeDockerClient = false;
         includeGnuSed = false;
         includeCoder = true;
+        includeCopilotVim = true;
       };
     }
   ];

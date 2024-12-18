@@ -1,10 +1,10 @@
-{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, includeCoder, ... }: {
+{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, includeCoder, includeCopilotVim, ... }: {
   imports = let
     baseImports = [
       ./personal-scripts.nix
       ./neovim.nix
     ];
-  in baseImports ++ (if include1Password then [./1password.nix] else []);
+  in baseImports ++ (if include1Password then [./1password.nix] else []) ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
 
   home.stateVersion = stateVersion;
 

@@ -139,6 +139,7 @@ in nixpkgs.lib.nixosSystem {
         includeDockerClient = true;
         includeGnuSed = true;
         includeCoder = false;
+        includeCopilotVim = false;
       };
     }
   ];
