@@ -31,7 +31,12 @@
     };
   };
 
-  nixpkgs.overlays = sharedOverlays;
+  nixpkgs = {
+    overlays = sharedOverlays;
+    config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+      "copilot.vim"
+    ];
+  };
 
   security.sudo.wheelNeedsPassword = false;
 
