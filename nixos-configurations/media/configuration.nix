@@ -222,6 +222,8 @@
 
   services.tailscale = {
     enable = true;
+    openFirewall = true;
+    port = 41642;
   };
 
   programs.ssh.startAgent = true;
