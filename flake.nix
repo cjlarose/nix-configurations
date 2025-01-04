@@ -119,6 +119,7 @@
               src = pkgs.lib.cleanSource nvr.outPath;
             };
           python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
+          teleport_14 = nixpkgs.legacyPackages.${system}.teleport_14;
           trueColorTest = pkgs.stdenv.mkDerivation {
             name = "true-color-test";
             src = trueColorTest;
