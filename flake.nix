@@ -167,7 +167,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs sharedOverlays additionalPackages home-manager pce impermanence disko;
+          inherit nixpkgs nixpkgs-24-11 sharedOverlays additionalPackages home-manager home-manager-24-11 pce impermanence disko;
         }
       );
 

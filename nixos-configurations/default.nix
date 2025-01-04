@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, pce, impermanence, disko, ... }: {
+{ nixpkgs, nixpkgs-24-11, sharedOverlays, additionalPackages, home-manager, home-manager-24-11, pce, impermanence, disko, ... }: {
   "builder" = (
     import ./builder {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
@@ -19,7 +19,9 @@
   );
   "cache" = (
     import ./cache {
-      inherit nixpkgs home-manager sharedOverlays additionalPackages impermanence;
+      inherit sharedOverlays additionalPackages impermanence;
+      nixpkgs = nixpkgs-24-11;
+      home-manager = home-manager-24-11;
       stateVersion = "24.05";
     }
   );
