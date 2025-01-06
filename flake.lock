@@ -284,6 +284,21 @@
         "type": "github"
       }
     },
+    "nixpkgs_4": {
+      "locked": {
+        "lastModified": 1735669367,
+        "narHash": "sha256-tfYRbFhMOnYaM4ippqqid3BaLOXoFNdImrfBfCp4zn0=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "edf04b75c13c2ac0e54df5ec5c543e300f76f1c9",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixos-24.11",
+        "type": "indirect"
+      }
+    },
     "nvr": {
       "flake": false,
       "locked": {
@@ -318,20 +333,39 @@
     },
     "pce": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_3",
+        "pce-dailies": "pce-dailies"
       },
       "locked": {
-        "lastModified": 1734710649,
-        "narHash": "sha256-BPv1HWIB4LUrwryXJFZss3bQeRCeKYV4CgvqtOXRSaA=",
+        "lastModified": 1736135719,
+        "narHash": "sha256-b3JghvqKc6GaTaswUbpC0FR+aaXB2/Dcl1mgeboa7Ws=",
         "ref": "refs/heads/main",
-        "rev": "57d2d17e416a241218b044d8fdd9b01c82c2270e",
-        "revCount": 305,
+        "rev": "56384ea7dbf9e101940bb280cffe83dafc77d920",
+        "revCount": 325,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
       "original": {
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
+      }
+    },
+    "pce-dailies": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_4"
+      },
+      "locked": {
+        "lastModified": 1736113639,
+        "narHash": "sha256-+OPOZJ9fItH8eGPUviO6ktLXYb5gNNObO0ED4LR++Wc=",
+        "ref": "refs/heads/main",
+        "rev": "07a9f99c09eaac2c19dd8daa6ab425cc95637ce6",
+        "revCount": 122,
+        "type": "git",
+        "url": "ssh://git@github.com/cjlarose/pixel-cats-end-dailies"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/cjlarose/pixel-cats-end-dailies"
       }
     },
     "root": {
