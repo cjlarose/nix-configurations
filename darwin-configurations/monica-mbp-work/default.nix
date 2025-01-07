@@ -49,6 +49,7 @@ in darwin.lib.darwinSystem {
         ];
         config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
           "1password-cli"
+          "copilot.vim"
         ];
       };
       users.users."monica.hung" = {
@@ -61,6 +62,7 @@ in darwin.lib.darwinSystem {
       home-manager.users."monica.hung" = import ../../home/monicahung;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
+        includeCopilotVim = true;
         configurationName = "Monica-MacBook-Pro-Work";
         email = "monica.hung@agilebits.com";
         yarnOverride = true;

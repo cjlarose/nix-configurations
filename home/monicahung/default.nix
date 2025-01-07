@@ -1,8 +1,10 @@
-{ system, pkgs, additionalPackages, stateVersion, configurationName, email, yarnOverride, ... }: {
-  imports = [
-    ./personal-scripts.nix
-    ./neovim.nix
-  ];
+{ system, pkgs, additionalPackages, stateVersion, includeCopilotVim, configurationName, email, yarnOverride, ... }: {
+  imports = let
+    baseImports = [
+      ./personal-scripts.nix
+      ./neovim.nix
+    ];
+  in baseImports ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
 
   home.stateVersion = stateVersion;
 
