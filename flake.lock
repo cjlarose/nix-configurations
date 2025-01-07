@@ -337,11 +337,11 @@
         "pce-dailies": "pce-dailies"
       },
       "locked": {
-        "lastModified": 1736142667,
-        "narHash": "sha256-ssYO79Dw8Z0qDz7oqeBpGZQpPfL2GJapcUgo0Fw0QPY=",
+        "lastModified": 1736231272,
+        "narHash": "sha256-o1/LMFbxY2AAE/bWgiwn2M5h80DV7TYy+L5c/1E9/yQ=",
         "ref": "refs/heads/main",
-        "rev": "b52da81fe42f3350c92e03ce22bce18a0611b585",
-        "revCount": 329,
+        "rev": "ebf61ef07cf21a6e4f3cb03ca0c0ff1f8a6eceb1",
+        "revCount": 337,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
@@ -355,11 +355,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1736142631,
-        "narHash": "sha256-bJqTeRpdgtrVdLWxgO6TzKFs31/+kKIcLwEUVUjv/h8=",
+        "lastModified": 1736231120,
+        "narHash": "sha256-4JNEGqthHoTj+O0QieKNRVKSjHVrUiEcxtB7m8pgbbo=",
         "ref": "refs/heads/main",
-        "rev": "196a241c3abd229f98b6e0d837ab3d128468d89d",
-        "revCount": 124,
+        "rev": "727152cdc516b080f56da63ebe970f1c221eb525",
+        "revCount": 130,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-dailies"
       },
