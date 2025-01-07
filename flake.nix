@@ -109,6 +109,7 @@
           chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
           bundix = import "${bundix}/default.nix" { inherit pkgs; };
           intranetHosts = intranetHosts;
+          nix-direnv = nixpkgs-24-11.legacyPackages.${system}.nix-direnv;
           nvr = let
             manifest = (pkgs.lib.importTOML "${nvr.outPath}/Cargo.toml").package;
           in

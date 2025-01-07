@@ -76,7 +76,10 @@
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
-    nix-direnv.enable = true;
+    nix-direnv = {
+      enable = true;
+      package = additionalPackages.${system}.nix-direnv;
+    };
   };
 
   programs.fzf = {
