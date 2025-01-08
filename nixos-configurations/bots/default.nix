@@ -72,7 +72,9 @@ in nixpkgs.lib.nixosSystem {
       home-manager.users.monicahung = import ../../home/monicahung;
       home-manager.extraSpecialArgs = {
         inherit system stateVersion additionalPackages;
-        server = true;
+        configurationName = "";
+        email = "monica.hung11@gmail.com";
+        yarnOverride = false;
       };
     }
   ];

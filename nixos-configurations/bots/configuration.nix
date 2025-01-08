@@ -34,6 +34,7 @@
   nixpkgs = {
     overlays = sharedOverlays;
     config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+      "1password-cli"
       "copilot.vim"
     ];
   };
