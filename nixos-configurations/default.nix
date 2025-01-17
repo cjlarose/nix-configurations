@@ -7,8 +7,9 @@
   );
   "bootstrap" = (
     import ./bootstrap {
-      inherit nixpkgs sharedOverlays disko impermanence;
-      stateVersion = "23.11";
+      inherit sharedOverlays disko impermanence;
+      nixpkgs = nixpkgs-24-11;
+      stateVersion = "24.11";
     }
   );
   "bots" = (
