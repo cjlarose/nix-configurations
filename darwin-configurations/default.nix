@@ -1,7 +1,9 @@
-{ nixpkgs, sharedOverlays, additionalPackages, darwin, home-manager }: {
+{ nixpkgs, nixpkgs-24-11, sharedOverlays, additionalPackages, darwin, home-manager, home-manager-24-11 }: {
   "LaRose-MacBook-Pro" = (
     import ./larose-mbp {
-      inherit additionalPackages darwin home-manager nixpkgs sharedOverlays;
+      inherit additionalPackages darwin sharedOverlays;
+      nixpkgs = nixpkgs-24-11;
+      home-manager = home-manager-24-11;
     }
   );
   "Monica-MacBook-Pro-Home" = (

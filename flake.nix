@@ -170,7 +170,7 @@
 
       darwinConfigurations = (
         import ./darwin-configurations {
-          inherit nixpkgs sharedOverlays additionalPackages darwin home-manager;
+          inherit nixpkgs nixpkgs-24-11 sharedOverlays additionalPackages darwin home-manager home-manager-24-11;
         }
       );
 
