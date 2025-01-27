@@ -11,9 +11,6 @@
     nixpkgs-24-11 = {
       url = "github:nixos/nixpkgs/nixos-24.11";
     };
-    nixpkgs-unstable = {
-      url = "github:nixos/nixpkgs/nixos-unstable";
-    };
     darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -85,7 +82,6 @@
     nixpkgs,
     nixpkgs-23-05,
     nixpkgs-24-11,
-    nixpkgs-unstable,
     omnisharpVim,
     pce,
     self,
@@ -105,7 +101,7 @@
       additionalPackages = nixpkgs.lib.genAttrs supportedPlatforms (system:
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
-          atlas = nixpkgs-unstable.legacyPackages.${system}.atlas;
+          atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
           chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
           bundix = import "${bundix}/default.nix" { inherit pkgs; };
           intranetHosts = intranetHosts;
