@@ -34,12 +34,14 @@ in nixpkgs.lib.nixosSystem {
               ".config/chicken-smoothie-automation"
               ".config/chromium"
               ".config/pce"
+              ".local/share/pce-dailies"
               ".vnc"
             ];
           };
           cjlarose = {
             directories = [
               ".config/chromium"
+              ".local/share/pce-dailies"
               ".ssh"
               "workspace"
             ];
