@@ -32,14 +32,14 @@ in nixpkgs.lib.nixosSystem {
           bot = {
             directories = [
               ".config/chicken-smoothie-automation"
-              ".config/chromium/pixel-cats-end"
+              ".config/chromium"
               ".config/pce"
               ".vnc"
             ];
           };
           cjlarose = {
             directories = [
-              ".config/chromium/pixel-cats-end"
+              ".config/chromium"
               ".ssh"
               "workspace"
             ];
