@@ -27,6 +27,12 @@
     lsof
   ];
 
+  services.minio = {
+    enable = true;
+    configDir = "/persistence/minio/config";
+    dataDir = ["/persistence/minio/data"];
+  };
+
   services.openssh = {
     enable = true;
     settings = {
