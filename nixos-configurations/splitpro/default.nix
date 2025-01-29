@@ -24,6 +24,7 @@ in nixpkgs.lib.nixosSystem {
           cjlarose = {
             directories = [
               ".ssh"
+              ".mc"
               "workspace"
             ];
           };

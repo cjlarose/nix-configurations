@@ -25,6 +25,7 @@
   environment.systemPackages = with pkgs; [
     iotop
     lsof
+    minio-client
   ];
 
   services.minio = {
