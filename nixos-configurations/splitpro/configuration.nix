@@ -6,6 +6,10 @@
   networking = {
     hostName = "splitpro";
     hostId = "d202c7d5";
+    firewall.allowedTCPPorts = [
+      80 # nginx
+      443 # nginx
+    ];
   };
 
   system.stateVersion = stateVersion;
@@ -53,6 +57,40 @@
     enable = true;
     configDir = "/persistence/minio/config";
     dataDir = ["/persistence/minio/data"];
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      "splitpro.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3000";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
+      };
+      "splitpro-assets.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:9000";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
+      };
+    };
   };
 
   services.openssh = {
