@@ -6,10 +6,20 @@
   networking = {
     hostName = "splitpro";
     hostId = "d202c7d5";
-    firewall.allowedTCPPorts = [
-      80 # nginx
-      443 # nginx
-    ];
+    firewall = {
+      allowedTCPPorts = [
+        80 # nginx
+        443 # nginx
+      ];
+      interfaces = {
+        podman0 = {
+          allowedTCPPorts = [
+            5432 # postgresql
+            9000 # minio
+          ];
+        };
+      };
+    };
   };
 
   system.stateVersion = stateVersion;
@@ -154,6 +164,20 @@
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
       ];
+    };
+  };
+
+  virtualisation.oci-containers = {
+    containers = {
+      splitpro = {
+        image = "ossapps/splitpro:v1.3.4";
+        environmentFiles = [
+          "/persistence/splitpro/.env"
+        ];
+        ports = [
+          "127.0.0.1:3000:3000"
+        ];
+      };
     };
   };
 }
