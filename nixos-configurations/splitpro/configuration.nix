@@ -22,6 +22,27 @@
 
   security.sudo.wheelNeedsPassword = false;
 
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+    certs = {
+      "splitpro.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "splitpro.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+      "splitpro-assets.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "splitpro-assets.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+    };
+  };
+
   environment.systemPackages = with pkgs; [
     iotop
     lsof
