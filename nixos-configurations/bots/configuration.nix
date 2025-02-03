@@ -177,6 +177,24 @@
     };
   };
 
+  systemd.services."pce-id-watcher" = {
+    description = "Pixel Cat's End ID watcher process";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      StandardInput = "null";
+      StandardOutput = "journal";
+      StandardError = "journal";
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c 'source ~/.config/pce/.pce-env && \
+        exec ${pce.packages.${system}.default}/bin/watch_cat_ids'
+      '';
+      Type = "exec";
+      User = "bot";
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
   systemd.timers."pce-shop-dispatcher" = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
