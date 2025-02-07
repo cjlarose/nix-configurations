@@ -69,6 +69,7 @@ in darwin.lib.darwinSystem {
         };
         extraConfig = ''
           yabai -m rule --add app="System Settings" manage=off
+          yabai -m rule --add app="Vysor" manage=off
         '';
       };
 
