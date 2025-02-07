@@ -175,11 +175,11 @@
     "intranetHosts": {
       "flake": false,
       "locked": {
-        "lastModified": 1738287450,
-        "narHash": "sha256-yWo5adQn4aRYFszDzw4scnu7L9xBCfVdYSNCOxpm0AI=",
+        "lastModified": 1738960370,
+        "narHash": "sha256-B6GRr2gvQweY6+e5cw4CJ2Whxdm0Pn5D1k2KBUXR6o4=",
         "ref": "refs/heads/main",
-        "rev": "b5624696a0963b2b14f6766f4608d88ec7d476bf",
-        "revCount": 16,
+        "rev": "1e6c42459160954536876ece21d9e9143548e9fc",
+        "revCount": 17,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/intranet-hosts"
       },
