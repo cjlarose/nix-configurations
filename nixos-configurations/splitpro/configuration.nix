@@ -141,6 +141,27 @@
     dataDir = "/persistence/postgresql";
   };
 
+  services.restic.backups = {
+    backblaze = {
+      initialize = true;
+
+      environmentFile = "/persistence/restic/backblaze/env";
+      repositoryFile = "/persistence/restic/backblaze/repo";
+      passwordFile = "/persistence/restic/backblaze/password";
+
+      paths = [
+        "/persistence/postgresql"
+        "/persistence/minio"
+      ];
+
+      pruneOpts = [
+        "--keep-daily 7"
+        "--keep-weekly 5"
+        "--keep-monthly 12"
+      ];
+    };
+  };
+
   services.tailscale = {
     enable = true;
   };
