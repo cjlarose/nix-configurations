@@ -11,7 +11,6 @@
   system.stateVersion = stateVersion;
 
   nix = {
-    package = pkgs.nixFlakes;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
@@ -59,14 +58,11 @@
 
   programs.ssh.startAgent = true;
 
-  programs.zsh.enable = true;
-
   users.mutableUsers = false;
 
   users.users.cjlarose = {
     isNormalUser = true;
     home = "/home/cjlarose";
-    shell = pkgs.zsh;
     extraGroups = [ "wheel" ];
     hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
     openssh.authorizedKeys.keys = [

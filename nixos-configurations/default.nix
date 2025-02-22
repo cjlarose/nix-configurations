@@ -7,8 +7,9 @@
   );
   "bootstrap" = (
     import ./bootstrap {
-      inherit nixpkgs sharedOverlays disko impermanence;
-      stateVersion = "23.11";
+      inherit sharedOverlays disko impermanence;
+      nixpkgs = nixpkgs-24-11;
+      stateVersion = "24.11";
     }
   );
   "bots" = (
@@ -59,6 +60,14 @@
     import ./photos.nix {
       inherit nixpkgs sharedOverlays additionalPackages home-manager;
       stateVersion = "23.05";
+    }
+  );
+  "splitpro" = (
+    import ./splitpro {
+      inherit sharedOverlays additionalPackages impermanence;
+      nixpkgs = nixpkgs-24-11;
+      home-manager = home-manager-24-11;
+      stateVersion = "24.11";
     }
   );
 }
