@@ -150,7 +150,7 @@
       passwordFile = "/persistence/restic/backblaze/password";
 
       paths = [
-        "/persistence/postgresql"
+        "/persistence/splitpro-sql-dumps"
         "/persistence/minio"
       ];
 
@@ -159,6 +159,14 @@
         "--keep-weekly 5"
         "--keep-monthly 12"
       ];
+
+      backupPrepareCommand = ''
+        mkdir -p /persistence/splitpro-sql-dumps
+        chown ${config.users.users.postgres.name}:${config.users.users.postgres.name} /persistence/splitpro-sql-dumps
+        current_date=$(date +%Y-%m-%d)
+        file_name="/persistence/splitpro-sql-dumps/splitpro-$current_date.sql"
+        /run/wrappers/bin/su - postgres -c "pg_dump splitpro > $file_name"
+      '';
     };
   };
 
