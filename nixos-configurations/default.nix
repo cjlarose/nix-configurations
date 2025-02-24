@@ -70,4 +70,12 @@
       stateVersion = "24.11";
     }
   );
+  "unifi" = (
+    import ./unifi {
+      inherit sharedOverlays additionalPackages impermanence;
+      nixpkgs = nixpkgs-24-11;
+      home-manager = home-manager-24-11;
+      stateVersion = "24.11";
+    }
+  );
 }
