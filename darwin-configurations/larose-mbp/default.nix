@@ -23,6 +23,7 @@ in darwin.lib.darwinSystem {
       };
       environment.systemPackages = [
         additionalPackages.${system}.wrappedTailscale
+        additionalPackages.${system}.wrappedWireshark
       ];
       services.nix-daemon.enable = true;
       programs.zsh = {

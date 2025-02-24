@@ -145,6 +145,9 @@
           wrappedTailscale = pkgs.writeShellScriptBin "tailscale" ''
             exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
           '';
+          wrappedWireshark = pkgs.writeShellScriptBin "wireshark" ''
+            exec /Applications/Wireshark.app/Contents/MacOS/Wireshark "$@"
+          '';
         }
       );
 
