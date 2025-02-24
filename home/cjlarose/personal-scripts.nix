@@ -1,10 +1,9 @@
 { pkgs, ... }:
 
 let
-  gitMakePatchCommand = pkgs.writeShellScriptBin "git-make-patch-command" ''
-    DIFF=$(git diff)
+  gitMakeApplyCommand = pkgs.writeShellScriptBin "git-make-apply-command" ''
     echo 'git apply <<'"'"'PATCH'"'"
-    echo "$DIFF"
+    cat
     echo 'PATCH'
   '';
 
@@ -17,7 +16,7 @@ let
   '';
 in {
   home.packages = [
-    gitMakePatchCommand
+    gitMakeApplyCommand
     runUntilFailure
     runUntilSuccess
   ];
