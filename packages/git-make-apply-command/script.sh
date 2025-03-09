@@ -16,7 +16,28 @@ while IFS= read -r -d '' -n1 char || [[ -n "$char" ]]; do
     if [[ "$char" == '\' ]]; then
         # Escape backslashes
         printf '%s' '\\\\'
-    elif [[ "$ord" -ge 32 && "$ord" -le 126 ]] || [[ "$ord" -eq 10 ]]; then
+    elif [[ "$ord" -eq 9 ]]; then
+        # Tab character
+        printf '%s' '\\t'
+    elif [[ "$ord" -eq 10 ]]; then
+        # Newline (encode this literally)
+        printf '%s' "$char"
+    elif [[ "$ord" -eq 13 ]]; then
+        # Carriage return
+        printf '%s' '\\r'
+    elif [[ "$ord" -eq 12 ]]; then
+        # Form feed
+        printf '%s' '\\f'
+    elif [[ "$ord" -eq 8 ]]; then
+        # Backspace
+        printf '%s' '\\b'
+    elif [[ "$ord" -eq 7 ]]; then
+        # Alert/Bell
+        printf '%s' '\\a'
+    elif [[ "$ord" -eq 27 ]]; then
+        # Escape
+        printf '%s' '\\e'
+    elif [[ "$ord" -ge 32 && "$ord" -le 126 ]]; then
         # Printable characters are kept as-is
         printf '%s' "$char"
     else
