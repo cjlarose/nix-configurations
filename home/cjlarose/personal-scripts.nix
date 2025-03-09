@@ -2,9 +2,38 @@
 
 let
   gitMakeApplyCommand = pkgs.writeShellScriptBin "git-make-apply-command" ''
-    echo 'git apply <<'"'"'PATCH'"'"
-    cat
-    echo 'PATCH'
+    # This script is used to generate a command that can be used to apply a diff
+    # The diff is passed to this script via stdin
+    # The generated command is printed to stdout
+
+    # Read the entire diff content
+    diff_content=$(cat)
+
+    # Start the command
+    printf '%b' 'printf %b $'"'"
+
+    # Process each character in the diff content
+    for (( i=0; i<''${#diff_content}; i++ )); do
+        char="''${diff_content:$i:1}"
+
+        # Get ASCII value
+        LC_CTYPE=C printf -v ord "%d" "'$char"
+
+        # Handle different character types
+        if [[ "$char" == '\' ]]; then
+            # Escape backslashes
+            printf '%s' '\\\\'
+        elif [[ "$ord" -ge 32 && "$ord" -le 126 ]] || [[ "$ord" -eq 10 ]]; then
+            # Printable characters are kept as-is
+            printf '%s' "$char"
+        else
+            # Encode other characters as \xHH
+            printf '\\\\x%02x' "$ord"
+        fi
+    done
+
+    # Close the command
+    printf '%b' '\n'"'"' | git apply -\n'
   '';
 
   runUntilFailure = pkgs.writeShellScriptBin "run-until-failure" ''
