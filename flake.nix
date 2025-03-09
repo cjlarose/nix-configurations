@@ -107,15 +107,7 @@
           intranetHosts = intranetHosts;
           git-make-apply-command = import ./packages/git-make-apply-command { inherit pkgs; };
           nix-direnv = nixpkgs-24-11.legacyPackages.${system}.nix-direnv;
-          nvr = let
-            manifest = (pkgs.lib.importTOML "${nvr.outPath}/Cargo.toml").package;
-          in
-            pkgs.rustPlatform.buildRustPackage {
-              pname = manifest.name;
-              version = manifest.version;
-              cargoLock.lockFile = "${nvr.outPath}/Cargo.lock";
-              src = pkgs.lib.cleanSource nvr.outPath;
-            };
+          nvr = import ./packages/nvr { inherit pkgs; };
           python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
           teleport_16 = nixpkgs-24-11.legacyPackages.${system}.teleport_16;
           trueColorTest = pkgs.stdenv.mkDerivation {
