@@ -36,6 +36,7 @@
       pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
+      additionalPackages.${system}.git-make-apply-command
       (pkgs.google-cloud-sdk.withExtraComponents ([pkgs.google-cloud-sdk.components.pubsub-emulator]))
       pkgs.gradle
       pkgs.htop
