@@ -6,16 +6,11 @@ let
     # The diff is passed to this script via stdin
     # The generated command is printed to stdout
 
-    # Read the entire diff content
-    diff_content=$(cat)
-
     # Start the command
     printf '%b' 'printf %b $'"'"
 
-    # Process each character in the diff content
-    for (( i=0; i<''${#diff_content}; i++ )); do
-        char="''${diff_content:$i:1}"
-
+    # Process input one byte at a time
+    while IFS= read -r -d ''' -n1 char || [[ -n "$char" ]]; do
         # Get ASCII value
         LC_CTYPE=C printf -v ord "%d" "'$char"
 
@@ -33,7 +28,7 @@ let
     done
 
     # Close the command
-    printf '%b' '\n'"'"' | git apply -\n'
+    printf '%b' "'"' | git apply -\n'
   '';
 
   runUntilFailure = pkgs.writeShellScriptBin "run-until-failure" ''
