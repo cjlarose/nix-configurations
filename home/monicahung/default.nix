@@ -40,6 +40,7 @@
     pkgs.omnisharp-roslyn
     pkgs.parallel
     additionalPackages.${system}.wrappedRg
+    additionalPackages.${system}.openCommitInGitlab
     pkgs.ruby
     pkgs.shellcheck
     pkgs.tmux

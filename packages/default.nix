@@ -52,4 +52,8 @@
   wrappedWireshark = pkgs.writeShellScriptBin "wireshark" ''
     exec /Applications/Wireshark.app/Contents/MacOS/Wireshark "$@"
   '';
+  openCommitInGitlab = pkgs.writeShellScriptBin "open-gitlab" ''
+    commit=$(git rev-parse ''${1:-HEAD})
+    open "$GITLAB_HOST/$(basename $(git rev-parse --show-toplevel))/-/commit/$commit"
+  '';
 }
