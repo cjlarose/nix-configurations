@@ -39,7 +39,7 @@
     pkgs.nodejs_20
     pkgs.omnisharp-roslyn
     pkgs.parallel
-    pkgs.ripgrep
+    additionalPackages.${system}.wrappedRg
     pkgs.ruby
     pkgs.shellcheck
     pkgs.tmux
