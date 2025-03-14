@@ -117,6 +117,7 @@
       mergetool.nvr.cmd = "${pkgs.neovim-remote}/bin/nvr -s -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd J | wincmd ='";
       pull.ff = "only";
       rebase.autosquash = true;
+      rebase.autostash = true;
       "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
       "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
     };
