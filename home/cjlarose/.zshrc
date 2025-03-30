@@ -11,9 +11,16 @@ __kube_ps1() {
   echo "$context "
 }
 
+__docker_ps1() {
+  local context
+  context=$(docker context show 2> /dev/null)
+  [ -z "${context}" ] && return
+  echo "%F{cyan}(docker: $context)%f "
+}
+
 setopt prompt_subst
 . "${GIT_PACKAGE_DIR}"/share/git/contrib/completion/git-prompt.sh
-PROMPT='[%m] %~ %F{green}$(GIT_PS1_SHOWCOLORHINTS=1 GIT_PS1_SHOWUPSTREAM=git GIT_PS1_SHOWDIRTYSTATE=1 __git_ps1 "%s ")%f$(__kube_ps1)$ '
+PROMPT='[%m] %~ %F{green}$(GIT_PS1_SHOWCOLORHINTS=1 GIT_PS1_SHOWUPSTREAM=git GIT_PS1_SHOWDIRTYSTATE=1 __git_ps1 "%s ")%f$(__kube_ps1)$(__docker_ps1)$ '
 
 # Allow command line editing in an external editor
 autoload -Uz edit-command-line
