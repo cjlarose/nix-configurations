@@ -90,6 +90,8 @@
 
   home.shellAliases = {
     gs = "git status";
+    gds = "git diff --staged";
+    gap = "git add --patch";
   };
 
   programs.zsh = {
