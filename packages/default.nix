@@ -32,7 +32,7 @@
       cp 24-bit-color.sh $out/bin
     '';
   };
-  wrappedJq = pkgs.writeShellScriptBin "jq" ''
+  wrappedJq = pkgs.writeShellScriptBin "jqp" ''
     if [ -t 1 ]; then
       ${pkgs.jq}/bin/jq --color-output "$@" | less
     else
