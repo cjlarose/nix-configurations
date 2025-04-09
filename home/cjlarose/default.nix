@@ -94,6 +94,7 @@
     gd = "git diff";
     gds = "git diff --staged";
     gap = "git add --patch";
+    gc = "git commit";
   };
 
   programs.zsh = {
