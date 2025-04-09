@@ -58,6 +58,7 @@
           let g:prettier#config#trailing_comma = 'all'
         '';
       }
+      vim-surround
     ];
     extraConfig = builtins.readFile ./init.vim;
   };
