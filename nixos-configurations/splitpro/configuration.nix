@@ -150,6 +150,7 @@
       passwordFile = "/persistence/restic/backblaze/password";
 
       paths = [
+        "/persistence/splitpro/.env"
         "/persistence/splitpro-sql-dumps"
         "/persistence/minio"
       ];
