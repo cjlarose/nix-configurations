@@ -54,6 +54,10 @@
     ];
   };
 
+  services.immich = {
+    enable = true;
+  };
+
   services.zfs.expandOnBoot = "all";
 
   programs.ssh.startAgent = true;
