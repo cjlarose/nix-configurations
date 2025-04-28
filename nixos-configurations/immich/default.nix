@@ -26,6 +26,12 @@ in nixpkgs.lib.nixosSystem {
               group = config.users.users.postgres.group;
               mode = "0700";
             }
+            {
+              directory = "/var/lib/tailscale";
+              user = "root";
+              group = "root";
+              mode = "0700";
+            }
           ];
           users = {
             cjlarose = {
