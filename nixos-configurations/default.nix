@@ -38,6 +38,14 @@
       stateVersion = "23.11";
     }
   );
+  "immich" = (
+    import ./immich {
+      inherit sharedOverlays additionalPackages impermanence disko;
+      nixpkgs = nixpkgs-24-11;
+      home-manager = home-manager-24-11;
+      stateVersion = "24.11";
+    }
+  );
   "media" = (
     import ./media {
       inherit nixpkgs sharedOverlays additionalPackages impermanence home-manager;
