@@ -15,6 +15,12 @@ in nixpkgs.lib.nixosSystem {
           hideMounts = true;
           directories = [
             {
+              directory = "/var/lib/acme";
+              user = "acme";
+              group = "acme";
+              mode = "0755";
+            }
+            {
               directory = config.services.postgresql.dataDir;
               user = config.users.users.postgres.name;
               group = config.users.users.postgres.group;

@@ -6,6 +6,10 @@
   networking = {
     hostName = "immich";
     hostId = "1467d75a";
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
   };
 
   system.stateVersion = stateVersion;
@@ -35,6 +39,20 @@
     lsof
   ];
 
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+    certs = {
+      "immich.toothyshouse.com" = {
+        dnsPropagationCheck = false;
+        dnsProvider = "digitalocean";
+        dnsResolver = "1.1.1.1:53";
+        domain = "immich.toothyshouse.com";
+        environmentFile = "/persistence/acme/digitalocean.secret";
+      };
+    };
+  };
+
   services.openssh = {
     enable = true;
     settings = {
@@ -56,6 +74,28 @@
 
   services.immich = {
     enable = true;
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      "immich.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://[::1]:${toString config.services.immich.port}";
+          proxyWebsockets = true;
+          recommendedProxySettings = true;
+          extraConfig = ''
+            client_max_body_size 50000M;
+            proxy_read_timeout   600s;
+            proxy_send_timeout   600s;
+            send_timeout         600s;
+          '';
+        };
+      };
+    };
   };
 
   services.zfs.expandOnBoot = "all";
