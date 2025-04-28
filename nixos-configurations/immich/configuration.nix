@@ -53,25 +53,6 @@
     };
   };
 
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = "no";
-    };
-    hostKeys = [
-      {
-        path = "/persistence/ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }
-      {
-        path = "/persistence/ssh/ssh_host_rsa_key";
-        type = "rsa";
-        bits = 4096;
-      }
-    ];
-  };
-
   services.immich = {
     enable = true;
   };
@@ -96,6 +77,25 @@
         };
       };
     };
+  };
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
+    hostKeys = [
+      {
+        path = "/persistence/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+      {
+        path = "/persistence/ssh/ssh_host_rsa_key";
+        type = "rsa";
+        bits = 4096;
+      }
+    ];
   };
 
   services.zfs.expandOnBoot = "all";
