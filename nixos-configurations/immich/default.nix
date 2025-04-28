@@ -52,6 +52,12 @@ in nixpkgs.lib.nixosSystem {
               group = config.users.users.immich.group;
               mode = "0700";
             }
+            {
+              directory = "/var/cache/restic-backups-backblaze";
+              user = "root";
+              group = "root";
+              mode = "0700";
+            }
           ];
         };
       };
