@@ -98,6 +98,40 @@
     ];
   };
 
+  services.restic.backups = {
+    backblaze = {
+      initialize = true;
+
+      timerConfig = {
+        OnCalendar = "02:00 America/Los_Angeles";
+        Persistent = true;
+      };
+
+      environmentFile = "/persistence/restic/backblaze/env";
+      repositoryFile = "/persistence/restic/backblaze/repo";
+      passwordFile = "/persistence/restic/backblaze/password";
+
+      paths = [
+        "/persistence/immich-sql-dumps"
+        "/var/lib/immich"
+      ];
+
+      pruneOpts = [
+        "--keep-daily 7"
+        "--keep-weekly 5"
+        "--keep-monthly 12"
+      ];
+
+      backupPrepareCommand = ''
+        mkdir -p /persistence/immich-sql-dumps
+        chown ${config.users.users.postgres.name}:${config.users.users.postgres.group} /persistence/immich-sql-dumps
+        current_date=$(date +%Y-%m-%d)
+        file_name="/persistence/immich-sql-dumps/immich-$current_date.sql"
+        /run/wrappers/bin/su - postgres -c "pg_dumpall --clean --if-exists > $file_name"
+      '';
+    };
+  };
+
   services.tailscale = {
     enable = true;
     openFirewall = true;
