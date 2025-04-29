@@ -98,6 +98,16 @@
     ];
   };
 
+  services.redis = {
+    servers = {
+      immich = {
+        save = []; # disable RDB persistence
+        appendOnly = true; # enable persistence via append-only file
+        appendFsync = "always"; # fsync as part of every write operation
+      };
+    };
+  };
+
   services.restic.backups = {
     backblaze = {
       initialize = true;
