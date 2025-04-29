@@ -32,6 +32,12 @@ in nixpkgs.lib.nixosSystem {
               group = "root";
               mode = "0700";
             }
+            {
+              directory = config.services.redis.servers.immich.settings.dir;
+              user = config.services.redis.servers.immich.user;
+              group = config.services.redis.servers.immich.group;
+              mode = "0700";
+            }
           ];
           users = {
             cjlarose = {
