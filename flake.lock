@@ -157,6 +157,27 @@
         "type": "github"
       }
     },
+    "home-manager-25-05": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-25-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1748226808,
+        "narHash": "sha256-GaBRgxjWO1bAQa8P2+FDxG4ANBVhjnSjBms096qQdxo=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "83665c39fa688bd6a1f7c43cf7997a70f6a109f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.05",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "impermanence": {
       "locked": {
         "lastModified": 1703656108,
@@ -248,6 +269,22 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-24.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-25-05": {
+      "locked": {
+        "lastModified": 1748162331,
+        "narHash": "sha256-rqc2RKYTxP3tbjA+PB3VMRQNnjesrT0pEofXQTrMsS8=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "7c43f080a7f28b2774f3b3f43234ca11661bf334",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -378,11 +415,13 @@
         "fzfVim": "fzfVim",
         "home-manager-24-05": "home-manager-24-05",
         "home-manager-24-11": "home-manager-24-11",
+        "home-manager-25-05": "home-manager-25-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
         "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-24-05": "nixpkgs-24-05",
         "nixpkgs-24-11": "nixpkgs-24-11",
+        "nixpkgs-25-05": "nixpkgs-25-05",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",

@@ -11,6 +11,9 @@
     nixpkgs-24-11 = {
       url = "github:nixos/nixpkgs/nixos-24.11";
     };
+    nixpkgs-25-05 = {
+      url = "github:nixos/nixpkgs/nixos-25.05";
+    };
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs/nixpkgs-unstable";
     };
@@ -25,6 +28,10 @@
     home-manager-24-11 = {
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs-24-05";
+    };
+    home-manager-25-05 = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs-25-05";
     };
     fzfVim = {
       url = "github:cjlarose/fzf.vim";
@@ -80,11 +87,13 @@
     fzfVim,
     home-manager-24-05,
     home-manager-24-11,
+    home-manager-25-05,
     impermanence,
     intranetHosts,
     nixpkgs-24-05,
     nixpkgs-23-05,
     nixpkgs-24-11,
+    nixpkgs-25-05,
     nixpkgs-unstable,
     omnisharpVim,
     pce,
