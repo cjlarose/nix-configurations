@@ -2,11 +2,11 @@
   description = "NixOS-based development environment";
 
   inputs = {
-    nixpkgs-24-05 = {
-      url = "github:nixos/nixpkgs/nixos-24.05";
-    };
     nixpkgs-23-05 = {
       url = "github:nixos/nixpkgs/nixos-23.05";
+    };
+    nixpkgs-24-05 = {
+      url = "github:nixos/nixpkgs/nixos-24.05";
     };
     nixpkgs-24-11 = {
       url = "github:nixos/nixpkgs/nixos-24.11";
