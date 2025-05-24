@@ -115,7 +115,7 @@
         "type": "github"
       }
     },
-    "home-manager": {
+    "home-manager-24-05": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs-24-05"
@@ -153,6 +153,27 @@
       "original": {
         "owner": "nix-community",
         "ref": "release-24.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "home-manager-25-05": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-25-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1747556831,
+        "narHash": "sha256-Qb84nbYFFk0DzFeqVoHltS2RodAYY5/HZQKE8WnBDsc=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "d0bbd221482c2713cccb80220f3c9d16a6e20a33",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.05",
         "repo": "home-manager",
         "type": "github"
       }
@@ -248,6 +269,22 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-24.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-25-05": {
+      "locked": {
+        "lastModified": 1747953325,
+        "narHash": "sha256-y2ZtlIlNTuVJUZCqzZAhIw5rrKP4DOSklev6c8PyCkQ=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "55d1f923c480dadce40f5231feb472e81b0bab48",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -360,13 +397,15 @@
         "disko": "disko",
         "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
-        "home-manager": "home-manager",
+        "home-manager-24-05": "home-manager-24-05",
         "home-manager-24-11": "home-manager-24-11",
+        "home-manager-25-05": "home-manager-25-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
         "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-24-05": "nixpkgs-24-05",
         "nixpkgs-24-11": "nixpkgs-24-11",
+        "nixpkgs-25-05": "nixpkgs-25-05",
         "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
