@@ -1,7 +1,8 @@
-{ nixpkgs, nixpkgs-24-11, sharedOverlays, additionalPackages, home-manager, home-manager-24-11, pce, impermanence, disko, ... }: {
+{ nixpkgs-24-05, nixpkgs-24-11, sharedOverlays, additionalPackages, home-manager, home-manager-24-11, pce, impermanence, disko, ... }: {
   "builder" = (
     import ./builder {
-      inherit nixpkgs sharedOverlays additionalPackages home-manager;
+      inherit sharedOverlays additionalPackages home-manager;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.05";
     }
   );
@@ -14,7 +15,8 @@
   );
   "bots" = (
     import ./bots {
-      inherit nixpkgs home-manager sharedOverlays additionalPackages pce impermanence;
+      inherit home-manager sharedOverlays additionalPackages pce impermanence;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.11";
     }
   );
@@ -28,13 +30,15 @@
   );
   "coder" = (
     import ./coder {
-      inherit nixpkgs home-manager sharedOverlays additionalPackages impermanence;
+      inherit home-manager sharedOverlays additionalPackages impermanence;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "24.05";
     }
   );
   "dns" = (
     import ./dns {
-      inherit nixpkgs sharedOverlays additionalPackages impermanence home-manager;
+      inherit sharedOverlays additionalPackages impermanence home-manager;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.11";
     }
   );
@@ -48,25 +52,29 @@
   );
   "media" = (
     import ./media {
-      inherit nixpkgs sharedOverlays additionalPackages impermanence home-manager;
+      inherit sharedOverlays additionalPackages impermanence home-manager;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.11";
     }
   );
   "palworld" = (
     import ./palworld {
-      inherit nixpkgs sharedOverlays additionalPackages home-manager;
+      inherit sharedOverlays additionalPackages home-manager;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.11";
     }
   );
   "pt-dev" = (
     import ./pt-dev.nix {
-      inherit nixpkgs sharedOverlays additionalPackages home-manager;
+      inherit sharedOverlays additionalPackages home-manager;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.05";
     }
   );
   "photos" = (
     import ./photos.nix {
-      inherit nixpkgs sharedOverlays additionalPackages home-manager;
+      inherit sharedOverlays additionalPackages home-manager;
+      nixpkgs = nixpkgs-24-05;
       stateVersion = "23.05";
     }
   );
