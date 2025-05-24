@@ -115,7 +115,7 @@
         "type": "github"
       }
     },
-    "home-manager": {
+    "home-manager-24-05": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs-24-05"
@@ -376,7 +376,7 @@
         "disko": "disko",
         "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
-        "home-manager": "home-manager",
+        "home-manager-24-05": "home-manager-24-05",
         "home-manager-24-11": "home-manager-24-11",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",

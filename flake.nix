@@ -18,7 +18,7 @@
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs-24-05";
     };
-    home-manager = {
+    home-manager-24-05 = {
       url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs-24-05";
     };
@@ -78,7 +78,7 @@
     disko,
     fzfProject,
     fzfVim,
-    home-manager,
+    home-manager-24-05,
     home-manager-24-11,
     impermanence,
     intranetHosts,
@@ -128,13 +128,13 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 sharedOverlays additionalPackages home-manager home-manager-24-11 pce impermanence disko;
+          inherit nixpkgs-24-05 nixpkgs-24-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 pce impermanence disko;
         }
       );
 
       darwinConfigurations = (
         import ./darwin-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 sharedOverlays additionalPackages darwin home-manager home-manager-24-11;
+          inherit nixpkgs-24-05 nixpkgs-24-11 sharedOverlays additionalPackages darwin home-manager-24-05 home-manager-24-11;
         }
       );
 
