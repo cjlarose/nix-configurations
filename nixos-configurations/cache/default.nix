@@ -32,6 +32,7 @@ in nixpkgs.lib.nixosSystem {
           cjlarose = {
             directories = [
               ".ssh"
+              "gc-roots"
               "workspace"
             ];
           };
