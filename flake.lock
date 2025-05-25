@@ -37,7 +37,7 @@
     "darwin": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-24-05"
+          "nixpkgs-25-05"
         ]
       },
       "locked": {
