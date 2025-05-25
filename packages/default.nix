@@ -20,6 +20,7 @@
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
   nvr = import ./nvr { inherit pkgs nvr; };
+  go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
   teleport_16 = nixpkgs-24-11.legacyPackages.${system}.teleport_16;
   trueColorTest = pkgs.stdenv.mkDerivation {

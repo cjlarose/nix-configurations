@@ -116,7 +116,7 @@
 
   programs.go = {
     enable = true;
-    package = pkgs.go_1_22;
+    package = additionalPackages.${system}.go_1_22;
   };
 
   programs.ssh = {
