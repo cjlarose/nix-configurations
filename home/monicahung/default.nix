@@ -33,7 +33,7 @@
     pkgs.neovim-remote
     pkgs.nil
     pkgs.nodePackages.bash-language-server
-    pkgs.nodePackages.pyright
+    pkgs.pyright
     pkgs.nodePackages.typescript-language-server
     pkgs.nodePackages.vscode-langservers-extracted
     pkgs.nodejs_20
