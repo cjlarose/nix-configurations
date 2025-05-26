@@ -19,6 +19,11 @@ in nixpkgs.lib.nixosSystem {
       ];
       environment.persistence."/persistence" = {
         hideMounts = true;
+        directories = [
+          {
+            directory = "/etc/nixos";
+          }
+        ];
         users = {
           cjlarose = {
             directories = [
