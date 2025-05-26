@@ -54,8 +54,8 @@
   "dns" = (
     import ./dns {
       inherit sharedOverlays additionalPackages impermanence;
-      nixpkgs = nixpkgs-24-05;
-      home-manager = home-manager-24-05;
+      nixpkgs = nixpkgs-25-05;
+      home-manager = home-manager-25-05;
       stateVersion = "23.11";
     }
   );
