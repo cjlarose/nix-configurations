@@ -22,6 +22,9 @@ in nixpkgs.lib.nixosSystem {
         hideMounts = true;
         directories = [
           {
+            directory = "/etc/nixos";
+          }
+          {
             directory = "/var/lib/acme";
             user = "acme";
             group = "acme";
