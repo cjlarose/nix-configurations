@@ -19,15 +19,15 @@
   "Monica-MacBook-Pro-Home" = (
     import ./monica-mbp {
       inherit additionalPackages darwin sharedOverlays;
-      nixpkgs = nixpkgs-24-05;
-      home-manager = home-manager-24-05;
+      nixpkgs = nixpkgs-25-05;
+      home-manager = home-manager-25-05;
     }
   );
   "Monica-MacBook-Pro-Work" = (
     import ./monica-mbp-work {
       inherit additionalPackages darwin sharedOverlays;
-      nixpkgs = nixpkgs-24-05;
-      home-manager = home-manager-24-05;
+      nixpkgs = nixpkgs-25-05;
+      home-manager = home-manager-25-05;
     }
   );
 }
