@@ -62,8 +62,8 @@
   "immich" = (
     import ./immich {
       inherit sharedOverlays additionalPackages impermanence disko;
-      nixpkgs = nixpkgs-24-11;
-      home-manager = home-manager-24-11;
+      nixpkgs = nixpkgs-25-05;
+      home-manager = home-manager-25-05;
       stateVersion = "24.11";
     }
   );
