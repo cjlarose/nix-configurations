@@ -29,7 +29,7 @@
   );
   "bots" = (
     import ./bots {
-      inherit sharedOverlays additionalPackages pce impermanence;
+      inherit sharedOverlays additionalPackages pce impermanence disko;
       nixpkgs = nixpkgs-25-05;
       home-manager = home-manager-25-05;
       stateVersion = "23.11";

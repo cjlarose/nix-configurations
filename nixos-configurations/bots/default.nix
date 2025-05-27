@@ -1,18 +1,10 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, pce, impermanence, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, pce, impermanence, disko, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
-    ({ pkgs, lib, ... }: {
-      boot = {
-        loader.systemd-boot.enable = true;
-        zfs.devNodes = "/dev/disk/by-label/tank";
-        initrd.postDeviceCommands = lib.mkAfter ''
-          zfs rollback -r tank/root@blank
-        '';
-      };
-    })
+    (import ./disk-config.nix { inherit disko; })
     (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system additionalPackages; })
     ({ pkgs, ... } : {
       imports = [
