@@ -2,6 +2,7 @@
   pkgs,
   nixpkgs-24-11,
   nixpkgs-23-05,
+  nixpkgs-master,
   system,
   bundix,
   intranetHosts,
@@ -17,7 +18,7 @@
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   intranetHosts = intranetHosts;
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };
-  nix-direnv = nixpkgs-24-11.legacyPackages.${system}.nix-direnv;
+  nix-direnv = nixpkgs-master.legacyPackages.${system}.nix-direnv;
   nvr = import ./nvr { inherit pkgs nvr; };
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
   teleport_16 = nixpkgs-24-11.legacyPackages.${system}.teleport_16;

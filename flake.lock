@@ -236,6 +236,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-master": {
+      "locked": {
+        "lastModified": 1748389978,
+        "narHash": "sha256-0fB6DyQSHEO04ng1J3MDrwxVkiN4agT5MTy/B7Ba5TI=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "beed2c8e29b049e79bc87945f90c6ed13bdea9be",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "master",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1728193676,
@@ -367,6 +383,7 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-24-11": "nixpkgs-24-11",
+        "nixpkgs-master": "nixpkgs-master",
         "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
