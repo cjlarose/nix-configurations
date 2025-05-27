@@ -53,7 +53,7 @@
   );
   "dns" = (
     import ./dns {
-      inherit sharedOverlays additionalPackages impermanence;
+      inherit sharedOverlays additionalPackages impermanence disko;
       nixpkgs = nixpkgs-25-05;
       home-manager = home-manager-25-05;
       stateVersion = "23.11";
