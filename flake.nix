@@ -47,8 +47,8 @@
     pce = {
       url = "git+ssh://git@github.com/cjlarose/pixel-cats-end-automation";
     };
-    chicken-smoothie-automation = {
-      url = "git+ssh://git@github.com/cjlarose/chicken-smoothie-automation";
+    cs-automation = {
+      url = "git+ssh://git@github.com/cjlarose/cs-automation";
     };
     impermanence = {
       url = "github:nix-community/impermanence";
@@ -101,7 +101,7 @@
     tfenv,
     trueColorTest,
     nvr,
-    chicken-smoothie-automation,
+    cs-automation,
   }:
     let
       supportedPlatforms = [
@@ -115,7 +115,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 bundix intranetHosts nvr trueColorTest chicken-smoothie-automation;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 bundix intranetHosts nvr trueColorTest cs-automation;
           };
         in
           import ./packages packageArgs

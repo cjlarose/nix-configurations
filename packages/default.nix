@@ -8,13 +8,13 @@
   intranetHosts,
   nvr,
   trueColorTest,
-  chicken-smoothie-automation,
+  cs-automation,
   ...
 }:
 
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
-  chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
+  cs-automation = cs-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   intranetHosts = intranetHosts;
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };

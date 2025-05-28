@@ -16,7 +16,7 @@
         "type": "github"
       }
     },
-    "chicken-smoothie-automation": {
+    "cs-automation": {
       "inputs": {
         "nixpkgs": "nixpkgs"
       },
@@ -27,11 +27,11 @@
         "rev": "094b2a66a886e0952dca579d1dd5e65eaccbf9e7",
         "revCount": 65,
         "type": "git",
-        "url": "ssh://git@github.com/cjlarose/chicken-smoothie-automation"
+        "url": "ssh://git@github.com/cjlarose/cs-automation"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/cjlarose/chicken-smoothie-automation"
+        "url": "ssh://git@github.com/cjlarose/cs-automation"
       }
     },
     "darwin": {
@@ -408,7 +408,7 @@
     "root": {
       "inputs": {
         "bundix": "bundix",
-        "chicken-smoothie-automation": "chicken-smoothie-automation",
+        "cs-automation": "cs-automation",
         "darwin": "darwin",
         "disko": "disko",
         "fzfProject": "fzfProject",
