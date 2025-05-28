@@ -11,8 +11,8 @@
     nixpkgs-24-11 = {
       url = "github:nixos/nixpkgs/nixos-24.11";
     };
-    nixpkgs-master = {
-      url = "github:nixos/nixpkgs/master";
+    nixpkgs-unstable = {
+      url = "github:nixos/nixpkgs/nixpkgs-unstable";
     };
     darwin = {
       url = "github:lnl7/nix-darwin/master";
@@ -85,7 +85,7 @@
     nixpkgs,
     nixpkgs-23-05,
     nixpkgs-24-11,
-    nixpkgs-master,
+    nixpkgs-unstable,
     omnisharpVim,
     pce,
     self,
@@ -106,7 +106,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-master nixpkgs-24-11 nixpkgs-23-05 bundix intranetHosts nvr trueColorTest chicken-smoothie-automation;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 bundix intranetHosts nvr trueColorTest chicken-smoothie-automation;
           };
         in
           import ./packages packageArgs
