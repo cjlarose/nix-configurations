@@ -97,6 +97,7 @@
       commit.verbose = true;
       pull.ff = "only";
       rebase.autosquash = true;
+      rebase.autostash = true;
       "url \"ssh://git@ssh.gitlab.1password.io:2227\"".insteadOf = "https://gitlab.1password.io";
       gpg.format = "ssh";
       "gpg \"ssh\"" = {
