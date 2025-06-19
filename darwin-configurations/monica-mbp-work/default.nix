@@ -59,8 +59,7 @@ in darwin.lib.darwinSystem {
     home-manager.darwinModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users."monica.hung" = import ../../home/monicahung;
-      home-manager.extraSpecialArgs = {
+      home-manager.users."monica.hung" = (import ../../home/monicahung) {
         inherit system stateVersion additionalPackages;
         includeCopilotVim = true;
         configurationName = "Monica-MacBook-Pro-Work";

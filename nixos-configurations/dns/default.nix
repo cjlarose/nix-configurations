@@ -30,8 +30,7 @@ in nixpkgs.lib.nixosSystem {
     home-manager.nixosModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.cjlarose = import ../../home/cjlarose;
-      home-manager.extraSpecialArgs = {
+      home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
         include1Password = false;
         includeDockerClient = false;

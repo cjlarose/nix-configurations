@@ -1,4 +1,5 @@
-{ system, pkgs, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, includeCoder, includeCopilotVim, ... }: {
+{ system, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, includeCoder, includeCopilotVim }:
+{ pkgs, ... }: {
   imports = let
     baseImports = [
       ./personal-scripts.nix

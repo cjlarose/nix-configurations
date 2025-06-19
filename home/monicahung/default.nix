@@ -1,4 +1,5 @@
-{ system, pkgs, additionalPackages, stateVersion, includeCopilotVim, configurationName, email, yarnOverride, ... }: {
+{ system, additionalPackages, stateVersion, includeCopilotVim, configurationName, email, yarnOverride }:
+{ pkgs, ... }: {
   imports = let
     baseImports = [
       ./personal-scripts.nix
