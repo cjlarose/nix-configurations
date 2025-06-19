@@ -65,7 +65,6 @@ in nixpkgs.lib.nixosSystem {
         inherit system stateVersion additionalPackages;
         configurationName = "";
         email = "monica.hung11@gmail.com";
-        yarnOverride = false;
       };
     }
   ];
