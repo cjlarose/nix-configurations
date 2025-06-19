@@ -33,7 +33,7 @@
     pkgs.neovim-remote
     pkgs.nil
     pkgs.nodePackages.bash-language-server
-    pkgs.nodePackages.pyright
+    pkgs.pyright
     pkgs.nodePackages.typescript-language-server
     pkgs.nodePackages.vscode-langservers-extracted
     pkgs.nodejs_20
@@ -116,7 +116,7 @@
 
   programs.go = {
     enable = true;
-    package = pkgs.go_1_22;
+    package = additionalPackages.${system}.go_1_22;
   };
 
   programs.ssh = {

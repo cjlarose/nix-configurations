@@ -5,7 +5,7 @@
 
   networking = {
     hostName = "dns";
-    hostId = "d202c7d5";
+    hostId = "3889a1e4";
     firewall = {
       enable = true;
       allowedTCPPorts = [ 53 ];
@@ -21,7 +21,6 @@
   system.stateVersion = stateVersion;
 
   nix = {
-    package = pkgs.nixFlakes;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';

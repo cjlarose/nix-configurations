@@ -33,7 +33,6 @@
       pkgs.corepack
       pkgs.csvtool
       pkgs.dig
-      pkgs.fluxctl
       pkgs.git-absorb
       pkgs.git-filter-repo
       additionalPackages.${system}.git-make-apply-command
@@ -169,7 +168,7 @@
 
   programs.go = {
     enable = true;
-    package = pkgs.go_1_22;
+    package = additionalPackages.${system}.go_1_22;
     goPrivate = [
       "bitbucket.org/picktrace"
       "github.com/picktrace"

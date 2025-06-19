@@ -26,13 +26,13 @@
     };
 
   fileSystems."/persistence" =
-    { device = "/dev/disk/by-label/persistence";
+    { device = "/dev/disk/by-partlabel/persistence";
       neededForBoot = true;
       fsType = "ext4";
     };
 
   swapDevices = [
-    { device = "/dev/disk/by-label/swap"; }
+    { device = "/dev/disk/by-partlabel/disk-main-swap"; }
   ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

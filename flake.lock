@@ -16,28 +16,28 @@
         "type": "github"
       }
     },
-    "chicken-smoothie-automation": {
+    "cs-automation": {
       "inputs": {
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1730075666,
-        "narHash": "sha256-hkhaMAYV/cn0SmRIXyX1Zl1Sgco4hDxBP/pnFRj0GKo=",
+        "lastModified": 1748418598,
+        "narHash": "sha256-Wb4BZEIiHr3a3FqarMSJ1m3wbKzhCk8ryZHlC+ongBw=",
         "ref": "refs/heads/main",
-        "rev": "713f1de9ed20830a232610b9965bd73d2ebf1e2e",
-        "revCount": 64,
+        "rev": "094b2a66a886e0952dca579d1dd5e65eaccbf9e7",
+        "revCount": 65,
         "type": "git",
-        "url": "ssh://git@github.com/cjlarose/chicken-smoothie-automation"
+        "url": "ssh://git@github.com/cjlarose/cs-automation"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/cjlarose/chicken-smoothie-automation"
+        "url": "ssh://git@github.com/cjlarose/cs-automation"
       }
     },
     "darwin": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-25-05"
         ]
       },
       "locked": {
@@ -58,7 +58,7 @@
     "disko": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-24-05"
         ]
       },
       "locked": {
@@ -78,7 +78,7 @@
     "fzfProject": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-24-05"
         ]
       },
       "locked": {
@@ -98,7 +98,7 @@
     "fzfVim": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-24-05"
         ]
       },
       "locked": {
@@ -115,18 +115,18 @@
         "type": "github"
       }
     },
-    "home-manager": {
+    "home-manager-24-05": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-24-05"
         ]
       },
       "locked": {
-        "lastModified": 1720042825,
-        "narHash": "sha256-A0vrUB6x82/jvf17qPCpxaM+ulJnD8YZwH9Ci0BsAzE=",
+        "lastModified": 1726989464,
+        "narHash": "sha256-Vl+WVTJwutXkimwGprnEtXc/s/s8sMuXzqXaspIGlwM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "e1391fb22e18a36f57e6999c7a9f966dc80ac073",
+        "rev": "2f23fa308a7c067e52dfcc30a0758f47043ec176",
         "type": "github"
       },
       "original": {
@@ -139,7 +139,7 @@
     "home-manager-24-11": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-24-05"
         ]
       },
       "locked": {
@@ -153,6 +153,27 @@
       "original": {
         "owner": "nix-community",
         "ref": "release-24.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "home-manager-25-05": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-25-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1748226808,
+        "narHash": "sha256-GaBRgxjWO1bAQa8P2+FDxG4ANBVhjnSjBms096qQdxo=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "83665c39fa688bd6a1f7c43cf7997a70f6a109f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.05",
         "repo": "home-manager",
         "type": "github"
       }
@@ -220,6 +241,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-24-05": {
+      "locked": {
+        "lastModified": 1735563628,
+        "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "b134951a4c9f3c995fd7be05f3243f8ecd65d798",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-24.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-24-11": {
       "locked": {
         "lastModified": 1745487689,
@@ -232,6 +269,22 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-24.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-25-05": {
+      "locked": {
+        "lastModified": 1748162331,
+        "narHash": "sha256-rqc2RKYTxP3tbjA+PB3VMRQNnjesrT0pEofXQTrMsS8=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "7c43f080a7f28b2774f3b3f43234ca11661bf334",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -254,22 +307,6 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1728193676,
-        "narHash": "sha256-PbDWAIjKJdlVg+qQRhzdSor04bAPApDqIv2DofTyynk=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "ecbc1ca8ffd6aea8372ad16be9ebbb39889e55b6",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-24.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_3": {
-      "locked": {
         "lastModified": 1722087241,
         "narHash": "sha256-2ShmEaFi0kJVOEEu5gmlykN5dwjWYWYUJmlRTvZQRpU=",
         "owner": "nixos",
@@ -284,7 +321,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_4": {
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1735669367,
         "narHash": "sha256-tfYRbFhMOnYaM4ippqqid3BaLOXoFNdImrfBfCp4zn0=",
@@ -333,7 +370,7 @@
     },
     "pce": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": "nixpkgs_2",
         "pce-dailies": "pce-dailies"
       },
       "locked": {
@@ -352,7 +389,7 @@
     },
     "pce-dailies": {
       "inputs": {
-        "nixpkgs": "nixpkgs_4"
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
         "lastModified": 1747878919,
@@ -371,18 +408,20 @@
     "root": {
       "inputs": {
         "bundix": "bundix",
-        "chicken-smoothie-automation": "chicken-smoothie-automation",
+        "cs-automation": "cs-automation",
         "darwin": "darwin",
         "disko": "disko",
         "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
-        "home-manager": "home-manager",
+        "home-manager-24-05": "home-manager-24-05",
         "home-manager-24-11": "home-manager-24-11",
+        "home-manager-25-05": "home-manager-25-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
-        "nixpkgs": "nixpkgs_2",
         "nixpkgs-23-05": "nixpkgs-23-05",
+        "nixpkgs-24-05": "nixpkgs-24-05",
         "nixpkgs-24-11": "nixpkgs-24-11",
+        "nixpkgs-25-05": "nixpkgs-25-05",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",
