@@ -23,11 +23,6 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
-        include1Password = false;
-        includeDockerClient = false;
-        includeGnuSed = true;
-        includeCoder = false;
-        includeCopilotVim = false;
       };
     }
   ];

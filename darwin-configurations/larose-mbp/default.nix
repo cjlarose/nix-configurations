@@ -84,7 +84,6 @@ in darwin.lib.darwinSystem {
       home-manager.users.chrislarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
         include1Password = true;
-        includeDockerClient = false;
         includeGnuSed = false;
         includeCoder = true;
         includeCopilotVim = true;

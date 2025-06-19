@@ -55,10 +55,6 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
-        include1Password = false;
-        includeDockerClient = false;
-        includeGnuSed = true;
-        includeCoder = false;
         includeCopilotVim = true;
       };
     }
@@ -67,7 +63,6 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.monicahung = (import ../../home/monicahung) {
         inherit system stateVersion additionalPackages;
-        includeCopilotVim = false;
         configurationName = "";
         email = "monica.hung11@gmail.com";
         yarnOverride = false;

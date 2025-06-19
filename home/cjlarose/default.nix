@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, include1Password, includeDockerClient, includeGnuSed, includeCoder, includeCopilotVim }:
+{ system, additionalPackages, stateVersion, include1Password ? false, includeDockerClient ? false, includeGnuSed ? true, includeCoder ? false, includeCopilotVim ? false }:
 { pkgs, ... }: {
   imports = let
     baseImports = [

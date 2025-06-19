@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, includeCopilotVim, configurationName, email, yarnOverride }:
+{ system, additionalPackages, stateVersion, includeCopilotVim ? false, configurationName, email, yarnOverride }:
 { pkgs, ... }: {
   imports = let
     baseImports = [
