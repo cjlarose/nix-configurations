@@ -16,6 +16,9 @@
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
   chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
+  cody = pkgs.writeShellScriptBin "cody" ''
+    exec ${pkgs.nodejs_20}/bin/npx --yes @sourcegraph/cody@latest "$@"
+  '';
   intranetHosts = intranetHosts;
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;

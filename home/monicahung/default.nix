@@ -25,6 +25,7 @@
 
   home.packages = [
     pkgs.abduco
+    additionalPackages.${system}.cody
     pkgs.dig
     pkgs.docker-client
     pkgs.git-absorb
