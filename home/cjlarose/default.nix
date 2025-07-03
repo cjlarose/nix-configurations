@@ -34,6 +34,7 @@
       pkgs.corepack
       pkgs.csvtool
       pkgs.dig
+      pkgs.gh
       pkgs.git-absorb
       pkgs.git-filter-repo
       additionalPackages.${system}.git-make-apply-command
