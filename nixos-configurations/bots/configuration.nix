@@ -1,4 +1,7 @@
-{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, ... }: { pkgs, ... }:
+let
+  allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
+in {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -32,10 +35,7 @@
 
   nixpkgs = {
     overlays = sharedOverlays;
-    config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-      "1password-cli"
-      "copilot.vim"
-    ];
+    config.allowUnfreePredicate = allowUnfreePredicate;
   };
 
   security.sudo.wheelNeedsPassword = false;

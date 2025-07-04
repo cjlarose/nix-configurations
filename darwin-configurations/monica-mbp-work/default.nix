@@ -8,6 +8,7 @@
 let
   system = "aarch64-darwin";
   stateVersion = "24.05";
+  allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
 in darwin.lib.darwinSystem {
   inherit system;
   modules = [
@@ -47,10 +48,7 @@ in darwin.lib.darwinSystem {
             nodejs = nixpkgs.legacyPackages.${system}.nodejs_20;
           })
         ];
-        config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-          "1password-cli"
-          "copilot.vim"
-        ];
+        config.allowUnfreePredicate = allowUnfreePredicate;
       };
       users.users."monica.hung" = {
         home = "/Users/monica.hung";

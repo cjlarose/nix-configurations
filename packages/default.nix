@@ -9,11 +9,16 @@
   nvr,
   trueColorTest,
   cs-automation,
+  allowUnfreePredicate,
   ...
 }:
 
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
+  claude-code = (import nixpkgs-unstable {
+    inherit system;
+    config.allowUnfreePredicate = allowUnfreePredicate;
+  }).claude-code;
   cs-automation = cs-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   intranetHosts = intranetHosts;

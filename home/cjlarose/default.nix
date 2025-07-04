@@ -84,6 +84,7 @@
       pkgs.wget
       pkgs.wrk
       pkgs.yq-go
+      additionalPackages.${system}.claude-code
     ];
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
     gnuSedPackages = (if includeGnuSed then [pkgs.gnused] else []);
@@ -131,6 +132,7 @@
     ignores = [
       "[._]*.s[a-w][a-z]"
       "[._]s[a-w][a-z]"
+      ".claude"
     ];
     delta = {
       enable = true;

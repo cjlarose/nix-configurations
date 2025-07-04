@@ -1,4 +1,7 @@
-{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { config, pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { config, pkgs, ... }:
+let
+  allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
+in {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -24,9 +27,7 @@
 
   nixpkgs = {
     overlays = sharedOverlays;
-    config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-      "plexmediaserver"
-    ];
+    config.allowUnfreePredicate = allowUnfreePredicate;
   };
 
   environment.systemPackages = with pkgs; [

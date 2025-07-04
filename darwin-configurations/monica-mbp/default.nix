@@ -8,6 +8,7 @@
 let
   system = "x86_64-darwin";
   stateVersion = "23.11";
+  allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
 in darwin.lib.darwinSystem {
   inherit system;
   modules = [
@@ -47,9 +48,7 @@ in darwin.lib.darwinSystem {
             nodejs = nixpkgs.legacyPackages.${system}.nodejs_20;
           })
         ];
-        config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-          "1password-cli"
-        ];
+        config.allowUnfreePredicate = allowUnfreePredicate;
       };
       users.users.monicahung = {
         home = "/Users/monicahung";
