@@ -200,7 +200,7 @@
   virtualisation.oci-containers = {
     containers = {
       splitpro = {
-        image = "ossapps/splitpro:v1.3.4";
+        image = "ossapps/splitpro:v1.4.3";
         environmentFiles = [
           "/persistence/splitpro/.env"
         ];
