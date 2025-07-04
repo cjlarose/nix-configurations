@@ -132,6 +132,7 @@
     ignores = [
       "[._]*.s[a-w][a-z]"
       "[._]s[a-w][a-z]"
+      ".claude"
     ];
     delta = {
       enable = true;
