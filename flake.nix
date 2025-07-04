@@ -18,7 +18,7 @@
       url = "github:nixos/nixpkgs/nixpkgs-unstable";
     };
     darwin = {
-      url = "github:lnl7/nix-darwin/master";
+      url = "github:lnl7/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs-25-05";
     };
     home-manager-24-05 = {

@@ -26,12 +26,14 @@ in darwin.lib.darwinSystem {
         additionalPackages.${system}.wrappedTailscale
         additionalPackages.${system}.wrappedWireshark
       ];
-      services.nix-daemon.enable = true;
       programs.zsh = {
         enable = true;
         promptInit = "";
       };
+
       system.stateVersion = 4;
+      system.primaryUser = "chrislarose";
+
       nix = {
         extraOptions = ''
           experimental-features = nix-command flakes
