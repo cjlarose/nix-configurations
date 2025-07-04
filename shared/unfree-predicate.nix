@@ -4,6 +4,7 @@ let
   # All unfree packages used across configurations
   allUnfreePackages = [
     "1password-cli"
+    "claude-code"
     "coder"
     "copilot.vim"
     "plexmediaserver"
