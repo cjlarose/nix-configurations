@@ -2,13 +2,13 @@
   additionalPackages,
   darwin,
   home-manager,
+  homeManagerStateVersion,
   nixpkgs,
   primaryUser,
   sharedOverlays
 }:
 let
   system = "aarch64-darwin";
-  stateVersion = "23.05";
   allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
 in darwin.lib.darwinSystem {
   inherit system;
@@ -81,7 +81,8 @@ in darwin.lib.darwinSystem {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.${primaryUser} = (import ../../home/cjlarose) {
-        inherit system stateVersion additionalPackages;
+        inherit system additionalPackages;
+        stateVersion = homeManagerStateVersion;
         include1Password = true;
         includeGnuSed = false;
         includeCoder = true;
