@@ -7,6 +7,8 @@
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []) ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
 
+  home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
+
   home.stateVersion = stateVersion;
 
   home.sessionPath = [
