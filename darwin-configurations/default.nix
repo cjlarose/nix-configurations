@@ -16,6 +16,7 @@
       home-manager = home-manager-25-05;
       primaryUser = "chrislarose";
       homeManagerStateVersion = "23.05";
+      nixDarwinStateVersion = 4;
     }
   );
   "Monica-MacBook-Pro-Home" = (

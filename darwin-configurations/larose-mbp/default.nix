@@ -3,6 +3,7 @@
   darwin,
   home-manager,
   homeManagerStateVersion,
+  nixDarwinStateVersion,
   nixpkgs,
   primaryUser,
   sharedOverlays
@@ -32,7 +33,7 @@ in darwin.lib.darwinSystem {
         promptInit = "";
       };
 
-      system.stateVersion = 4;
+      system.stateVersion = nixDarwinStateVersion;
       system.primaryUser = primaryUser;
 
       nix = {
