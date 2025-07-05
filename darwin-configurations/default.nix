@@ -9,6 +9,16 @@
   home-manager-24-11,
   home-manager-25-05
 }: {
+  "Christophers-MacBook-Pro" = (
+    import ./larose-mbp {
+      inherit additionalPackages darwin sharedOverlays;
+      nixpkgs = nixpkgs-25-05;
+      home-manager = home-manager-25-05;
+      primaryUser = "cjlarose";
+      homeManagerStateVersion = "25.05";
+      nixDarwinStateVersion = 6;
+    }
+  );
   "LaRose-MacBook-Pro" = (
     import ./larose-mbp {
       inherit additionalPackages darwin sharedOverlays;
