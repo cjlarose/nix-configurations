@@ -14,6 +14,7 @@
       inherit additionalPackages darwin sharedOverlays;
       nixpkgs = nixpkgs-25-05;
       home-manager = home-manager-25-05;
+      primaryUser = "chrislarose";
     }
   );
   "Monica-MacBook-Pro-Home" = (

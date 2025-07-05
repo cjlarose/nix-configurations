@@ -3,6 +3,7 @@
   darwin,
   home-manager,
   nixpkgs,
+  primaryUser,
   sharedOverlays
 }:
 let
@@ -32,7 +33,7 @@ in darwin.lib.darwinSystem {
       };
 
       system.stateVersion = 4;
-      system.primaryUser = "chrislarose";
+      system.primaryUser = primaryUser;
 
       nix = {
         extraOptions = ''
@@ -72,14 +73,14 @@ in darwin.lib.darwinSystem {
         '';
       };
 
-      users.users.chrislarose = {
-        home = "/Users/chrislarose";
+      users.users.${primaryUser} = {
+        home = "/Users/${primaryUser}";
       };
     })
     home-manager.darwinModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.chrislarose = (import ../../home/cjlarose) {
+      home-manager.users.${primaryUser} = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
         include1Password = true;
         includeGnuSed = false;
