@@ -7,6 +7,7 @@
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []) ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
 
+  home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
   home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
 
   home.stateVersion = stateVersion;
