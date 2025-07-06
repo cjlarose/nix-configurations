@@ -57,7 +57,7 @@ in darwin.lib.darwinSystem {
       nixpkgs = {
         overlays = sharedOverlays ++ [
           (final: prev: {
-            nodejs = nixpkgs.legacyPackages.${system}.nodejs_20;
+            nodejs = nixpkgs.legacyPackages.${system}.nodejs_22;
           })
         ];
         config.allowUnfreePredicate = allowUnfreePredicate;
