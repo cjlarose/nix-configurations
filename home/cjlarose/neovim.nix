@@ -36,8 +36,8 @@
       {
         plugin = fzf-project;
         config = ''
-          let g:fzfSwitchProjectWorkspaces = [ '~/workspace', '~/workspace/cjlarose/dotfiles' ]
-          let g:fzfSwitchProjectProjectDepth = 2
+          let g:fzfSwitchProjectWorkspaces = [ '~/worktrees', '~/workspace', '~/workspace/cjlarose/dotfiles' ]
+          let g:fzfSwitchProjectProjectDepth = 3
         '';
       }
       vim-fugitive
