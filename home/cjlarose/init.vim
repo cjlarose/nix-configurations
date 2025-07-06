@@ -74,6 +74,9 @@ nmap <leader>n :nohlsearch<CR>
 " Always display signcolumn
 set signcolumn=yes
 
+" Disable swap files
+set noswapfile
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Terminal Buffer Shortcuts                                                    "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
