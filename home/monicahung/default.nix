@@ -25,6 +25,7 @@
 
   home.packages = [
     pkgs.abduco
+    additionalPackages.${system}.amp
     additionalPackages.${system}.cody
     pkgs.dig
     pkgs.docker-client

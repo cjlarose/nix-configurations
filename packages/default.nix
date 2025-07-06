@@ -13,6 +13,9 @@
 }:
 
 {
+  amp = pkgs.writeShellScriptBin "amp" ''
+    exec ${pkgs.nodejs_22}/bin/npx --yes @sourcegraph/amp@latest "$@"
+  '';
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
   chicken-smoothie-automation = chicken-smoothie-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
