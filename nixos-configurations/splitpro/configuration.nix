@@ -173,6 +173,8 @@
 
   services.tailscale = {
     enable = true;
+    openFirewall = true;
+    port = 41643;
   };
 
   services.zfs.expandOnBoot = "all";
