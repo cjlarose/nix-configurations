@@ -26,7 +26,7 @@ in nixpkgs.lib.nixosSystem {
         users = {
           bot = {
             directories = [
-              ".config/chicken-smoothie-automation"
+              ".config/cs-automation"
               ".config/chromium"
               ".config/pce"
               ".local/share/pce-dailies"
