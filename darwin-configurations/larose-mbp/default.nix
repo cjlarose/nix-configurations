@@ -2,12 +2,14 @@
   additionalPackages,
   darwin,
   home-manager,
+  homeManagerStateVersion,
+  nixDarwinStateVersion,
   nixpkgs,
+  primaryUser,
   sharedOverlays
 }:
 let
   system = "aarch64-darwin";
-  stateVersion = "23.05";
   allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
 in darwin.lib.darwinSystem {
   inherit system;
@@ -31,8 +33,8 @@ in darwin.lib.darwinSystem {
         promptInit = "";
       };
 
-      system.stateVersion = 4;
-      system.primaryUser = "chrislarose";
+      system.stateVersion = nixDarwinStateVersion;
+      system.primaryUser = primaryUser;
 
       nix = {
         extraOptions = ''
@@ -55,7 +57,7 @@ in darwin.lib.darwinSystem {
       nixpkgs = {
         overlays = sharedOverlays ++ [
           (final: prev: {
-            nodejs = nixpkgs.legacyPackages.${system}.nodejs_20;
+            nodejs = nixpkgs.legacyPackages.${system}.nodejs_22;
           })
         ];
         config.allowUnfreePredicate = allowUnfreePredicate;
@@ -72,15 +74,16 @@ in darwin.lib.darwinSystem {
         '';
       };
 
-      users.users.chrislarose = {
-        home = "/Users/chrislarose";
+      users.users.${primaryUser} = {
+        home = "/Users/${primaryUser}";
       };
     })
     home-manager.darwinModules.home-manager {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.chrislarose = (import ../../home/cjlarose) {
-        inherit system stateVersion additionalPackages;
+      home-manager.users.${primaryUser} = (import ../../home/cjlarose) {
+        inherit system additionalPackages;
+        stateVersion = homeManagerStateVersion;
         include1Password = true;
         includeGnuSed = false;
         includeCoder = true;

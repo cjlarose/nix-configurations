@@ -7,6 +7,7 @@
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []) ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
 
+  home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
   home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
 
   home.stateVersion = stateVersion;
@@ -57,7 +58,7 @@
       pkgs.pyright
       pkgs.nodePackages.typescript-language-server
       pkgs.nodePackages.vscode-langservers-extracted
-      pkgs.nodejs_20
+      pkgs.nodejs_22
       pkgs.parallel
       pkgs.postgresql
       (additionalPackages.${system}.python39.withPackages (python-pkgs: with python-pkgs; [
