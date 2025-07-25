@@ -59,6 +59,7 @@
       pkgs.nodePackages.typescript-language-server
       pkgs.nodePackages.vscode-langservers-extracted
       pkgs.nodejs_22
+      pkgs.oha
       pkgs.parallel
       pkgs.postgresql
       (additionalPackages.${system}.python39.withPackages (python-pkgs: with python-pkgs; [
