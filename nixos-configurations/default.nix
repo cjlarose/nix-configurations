@@ -75,6 +75,14 @@
       stateVersion = "23.11";
     }
   );
+  "memos" = (
+    import ./memos {
+      inherit sharedOverlays additionalPackages impermanence disko;
+      nixpkgs = nixpkgs-25-05;
+      home-manager = home-manager-25-05;
+      stateVersion = "25.05";
+    }
+  );
   "palworld" = (
     import ./palworld {
       inherit sharedOverlays additionalPackages;
