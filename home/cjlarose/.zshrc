@@ -45,6 +45,12 @@ function set-kubeconfig {
 autoload -U add-zsh-hook
 add-zsh-hook precmd set-kubeconfig
 
+# Create symlink for current SSH_AUTH_SOCK and set SSH_AUTH_SOCK to reference the link
+if [ -n "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/ssh_auth_sock" ]; then
+  ln -sf "$SSH_AUTH_SOCK" "$HOME/.ssh/ssh_auth_sock"
+  export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+fi
+
 if [ -f ~/.zshlocalrc ]; then
   source ~/.zshlocalrc
 fi
