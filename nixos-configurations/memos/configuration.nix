@@ -58,6 +58,12 @@
     ];
   };
 
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+    port = 41644;
+  };
+
   services.zfs.expandOnBoot = "all";
 
   programs.ssh.startAgent = true;
