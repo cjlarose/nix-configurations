@@ -72,7 +72,17 @@
 
   users = {
     mutableUsers = false;
+    groups = {
+      acme = {
+        gid = 200;
+      };
+    };
     users = {
+      acme = {
+        isSystemUser = true;
+        uid = 200;
+        group = "acme";
+      };
       cjlarose = {
         uid = 1000;
         isNormalUser = true;
