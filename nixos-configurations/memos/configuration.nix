@@ -78,6 +78,20 @@
     port = 41644;
   };
 
+  virtualisation.oci-containers = {
+    containers = {
+      scriberr = {
+        image = "ghcr.io/rishikanthc/scriberr:v1.0.4";
+        ports = [ "8080:8080" ];
+        volumes = [ "/var/lib/scriberr:/app/data" ];
+        environment = {
+          PUID = toString config.users.users.scriberr.uid;
+          PGID = toString config.users.groups.scriberr.gid;
+        };
+      };
+    };
+  };
+
   services.zfs.expandOnBoot = "all";
 
   programs.ssh.startAgent = true;
