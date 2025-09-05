@@ -18,6 +18,12 @@ in nixpkgs.lib.nixosSystem {
               directory = "/etc/nixos";
             }
             {
+              directory = "/var/lib/acme";
+              user = config.users.users.acme.name;
+              group = config.users.users.acme.group;
+              mode = "0755";
+            }
+            {
               directory = "/var/lib/tailscale";
               user = "root";
               group = "root";
