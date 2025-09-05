@@ -90,6 +90,9 @@
       acme = {
         gid = 200;
       };
+      scriberr = {
+        gid = 201;
+      };
     };
     users = {
       acme = {
@@ -107,6 +110,11 @@
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
         ];
+      };
+      scriberr = {
+        isSystemUser = true;
+        uid = 201;
+        group = "scriberr";
       };
     };
   };
