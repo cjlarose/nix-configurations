@@ -24,6 +24,12 @@ in nixpkgs.lib.nixosSystem {
               mode = "0755";
             }
             {
+              directory = "/var/lib/scriberr";
+              user = config.users.users.scriberr.name;
+              group = config.users.users.scriberr.group;
+              mode = "0755";
+            }
+            {
               directory = "/var/lib/tailscale";
               user = "root";
               group = "root";
