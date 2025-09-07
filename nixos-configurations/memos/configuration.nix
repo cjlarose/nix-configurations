@@ -107,6 +107,36 @@
     };
   };
 
+  services.restic.backups = {
+    backblaze = {
+      initialize = true;
+
+      timerConfig = {
+        OnCalendar = "02:00 America/Los_Angeles";
+        Persistent = true;
+      };
+
+      environmentFile = "/persistence/restic/backblaze/env";
+      repositoryFile = "/persistence/restic/backblaze/repo";
+      passwordFile = "/persistence/restic/backblaze/password";
+
+      paths = [
+        "/var/lib/scriberr"
+        "/var/lib/scriberr-sqlite-backups"
+      ];
+
+      pruneOpts = [
+        "--keep-daily 7"
+        "--keep-weekly 5"
+        "--keep-monthly 12"
+      ];
+
+      backupPrepareCommand = ''
+        ${pkgs.sqlite}/bin/sqlite3 /var/lib/scriberr/scriberr.db ".backup /var/lib/scriberr-sqlite-backups/scriberr.db"
+      '';
+    };
+  };
+
   services.zfs.expandOnBoot = "all";
 
   programs.ssh.startAgent = true;

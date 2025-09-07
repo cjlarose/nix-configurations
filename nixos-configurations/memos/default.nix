@@ -24,9 +24,21 @@ in nixpkgs.lib.nixosSystem {
               mode = "0755";
             }
             {
+              directory = "/var/cache/restic-backups-backblaze";
+              user = "root";
+              group = "root";
+              mode = "0755";
+            }
+            {
               directory = "/var/lib/scriberr";
               user = config.users.users.scriberr.name;
               group = config.users.users.scriberr.group;
+              mode = "0755";
+            }
+            {
+              directory = "/var/lib/scriberr-sqlite-backups";
+              user = "root";
+              group = "root";
               mode = "0755";
             }
             {
