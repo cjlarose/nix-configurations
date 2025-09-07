@@ -53,6 +53,21 @@
     };
   };
 
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      "memos.toothyshouse.com" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8080";
+          recommendedProxySettings = true;
+        };
+      };
+    };
+  };
+
   services.openssh = {
     enable = true;
     settings = {
