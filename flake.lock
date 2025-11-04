@@ -21,11 +21,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1761586517,
-        "narHash": "sha256-C+2NKoEaV2qXoHfcC9yZVSicwuz3CXSTE4duHUsfcag=",
+        "lastModified": 1762283045,
+        "narHash": "sha256-u1yC5ffRAiIaRZ4coNHokt0bNffsJGckSYybDmxDYVk=",
         "ref": "refs/heads/main",
-        "rev": "768ec613f0ba6c474bf4219ab70f6ee630d45ead",
-        "revCount": 70,
+        "rev": "6e41b795f4dc5c3e224f090184dbcfab58ed6973",
+        "revCount": 71,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/cs-automation"
       },
