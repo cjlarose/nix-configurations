@@ -35,6 +35,7 @@ in darwin.lib.darwinSystem {
 
       system.stateVersion = nixDarwinStateVersion;
       system.primaryUser = primaryUser;
+      system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
 
       nix = {
         extraOptions = ''
