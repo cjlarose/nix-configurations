@@ -108,7 +108,7 @@
     envExtra = ''
       export GIT_PACKAGE_DIR=${pkgs.git}
     '';
-    initExtra = builtins.readFile ./.zshrc;
+    initExtra = builtins.readFile ./init.zsh;
   };
 
   programs.git = {
