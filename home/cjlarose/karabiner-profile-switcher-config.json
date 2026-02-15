@@ -1,0 +1,13 @@
+{
+  "polling_interval_seconds": 0.1,
+  "rules": [
+    {
+      "profile": "Gaming",
+      "app_name_pattern": "^java$",
+      "window_title_pattern": "Minecraft.*"
+    },
+    {
+      "profile": "Home row mods CAGS"
+    }
+  ]
+}

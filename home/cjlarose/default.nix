@@ -4,6 +4,7 @@
     baseImports = [
       ./personal-scripts.nix
       ./neovim.nix
+      ./karabiner-profile-switcher.nix
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []) ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
 
