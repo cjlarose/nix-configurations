@@ -102,6 +102,7 @@
                 type = "zfs_fs";
                 mountpoint = "/nix";
                 options.mountpoint = "legacy";
+                options.quota = "64G";
               };
               persistence = {
                 type = "zfs_fs";
