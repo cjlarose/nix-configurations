@@ -16,7 +16,6 @@
 
   nix = {
     registry.nixpkgs.flake = nixpkgs;
-    nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
   };
 
   nixpkgs.overlays = sharedOverlays;
