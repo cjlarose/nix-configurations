@@ -12,6 +12,7 @@
   pce,
   impermanence,
   disko,
+  determinate,
   ...
 }: {
   "builder" = (
@@ -127,7 +128,7 @@
   );
   "ns1010301" = (
     import ./ns1010301 {
-      inherit sharedOverlays additionalPackages impermanence disko;
+      inherit sharedOverlays additionalPackages impermanence disko determinate;
       nixpkgs = nixpkgs-25-11;
       home-manager = home-manager-25-11;
       stateVersion = "25.11";

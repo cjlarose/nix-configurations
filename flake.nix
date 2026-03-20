@@ -20,6 +20,9 @@
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs/nixpkgs-unstable";
     };
+    determinate = {
+      url = "github:DeterminateSystems/determinate";
+    };
     darwin = {
       url = "github:lnl7/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs-25-05";
@@ -89,6 +92,7 @@
   outputs = {
     bundix,
     darwin,
+    determinate,
     disko,
     fzfProject,
     fzfVim,
@@ -147,7 +151,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko;
+          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate;
         }
       );
 

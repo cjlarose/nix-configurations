@@ -1,9 +1,10 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
+    determinate.nixosModules.default
     (import ./disk-config.nix { inherit disko; })
     (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
     ({ pkgs, config, ... } : {
