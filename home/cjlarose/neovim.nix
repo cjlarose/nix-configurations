@@ -36,7 +36,7 @@
       {
         plugin = fzf-project;
         config = ''
-          let g:fzfSwitchProjectWorkspaces = [ '~/worktrees', '~/workspace', '~/workspace/cjlarose/dotfiles' ]
+          let g:fzfSwitchProjectWorkspaces = [ '~/worktrees' ]
           let g:fzfSwitchProjectProjectDepth = 3
         '';
       }
