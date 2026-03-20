@@ -178,6 +178,27 @@
         "type": "github"
       }
     },
+    "home-manager-25-11": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-25-11"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773963144,
+        "narHash": "sha256-WzBOBfSay3GYilUfKaUa1Mbf8/jtuAiJIedx7fWuIX4=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "a91b3ea73a765614d90360580b689c48102d1d33",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "impermanence": {
       "locked": {
         "lastModified": 1703656108,
@@ -432,6 +453,7 @@
         "home-manager-24-05": "home-manager-24-05",
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-05": "home-manager-25-05",
+        "home-manager-25-11": "home-manager-25-11",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
         "nixpkgs-23-05": "nixpkgs-23-05",

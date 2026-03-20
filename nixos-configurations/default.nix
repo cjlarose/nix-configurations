@@ -2,11 +2,13 @@
   nixpkgs-24-05,
   nixpkgs-24-11,
   nixpkgs-25-05,
+  nixpkgs-25-11,
   sharedOverlays,
   additionalPackages,
   home-manager-24-05,
   home-manager-24-11,
   home-manager-25-05,
+  home-manager-25-11,
   pce,
   impermanence,
   disko,
@@ -121,6 +123,14 @@
       nixpkgs = nixpkgs-24-11;
       home-manager = home-manager-24-11;
       stateVersion = "24.11";
+    }
+  );
+  "ns1010301" = (
+    import ./ns1010301 {
+      inherit sharedOverlays additionalPackages impermanence disko;
+      nixpkgs = nixpkgs-25-11;
+      home-manager = home-manager-25-11;
+      stateVersion = "25.11";
     }
   );
 }
