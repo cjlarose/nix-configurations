@@ -102,6 +102,7 @@
                 type = "zfs_fs";
                 mountpoint = "/";
                 options.mountpoint = "legacy";
+                options.reservation = "4G";
                 postCreateHook = "zfs snapshot tank/root@blank";
               };
               nix = {
