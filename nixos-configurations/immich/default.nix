@@ -5,7 +5,7 @@ in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
     (import ./disk-config.nix { inherit disko; })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
     ({ pkgs, config, ... } : {
       imports = [
         impermanence.nixosModules.impermanence

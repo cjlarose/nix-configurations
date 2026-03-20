@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { pkgs, config, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, system, additionalPackages, ... }: { pkgs, config, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -55,6 +55,7 @@
 
   services.immich = {
     enable = true;
+    package = additionalPackages.${system}.immich;
   };
 
   services.nginx = {

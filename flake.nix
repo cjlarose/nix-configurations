@@ -14,6 +14,9 @@
     nixpkgs-25-05 = {
       url = "github:nixos/nixpkgs/nixos-25.05";
     };
+    nixpkgs-25-11 = {
+      url = "github:nixos/nixpkgs/nixos-25.11";
+    };
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs/nixpkgs-unstable";
     };
@@ -94,6 +97,7 @@
     nixpkgs-23-05,
     nixpkgs-24-11,
     nixpkgs-25-05,
+    nixpkgs-25-11,
     nixpkgs-unstable,
     omnisharpVim,
     pce,
@@ -116,7 +120,7 @@
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           allowUnfreePredicate = import ./shared/unfree-predicate.nix { nixpkgs = nixpkgs-24-05; };
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate;
           };
         in
           import ./packages packageArgs

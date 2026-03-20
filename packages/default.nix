@@ -3,6 +3,7 @@
   nixpkgs-24-11,
   nixpkgs-23-05,
   nixpkgs-25-05,
+  nixpkgs-25-11,
   nixpkgs-unstable,
   system,
   bundix,
@@ -22,6 +23,7 @@
   }).claude-code;
   cs-automation = cs-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
+  immich = nixpkgs-25-11.legacyPackages.${system}.immich;
   intranetHosts = intranetHosts;
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
