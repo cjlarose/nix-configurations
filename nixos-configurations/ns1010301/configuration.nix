@@ -6,10 +6,7 @@
   networking = {
     hostName = "ns1010301";
     hostId = "eae273e3";
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [ 22 ];
-    };
+    firewall.enable = true;
   };
 
   system.stateVersion = stateVersion;
