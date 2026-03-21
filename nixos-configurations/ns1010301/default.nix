@@ -16,9 +16,6 @@ in nixpkgs.lib.nixosSystem {
           hideMounts = true;
           directories = [
             {
-              directory = "/etc/nixos";
-            }
-            {
               directory = "/var/lib/tailscale";
               user = "root";
               group = "root";
