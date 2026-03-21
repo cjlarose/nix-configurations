@@ -101,6 +101,9 @@ nmap <leader>tr :RenameTerminalBuffer<space>
 command! -nargs=0 CreateGitTerminalBuffer :call s:create_named_terminal_buffer('git')
 nmap <leader>tg :CreateGitTerminalBuffer<CR>
 
+command! -nargs=0 CreateClaudeTerminalBuffer :call s:create_named_terminal_buffer('claude', 'claude')
+nmap <leader>tc :CreateClaudeTerminalBuffer<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-grepper configuration                                                    "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
