@@ -23,22 +23,11 @@
           colorscheme onedark
         '';
       }
+      plenary-nvim
       {
-        plugin = fzf-vim;
-        config = ''
-          " set prefix for FZF functions
-          let g:fzf_command_prefix = 'Fzf'
-
-          " disable fzf preview
-          let g:fzf_preview_window = []
-        '';
-      }
-      {
-        plugin = fzf-project;
-        config = ''
-          let g:fzfSwitchProjectWorkspaces = [ '~/worktrees' ]
-          let g:fzfSwitchProjectProjectDepth = 3
-        '';
+        plugin = telescope-nvim;
+        config = builtins.readFile ./telescope-config.lua;
+        type = "lua";
       }
       vim-fugitive
       vim-rhubarb
