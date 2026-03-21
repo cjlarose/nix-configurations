@@ -11,6 +11,17 @@
   home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
   home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
 
+  home.file.".claude/settings.json".text = builtins.toJSON {
+    enabledPlugins = {
+      "superpowers@claude-plugins-official" = true;
+    };
+    skipDangerousModePermissionPrompt = true;
+    effortLevel = "medium";
+    permissions = {
+      defaultMode = "bypassPermissions";
+    };
+  };
+
   home.stateVersion = stateVersion;
 
   home.sessionPath = [
