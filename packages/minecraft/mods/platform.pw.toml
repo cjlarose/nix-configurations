@@ -1,0 +1,13 @@
+name = "Platform"
+filename = "Platform-fabric-1.20.1-1.2.11.5.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/i6fiqm5y/versions/kPtnViap/Platform-fabric-1.20.1-1.2.11.5.jar"
+hash-format = "sha512"
+hash = "64c37103804ca14fff1f6368cd6785bf773f60024cecba03459abf6618d7da1378f5e9348319899f4d1d01826ef7d9946696127f6e962da77d4668d7a002454b"
+
+[update]
+[update.modrinth]
+mod-id = "i6fiqm5y"
+version = "kPtnViap"

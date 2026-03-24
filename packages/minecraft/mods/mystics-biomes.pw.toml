@@ -1,0 +1,13 @@
+name = "Mystic's Biomes"
+filename = "mysticsbiomes-fabric-1.20.1-3.4.3.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/kUpOjknA/versions/wCTfHbkx/mysticsbiomes-fabric-1.20.1-3.4.3.jar"
+hash-format = "sha512"
+hash = "745e749e8759682d4cbf7cef927152adddfbd5389f909106455bea7d660cf13a0138ed293d7a9ff0c540a2c93b1608326c823e542c8588c2cabf436a77910c17"
+
+[update]
+[update.modrinth]
+mod-id = "kUpOjknA"
+version = "wCTfHbkx"

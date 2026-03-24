@@ -1,0 +1,13 @@
+name = "Bow Infinity Fix"
+filename = "BowInfinityFix-1.20.x-fabric-2.6.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/BFENfScW/versions/VllsAwTD/BowInfinityFix-1.20.x-fabric-2.6.0.jar"
+hash-format = "sha512"
+hash = "7fb2959cc679dff5c1b21d4a607f567da1fbff1f4220c692c1f1dd3e6722b3721ecc93edb13c9d03f46d38840c3967f3d8ff3f9e255152ae95c11b1206a49eb4"
+
+[update]
+[update.modrinth]
+mod-id = "BFENfScW"
+version = "VllsAwTD"

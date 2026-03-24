@@ -1,0 +1,13 @@
+name = "Silent's Delight"
+filename = "silentsdelight-fabric-1.0.3-1.20.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/dzrjiUho/versions/e84MFiJT/silentsdelight-fabric-1.0.3-1.20.1.jar"
+hash-format = "sha512"
+hash = "70fe66d3c26b90d7645bd46e677a43e758aefc903ae79d434ba8acc32d36d6ccda1b60efb83c6422db2ecfe5b05fc6271338dd9578dbe3b0a588de3af982d287"
+
+[update]
+[update.modrinth]
+mod-id = "dzrjiUho"
+version = "e84MFiJT"

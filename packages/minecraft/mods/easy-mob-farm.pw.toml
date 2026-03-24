@@ -1,0 +1,13 @@
+name = "Easy Mob Farm"
+filename = "easy_mob_farm-fabric-1.20.1-10.3.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/crxsDbEo/versions/CGAUWRiF/easy_mob_farm-fabric-1.20.1-10.3.0.jar"
+hash-format = "sha512"
+hash = "daf40680b4257210af440a0003a8424ae4e9b66ad944c88307d5d9c1d75763c43aeb931f4d1b3792659696a2f98338bc048d0252a1bd7dde39eabead4c36e7c7"
+
+[update]
+[update.modrinth]
+mod-id = "crxsDbEo"
+version = "CGAUWRiF"

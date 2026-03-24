@@ -1,0 +1,13 @@
+name = "Freeze the Happy Ghasts"
+filename = "FHG-Fabric-1.20.1-1.0.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/9Ae5gWms/versions/WKIcBGfP/FHG-Fabric-1.20.1-1.0.0.jar"
+hash-format = "sha512"
+hash = "48de219c0939b87cc9f70e4a602bbb18a979becde2ee4a0b4a261a7c660bd600ecf6a94e023a69fc0d108271c6d910deb1ab578ae2ba73dc0768266609f512c4"
+
+[update]
+[update.modrinth]
+mod-id = "9Ae5gWms"
+version = "WKIcBGfP"

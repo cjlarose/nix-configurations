@@ -23,6 +23,10 @@
     determinate = {
       url = "github:DeterminateSystems/determinate";
     };
+    nix-minecraft = {
+      url = "github:Infinidoge/nix-minecraft";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     darwin = {
       url = "github:lnl7/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs-25-05";
@@ -102,6 +106,7 @@
     home-manager-25-11,
     impermanence,
     intranetHosts,
+    nix-minecraft,
     nixpkgs-24-05,
     nixpkgs-23-05,
     nixpkgs-24-11,
@@ -129,7 +134,7 @@
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           allowUnfreePredicate = import ./shared/unfree-predicate.nix { nixpkgs = nixpkgs-24-05; };
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft;
           };
         in
           import ./packages packageArgs

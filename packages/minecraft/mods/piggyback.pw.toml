@@ -1,0 +1,13 @@
+name = "Piggyback"
+filename = "piggyback-fabric-1.20.1-1.1.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/yP77bAiA/versions/hY2jOr2y/piggyback-fabric-1.20.1-1.1.1.jar"
+hash-format = "sha512"
+hash = "c0efd70c7f1035035ebe63b09afe55556d05c8a9f613edf889a26bfed153bf202c2d1377316534be20a8ff7dbbe614dc9c4daf63e02cfc48363e9913ccaae574"
+
+[update]
+[update.modrinth]
+mod-id = "yP77bAiA"
+version = "hY2jOr2y"

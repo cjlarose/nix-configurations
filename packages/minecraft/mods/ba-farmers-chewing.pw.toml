@@ -1,0 +1,13 @@
+name = "Bug's Alterations - Farmer's Chewing"
+filename = "ba-farmers-chewing-3.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/NbiphTOs/versions/yqYtmW5V/ba-farmers-chewing-3.jar"
+hash-format = "sha512"
+hash = "4606b993969c842295818b923e00de1343b91c1a671f9caf961ffd38db9835942c849b54e87a62eb4ee1011c95b499a9e0afdfa97513d0ac04d66d33402b359f"
+
+[update]
+[update.modrinth]
+mod-id = "NbiphTOs"
+version = "yqYtmW5V"

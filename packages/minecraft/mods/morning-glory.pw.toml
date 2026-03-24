@@ -1,0 +1,13 @@
+name = "Morning Glory - Cat Morning Gift (RPG Theme)"
+filename = "morningglory-fabric-1.20.1-1.0.0.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "9f1b6b3a6eb655957783a34c12792aa56bc8f8aa"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 5806134
+project-id = 1120221

@@ -1,0 +1,13 @@
+name = "Festive Delight"
+filename = "Festive_Delight_1.1_Fabric_1.20.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/AsUUCoXX/versions/Gs9jmquQ/Festive_Delight_1.1_Fabric_1.20.1.jar"
+hash-format = "sha512"
+hash = "5e99f05cfd66fae8fe8b230e20eb013c9fbeb09d98d899f0d556ed007e4ea73cb60069c4dee83db4a4ab85c114738c41c99f86fc34e254db23e19e7a780c0357"
+
+[update]
+[update.modrinth]
+mod-id = "AsUUCoXX"
+version = "Gs9jmquQ"

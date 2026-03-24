@@ -1,0 +1,13 @@
+name = "Delightful Chefs"
+filename = "delightful-chefs-1.0.3-fabric.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/sCnO4R7e/versions/cTWY5uBo/delightful-chefs-1.0.3-fabric.jar"
+hash-format = "sha512"
+hash = "410e9dd16aceda75b54f4d223f36d9d4792059ae8e5f330b88aff6518254a813a47d629f7191447cefa2c07aa4a2ac257a83ec06d89b06447fd9b87caf793cd8"
+
+[update]
+[update.modrinth]
+mod-id = "sCnO4R7e"
+version = "cTWY5uBo"

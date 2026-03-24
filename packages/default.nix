@@ -12,9 +12,13 @@
   trueColorTest,
   cs-automation,
   allowUnfreePredicate,
+  nix-minecraft,
   ...
 }:
 
+let
+  pkgsWithMinecraft = pkgs.extend nix-minecraft.overlays.default;
+in
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
   claude-code =
@@ -82,4 +86,8 @@
     commit=$(git rev-parse ''${1:-HEAD})
     open "$GITLAB_HOST/$(basename $(git rev-parse --show-toplevel))/-/commit/$commit"
   '';
+  minecraft-modpack = pkgsWithMinecraft.fetchPackwizModpack {
+    src = ./minecraft;
+    packHash = "sha256-1lVv9zP0ALE3Mrw4xMrR/U9gKIJbE1NcyjkN3PGerLg=";
+  };
 }

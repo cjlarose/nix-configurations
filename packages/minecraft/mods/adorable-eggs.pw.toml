@@ -1,0 +1,13 @@
+name = "Adorable Eggs"
+filename = "adorable_eggs-Fabric-1.20.1-1.0.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/v1NZJevY/versions/lyGGz8Qx/adorable_eggs-Fabric-1.20.1-1.0.2.jar"
+hash-format = "sha512"
+hash = "ac645327a4cbf040b626352c0bf9860c21e24ac84c45204e0efbc29249b9ba6b131eb8e91229f1e90a73403857169041221787c0b8c114ddbd185efc97c8dd5c"
+
+[update]
+[update.modrinth]
+mod-id = "v1NZJevY"
+version = "lyGGz8Qx"

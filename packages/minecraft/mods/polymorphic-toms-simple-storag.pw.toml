@@ -1,0 +1,13 @@
+name = "Polymorphic Tom's Simple Storag"
+filename = "polymorphic-tom-1.0.4.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/lgaejLU2/versions/oMm5vDjv/polymorphic-tom-1.0.4.jar"
+hash-format = "sha512"
+hash = "af2cdf097a8a786aaf8a911d0550a980a733e8c4926260c6876fe0121d9e5e67fca4236cc054f0aa566a2d3f024259181a892f38f916e37aef8d823925da1e71"
+
+[update]
+[update.modrinth]
+mod-id = "lgaejLU2"
+version = "oMm5vDjv"
