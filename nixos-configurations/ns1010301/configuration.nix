@@ -122,7 +122,7 @@ in { pkgs, config, ... }: {
         uid = 1000;
         isNormalUser = true;
         home = "/home/cjlarose";
-        extraGroups = [ "wheel" ];
+        extraGroups = [ "wheel" "minecraft" ];
         shell = pkgs.zsh;
         hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
         openssh.authorizedKeys.keys = [
