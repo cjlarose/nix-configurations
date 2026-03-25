@@ -156,7 +156,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate;
+          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft;
         }
       );
 
