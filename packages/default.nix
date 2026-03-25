@@ -88,6 +88,6 @@ in
   '';
   minecraft-modpack = pkgsWithMinecraft.fetchPackwizModpack {
     src = ./minecraft;
-    packHash = "sha256-1lVv9zP0ALE3Mrw4xMrR/U9gKIJbE1NcyjkN3PGerLg=";
+    packHash = "sha256-Rdg6q7RVZGpWhGkOgvkDfR/n5IC0EIefv2HH3xGJgtg=";
   };
 }
