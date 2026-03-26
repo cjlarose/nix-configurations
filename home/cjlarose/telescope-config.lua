@@ -163,7 +163,7 @@ end
 
 -- Keymaps
 vim.keymap.set('n', '<leader>f', builtin.git_files, {})
-vim.keymap.set('n', '<leader>tt', builtin.find_files, {})
+vim.keymap.set('n', '<leader>tt', function() builtin.find_files({ no_ignore = true }) end, {})
 vim.keymap.set('n', '<leader>bb', function()
   builtin.buffers({
     sort_mru = true,
