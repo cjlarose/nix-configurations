@@ -7,7 +7,7 @@
   programs.git = {
     signing = {
       key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPVpeUiVCUdL3/2xAORyus00XAOrvXukwpOiaZhdHoKs";
-      signByDefault = true;
+      signByDefault = false;
     };
     extraConfig = {
       gpg.format = "ssh";
