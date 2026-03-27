@@ -28,9 +28,11 @@
     pkgs.abduco
     pkgs.dig
     pkgs.docker-client
+    pkgs.gh
     pkgs.git-absorb
     pkgs.htop
     pkgs.jq
+    pkgs.mirrord
     pkgs.neovim-remote
     pkgs.nil
     pkgs.nodePackages.bash-language-server
@@ -40,6 +42,7 @@
     pkgs.nodejs_20
     pkgs.omnisharp-roslyn
     pkgs.parallel
+    additionalPackages.${system}.claude-code
     additionalPackages.${system}.wrappedRg
     additionalPackages.${system}.openCommitInGitlab
     pkgs.ruby
@@ -104,6 +107,13 @@
       "gpg \"ssh\"" = {
         program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
       };
+      url."ssh://git@github.com".insteadOf = "https://github.com";
+      "url \"git@github-enterprise:agilebits-inc/\"" = {
+        insteadOf = [
+          "https://github.com/agilebits-inc/"
+          "git@github.com:agilebits-inc/"
+        ];
+      };
     };
     ignores = [
       "[._]*.s[a-w][a-z]"
@@ -113,6 +123,14 @@
       key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE4ftRm9tJtFBks5PtRi+gf7yFMhjaZ3zxGHd/B/tcBb";
       signByDefault = true;
     };
+    includes = [
+      {
+        condition = "gitdir:~/workspace/agilebits-inc/";
+        contents = {
+          user.signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKaUCLu6mxvJ0ubkp/0V8kU38Q7XEG7gW9L/Z0SCDYOa";
+        };
+      }
+    ];
   };
 
   programs.go = {
@@ -131,6 +149,12 @@
       "gitlab gitlab.1password.io ssh.gitlab.1password.io" = {
         hostname = "ssh.gitlab.1password.io";
         port = 2227;
+      };
+      "github-enterprise" = {
+        hostname = "github.com";
+        user = "git";
+        identityFile = "~/.ssh/github-enterprise.pub";
+        identitiesOnly = true;
       };
     };
   };

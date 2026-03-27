@@ -27,6 +27,7 @@ in darwin.lib.darwinSystem {
         promptInit = "";
       };
       system.stateVersion = 4;
+      ids.gids.nixbld = 350;
       nix = {
         extraOptions = ''
           experimental-features = nix-command flakes
