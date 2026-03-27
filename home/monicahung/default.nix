@@ -52,6 +52,7 @@
     pkgs.unixtools.watch
     pkgs.wget
     pkgs.wrk
+    pkgs.yq
     pkgs.yarn
     pkgs.gnupg
     pkgs._1password
@@ -135,7 +136,7 @@
 
   programs.go = {
     enable = true;
-    package = additionalPackages.${system}.go_1_22;
+    package = additionalPackages.${system}.go_1_24;
     goPrivate = [ "go.1password.io" "gitlab.1password.io" "proto.1infra.dev" "github.com/agilebits-inc" ];
   };
 
