@@ -17,15 +17,31 @@
 
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
-  claude-code = (import nixpkgs-unstable {
-    inherit system;
-    config.allowUnfreePredicate = allowUnfreePredicate;
-  }).claude-code;
+  claude-code =
+    let
+      base = (import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfreePredicate = allowUnfreePredicate;
+      }).claude-code;
+    in
+    pkgs.symlinkJoin {
+      name = "claude-code";
+      paths = [ base ];
+      buildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/claude --unset TMUX
+      '';
+    };
   cs-automation = cs-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   immich = nixpkgs-25-11.legacyPackages.${system}.immich;
   intranetHosts = intranetHosts;
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };
+  ghostty-terminfo = pkgs.runCommand "ghostty-terminfo" {} ''
+    mkdir -p $out/share/terminfo
+    cp -r ${nixpkgs-unstable.legacyPackages.${system}.ghostty}/share/terminfo/. \
+      $out/share/terminfo/
+  '';
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
   nvr = import ./nvr { inherit pkgs nvr; };
   go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
