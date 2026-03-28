@@ -14,7 +14,10 @@
   disko,
   determinate,
   ...
-}: {
+}:
+let
+  ghosttyTerminfoModule = import ../nixos-modules/ghostty-terminfo.nix;
+  hosts = {
   "builder" = (
     import ./builder {
       inherit sharedOverlays additionalPackages;
@@ -134,4 +137,9 @@
       stateVersion = "25.11";
     }
   );
-}
+};
+in
+  builtins.mapAttrs (_: host: host.extendModules {
+    modules = [ ghosttyTerminfoModule ];
+    specialArgs = { inherit additionalPackages; };
+  }) hosts
