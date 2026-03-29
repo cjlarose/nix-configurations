@@ -4,6 +4,7 @@
     baseImports = [
       ../../home-manager-modules/dev-tools.nix
       ../../home-manager-modules/neovim.nix
+      ../../home-manager-modules/git.nix
       ./karabiner-profile-switcher.nix
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []);
@@ -77,14 +78,6 @@
     coderPackages = (if includeCoder then [pkgs.coder] else []);
   in commonPackages ++ dockerClientPackages ++ gnuSedPackages ++ coderPackages;
 
-  home.shellAliases = {
-    gs = "git status";
-    gd = "git diff";
-    gds = "git diff --staged";
-    gap = "git add --patch";
-    gc = "git commit";
-  };
-
   programs.zsh = {
     enable = true;
     envExtra = ''
@@ -93,36 +86,11 @@
     initExtra = builtins.readFile ./init.zsh;
   };
 
-  programs.git = {
-    enable = true;
-    userName = "Chris LaRose";
-    userEmail = "cjlarose@gmail.com";
-    aliases = {
-      switchoc = "!f() { git switch $1 2>/dev/null || git switch -c $1; }; f";
-    };
-    extraConfig = {
-      color.ui = true;
-      commit.verbose = true;
-      diff.tool = "nvr";
-      difftool.nvr.cmd = "${pkgs.neovim-remote}/bin/nvr -s -d $LOCAL $REMOTE";
-      init.defaultBranch = "main";
-      merge.tool = "nvr";
-      mergetool.nvr.cmd = "${pkgs.neovim-remote}/bin/nvr -s -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd J | wincmd ='";
-      pull.ff = "only";
-      rebase.autosquash = true;
-      rebase.autostash = true;
-      rebase.updateRefs = true;
-      "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
-      "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
-    };
-    ignores = [
-      "[._]*.s[a-w][a-z]"
-      "[._]s[a-w][a-z]"
-      ".claude"
-    ];
-    delta = {
-      enable = true;
-    };
+  programs.git.userName = "Chris LaRose";
+  programs.git.userEmail = "cjlarose@gmail.com";
+  programs.git.extraConfig = {
+    "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
+    "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
   };
 
   programs.ssh = {
