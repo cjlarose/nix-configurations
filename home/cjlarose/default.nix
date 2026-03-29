@@ -36,7 +36,7 @@
   home.sessionVariables = {
     EDITOR = "${additionalPackages.${system}.nvr}/bin/nvr";
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
-    THOR_MERGE = "nvr -s -d";
+    THOR_MERGE = "${pkgs.neovim-remote}/bin/nvr -s -d";
     CODER_SSH_CONFIG_FILE = "~/.ssh/config-coder";
   };
 
@@ -63,7 +63,6 @@
       pkgs.kubernetes-helm
       pkgs.kubeseal
       pkgs.kustomize
-      pkgs.neovim-remote
       pkgs.nil
       pkgs.nodePackages.bash-language-server
       pkgs.pyright
