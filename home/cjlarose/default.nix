@@ -1,18 +1,15 @@
-{ system, additionalPackages, stateVersion, includeDockerClient ? false, includeGnuSed ? true }:
+{ system, additionalPackages, stateVersion, includeDockerClient ? false }:
 { pkgs, ... }: {
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
-    ../../home-manager-modules/karabiner.nix
-    ../../home-manager-modules/_1password.nix
   ];
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
   cjlarose.shell.kubePrompt = true;
   cjlarose.shell.dockerPrompt = true;
-  cjlarose._1password.signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPVpeUiVCUdL3/2xAORyus00XAOrvXukwpOiaZhdHoKs";
 
   home.file.".claude/settings.json".text = builtins.toJSON {
     enabledPlugins = {
@@ -26,13 +23,6 @@
   };
 
   home.stateVersion = stateVersion;
-
-  home.sessionPath = [
-    "$HOME/Library/Android/sdk/platform-tools"
-    "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-    "/Applications/Inkscape.app/Contents/MacOS"
-    "/Applications/WezTerm.app/Contents/MacOS"
-  ];
 
   home.sessionVariables = {
     THOR_MERGE = "${pkgs.neovim-remote}/bin/nvr -s -d";
@@ -70,8 +60,7 @@
       additionalPackages.${system}.claude-code
     ];
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
-    gnuSedPackages = (if includeGnuSed then [pkgs.gnused] else []);
-  in commonPackages ++ dockerClientPackages ++ gnuSedPackages;
+  in commonPackages ++ dockerClientPackages;
 
   programs.git.userName = "Chris LaRose";
   programs.git.userEmail = "cjlarose@gmail.com";
