@@ -2,6 +2,7 @@
 { pkgs, ... }: {
   imports = let
     baseImports = [
+      ../../home-manager-modules/dev-tools.nix
       ./neovim.nix
       ./karabiner-profile-switcher.nix
     ];
@@ -49,22 +50,15 @@
       pkgs.csvtool
       pkgs.dig
       pkgs.gh
-      pkgs.git-absorb
       pkgs.git-filter-repo
       additionalPackages.${system}.git-make-apply-command
       (pkgs.google-cloud-sdk.withExtraComponents ([pkgs.google-cloud-sdk.components.pubsub-emulator]))
       pkgs.gradle
-      pkgs.htop
       pkgs.jdk11
-      pkgs.jq
-      additionalPackages.${system}.wrappedJq
       pkgs.kotlin-language-server
-      pkgs.kubectl
       pkgs.kubernetes-helm
       pkgs.kubeseal
       pkgs.kustomize
-      pkgs.nil
-      pkgs.nodePackages.bash-language-server
       pkgs.pyright
       pkgs.nodePackages.typescript-language-server
       pkgs.nodePackages.vscode-langservers-extracted
@@ -83,21 +77,14 @@
         setuptools
         shortuuid
       ]))
-      additionalPackages.${system}.wrappedRg
       pkgs.ruby
       pkgs.shellcheck
       pkgs.socat
       pkgs.speedtest-cli
       pkgs.stack
       additionalPackages.${system}.teleport_16
-      pkgs.tfenv
-      pkgs.tmux
-      pkgs.tree
       additionalPackages.${system}.trueColorTest
-      pkgs.unixtools.watch
       pkgs.wget
-      pkgs.wrk
-      pkgs.yq-go
       additionalPackages.${system}.claude-code
     ];
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
