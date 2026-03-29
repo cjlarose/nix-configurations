@@ -3,7 +3,7 @@
   imports = let
     baseImports = [
       ../../home-manager-modules/dev-tools.nix
-      ./neovim.nix
+      ../../home-manager-modules/neovim.nix
       ./karabiner-profile-switcher.nix
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []);
