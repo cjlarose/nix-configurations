@@ -153,6 +153,28 @@
           };
         })
       ];
+      lib = nixpkgs-24-05.lib;
+
+      hmChecks = import ./tests/home-manager-checks.nix { inherit lib; };
+
+      nixosHmConfig = name:
+        self.nixosConfigurations.${name}.config.home-manager.users.cjlarose;
+
+      darwinHmConfig = name:
+        self.darwinConfigurations.${name}.config.home-manager.users.cjlarose;
+
+      nixosConfigsWithCjlarose = [
+        "builder" "bots" "cache" "coder" "dns" "immich" "media"
+        "memos" "palworld" "pt-dev" "photos" "splitpro" "unifi" "ns1010301"
+      ];
+
+      mkNixosCheck = pkgs: name:
+        assert hmChecks.assertCoreInvariants name (nixosHmConfig name);
+        pkgs.runCommand "home-cjlarose-${name}-ok" {} "echo ok > $out";
+
+      mkDarwinCheck = pkgs: name:
+        assert hmChecks.assertCoreInvariants name (darwinHmConfig name);
+        pkgs.runCommand "home-cjlarose-${lib.strings.sanitizeDerivationName name}-ok" {} "echo ok > $out";
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
@@ -171,5 +193,16 @@
       );
 
       packages = additionalPackages;
+
+      checks.x86_64-linux = lib.listToAttrs (map (name: {
+        name = "home-cjlarose-${name}";
+        value = mkNixosCheck nixpkgs-24-05.legacyPackages.x86_64-linux name;
+      }) nixosConfigsWithCjlarose);
+
+      checks.aarch64-darwin = {
+        home-cjlarose-macbook = mkDarwinCheck
+          nixpkgs-25-05.legacyPackages.aarch64-darwin
+          "Christophers-MacBook-Pro";
+      };
     };
 }
