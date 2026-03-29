@@ -19,16 +19,6 @@
       nixDarwinStateVersion = 6;
     }
   );
-  "LaRose-MacBook-Pro" = (
-    import ./larose-mbp {
-      inherit additionalPackages darwin sharedOverlays;
-      nixpkgs = nixpkgs-25-05;
-      home-manager = home-manager-25-05;
-      primaryUser = "chrislarose";
-      homeManagerStateVersion = "23.05";
-      nixDarwinStateVersion = 4;
-    }
-  );
   "Monica-MacBook-Pro-Home" = (
     import ./monica-mbp {
       inherit additionalPackages darwin sharedOverlays;
