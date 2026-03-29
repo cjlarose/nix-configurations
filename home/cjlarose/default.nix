@@ -5,9 +5,14 @@
       ../../home-manager-modules/dev-tools.nix
       ../../home-manager-modules/neovim.nix
       ../../home-manager-modules/git.nix
+      ../../home-manager-modules/shell.nix
       ./karabiner-profile-switcher.nix
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []);
+
+  cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
+  cjlarose.shell.kubePrompt = true;
+  cjlarose.shell.dockerPrompt = true;
 
   home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
   home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
@@ -26,18 +31,13 @@
   home.stateVersion = stateVersion;
 
   home.sessionPath = [
-    "$HOME/.yarn/bin"
-    "$HOME/go/bin"
     "$HOME/Library/Android/sdk/platform-tools"
     "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
     "/Applications/Inkscape.app/Contents/MacOS"
     "/Applications/WezTerm.app/Contents/MacOS"
-    "node_modules/.bin"
   ];
 
   home.sessionVariables = {
-    EDITOR = "${additionalPackages.${system}.nvr}/bin/nvr";
-    LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     THOR_MERGE = "${pkgs.neovim-remote}/bin/nvr -s -d";
     CODER_SSH_CONFIG_FILE = "~/.ssh/config-coder";
   };
@@ -93,14 +93,6 @@
     coderPackages = (if includeCoder then [pkgs.coder] else []);
   in commonPackages ++ dockerClientPackages ++ gnuSedPackages ++ coderPackages;
 
-  programs.zsh = {
-    enable = true;
-    envExtra = ''
-      export GIT_PACKAGE_DIR=${pkgs.git}
-    '';
-    initExtra = builtins.readFile ./init.zsh;
-  };
-
   programs.git.userName = "Chris LaRose";
   programs.git.userEmail = "cjlarose@gmail.com";
   programs.git.extraConfig = {
@@ -109,8 +101,6 @@
   };
 
   programs.ssh = {
-    enable = true;
-    addKeysToAgent = "yes";
     includes = [
       "config-coder"
     ];
@@ -119,11 +109,6 @@
         forwardAgent = true;
       };
     };
-  };
-
-  programs.fzf = {
-    enable = true;
-    enableZshIntegration = true;
   };
 
   programs.go = {
