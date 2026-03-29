@@ -984,3 +984,138 @@ metafile = true
 file = "mods/yungs-better-ocean-monuments.pw.toml"
 hash = "f23d28e95b21a9655e615390a560bc66f3cb87610ac38cd9d849129d0600a766"
 metafile = true
+
+[[files]]
+file = "config/aether-common.toml"
+hash = "bc445f5aba1057739d0594e2017a1066ba3d848ec252400c62eac3743a7e873a"
+metafile = false
+
+[[files]]
+file = "config/amendments-common.json"
+hash = "c06536d2feee1c2fb4c690f393659da907dd3ef984db66ed0aff5d9cd84b582c"
+metafile = false
+
+[[files]]
+file = "config/archers/items_v2.json"
+hash = "a04a80c21cfc29053e101b384486c79b24ee6ffa4fc0b134a8aa4365e9c26024"
+metafile = false
+
+[[files]]
+file = "config/betterendisland-fabric-1_20.toml"
+hash = "24b38c3caa93e98ffaab6d3f7380e9d7469fa3a3576bdb8ff146b78bce636f71"
+metafile = false
+
+[[files]]
+file = "config/bewitchment.json"
+hash = "cedc9d142f893dd3d9156b7d89100cad28217a83a48897473b94ccd2ca4b60e7"
+metafile = false
+
+[[files]]
+file = "config/biomesoplenty/generation.toml"
+hash = "64e544b5580f7db200e6e70b6500d4a09ec1068e67ce9f5b5ba8dc30e63633c0"
+metafile = false
+
+[[files]]
+file = "config/deeperdarker.json5"
+hash = "2a44c3bca4003e1359bbab05e58034fbf9af26db10bb70a616df4236ca1d0d31"
+metafile = false
+
+[[files]]
+file = "config/DistantHorizons.toml"
+hash = "c9d2598eba8e08382d7c0d43a680d7a41940aa87fb02ab53645a9f87774c7323"
+metafile = false
+
+[[files]]
+file = "config/explorerscompass.json"
+hash = "ebd406dcbd364d4b1850b602a6c6b381962773308ce3f15473bf626d62ae88d9"
+metafile = false
+
+[[files]]
+file = "config/farmersdelight-common.toml"
+hash = "0ff0bc877ed5311aad2b7e68033bbb85f3e693616d99d49798543d16bf50cd9f"
+metafile = false
+
+[[files]]
+file = "config/frostiful.json"
+hash = "447ed8fab6de4764014b09d2bbe81bafedded3d986731d03c0dba5f9f82ff258"
+metafile = false
+
+[[files]]
+file = "config/goblintraders-entities.toml"
+hash = "142b4be6ed989c1b53367c9e3bdfed1c4f9ccf35f6d5668784da175f5c60ddb3"
+metafile = false
+
+[[files]]
+file = "config/lootr.json"
+hash = "be018f9a2435aa4bc111afea2b89630b5ece5ecd5d8389ac94fe4367530644c1"
+metafile = false
+
+[[files]]
+file = "config/magnumtorch-server.toml"
+hash = "fc92fa345131b321271f7c524b049cd121c1433fda90efd85bdbf503b9298824"
+metafile = false
+
+[[files]]
+file = "config/mysticsbiomes-common.json"
+hash = "f67586b08f8d1fb5b71e7abc546bd6b5be4eb3cdd065311a5e38e250939202ac"
+metafile = false
+
+[[files]]
+file = "config/origins_server.json"
+hash = "319c33a1b6eef3d86c3e60c17c0045add360e3314d9408bf44574c0dd1013fe7"
+metafile = false
+
+[[files]]
+file = "config/paladins/items_v5.json"
+hash = "500ade205ac422a508fcc4ad8f65f023f472df5e122a940750d01c335b027b83"
+metafile = false
+
+[[files]]
+file = "config/perfectplushie-loot.toml"
+hash = "24e151b229ed372a35b02a46c514b42732b3d332c215649d9ba5a3786d0e4b74"
+metafile = false
+
+[[files]]
+file = "config/plushie_buddies.json"
+hash = "04ad5aae93102685878b213cc9922cf07e2dfcada46af97dc002227f19779bc7"
+metafile = false
+
+[[files]]
+file = "config/rogues/items_v2.json"
+hash = "f8b8b5a0ac803554d523cc5222bc064bcf11e711945f196c73f322dd7be66e11"
+metafile = false
+
+[[files]]
+file = "config/rpg_series/loot_v2.json"
+hash = "617689791f60c9ef111b7c5d84b4623123e82e5950fdcd65cb9b06160bfbe1e2"
+metafile = false
+
+[[files]]
+file = "config/scorchful.json"
+hash = "c205f49e054e80ec1431de22458f41d5a07234e953ab4784e9c0f254bb6c4a07"
+metafile = false
+
+[[files]]
+file = "config/supplementaries-common.json"
+hash = "23a010ba3b90e4674ce0796156391569500ff2ef0db6333c46925ca275d81f9f"
+metafile = false
+
+[[files]]
+file = "config/ubesdelight.json"
+hash = "1a82a43edb97e5268a2164d8316488d9412fccba51c2f3e0abaf23e2f74d5066"
+metafile = false
+
+[[files]]
+file = "config/universal-graves/config.json"
+hash = "f7a3a5255789a2a50a510a4325fcbed6badb5fa89dc806450a86d8670c45aee6"
+metafile = false
+
+[[files]]
+file = "config/waystones-common.toml"
+hash = "82a5f6750098c6439f775225fcfa9af7c038ac8ebfb47bbf5336143c50a4172c"
+metafile = false
+
+[[files]]
+file = "config/wizards/items_v4.json"
+hash = "453d0e47646f564e820fddfdb82273fa12333a511ccb09d3bfe31343a3c0e1b3"
+metafile = false

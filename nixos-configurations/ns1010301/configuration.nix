@@ -62,8 +62,37 @@ in { pkgs, config, ... }: {
     servers.mellowcatfe = {
       enable = true;
       package = pkgs.minecraftServers.fabric-1_20_1;
-      symlinks = {
-        mods = "${additionalPackages.${system}.minecraft-modpack}/mods";
+      symlinks = let modpack = additionalPackages.${system}.minecraft-modpack; in {
+        mods = "${modpack}/mods";
+      };
+      files = let modpack = additionalPackages.${system}.minecraft-modpack; in {
+        "config/aether-common.toml" = "${modpack}/config/aether-common.toml";
+        "config/amendments-common.json" = "${modpack}/config/amendments-common.json";
+        "config/archers/items_v2.json" = "${modpack}/config/archers/items_v2.json";
+        "config/betterendisland-fabric-1_20.toml" = "${modpack}/config/betterendisland-fabric-1_20.toml";
+        "config/bewitchment.json" = "${modpack}/config/bewitchment.json";
+        "config/biomesoplenty/generation.toml" = "${modpack}/config/biomesoplenty/generation.toml";
+        "config/deeperdarker.json5" = "${modpack}/config/deeperdarker.json5";
+        "config/DistantHorizons.toml" = "${modpack}/config/DistantHorizons.toml";
+        "config/explorerscompass.json" = "${modpack}/config/explorerscompass.json";
+        "config/farmersdelight-common.toml" = "${modpack}/config/farmersdelight-common.toml";
+        "config/frostiful.json" = "${modpack}/config/frostiful.json";
+        "config/goblintraders-entities.toml" = "${modpack}/config/goblintraders-entities.toml";
+        "config/lootr.json" = "${modpack}/config/lootr.json";
+        "config/magnumtorch-server.toml" = "${modpack}/config/magnumtorch-server.toml";
+        "config/mysticsbiomes-common.json" = "${modpack}/config/mysticsbiomes-common.json";
+        "config/origins_server.json" = "${modpack}/config/origins_server.json";
+        "config/paladins/items_v5.json" = "${modpack}/config/paladins/items_v5.json";
+        "config/perfectplushie-loot.toml" = "${modpack}/config/perfectplushie-loot.toml";
+        "config/plushie_buddies.json" = "${modpack}/config/plushie_buddies.json";
+        "config/rogues/items_v2.json" = "${modpack}/config/rogues/items_v2.json";
+        "config/rpg_series/loot_v2.json" = "${modpack}/config/rpg_series/loot_v2.json";
+        "config/scorchful.json" = "${modpack}/config/scorchful.json";
+        "config/supplementaries-common.json" = "${modpack}/config/supplementaries-common.json";
+        "config/ubesdelight.json" = "${modpack}/config/ubesdelight.json";
+        "config/universal-graves/config.json" = "${modpack}/config/universal-graves/config.json";
+        "config/waystones-common.toml" = "${modpack}/config/waystones-common.toml";
+        "config/wizards/items_v4.json" = "${modpack}/config/wizards/items_v4.json";
       };
       serverProperties = {
         server-port = 25565;
