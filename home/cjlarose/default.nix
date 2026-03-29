@@ -1,20 +1,18 @@
-{ system, additionalPackages, stateVersion, include1Password ? false, includeDockerClient ? false, includeGnuSed ? true, includeCoder ? false }:
+{ system, additionalPackages, stateVersion, includeDockerClient ? false, includeGnuSed ? true, includeCoder ? false }:
 { pkgs, ... }: {
-  imports = let
-    baseImports = [
-      ../../home-manager-modules/dev-tools.nix
-      ../../home-manager-modules/neovim.nix
-      ../../home-manager-modules/git.nix
-      ../../home-manager-modules/shell.nix
-      ../../home-manager-modules/karabiner.nix
-    ];
-  in baseImports ++ (if include1Password then [./1password.nix] else []);
+  imports = [
+    ../../home-manager-modules/dev-tools.nix
+    ../../home-manager-modules/neovim.nix
+    ../../home-manager-modules/git.nix
+    ../../home-manager-modules/shell.nix
+    ../../home-manager-modules/karabiner.nix
+    ../../home-manager-modules/_1password.nix
+  ];
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
   cjlarose.shell.kubePrompt = true;
   cjlarose.shell.dockerPrompt = true;
-
-  home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
+  cjlarose._1password.signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPVpeUiVCUdL3/2xAORyus00XAOrvXukwpOiaZhdHoKs";
 
   home.file.".claude/settings.json".text = builtins.toJSON {
     enabledPlugins = {
