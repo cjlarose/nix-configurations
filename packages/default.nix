@@ -68,9 +68,9 @@
   '';
   wrappedRg = pkgs.writeShellScriptBin "rg" ''
     if [ -t 1 ]; then
-      ${pkgs.ripgrep}/bin/rg --pretty --sort path "$@" | less
+      ${pkgs.ripgrep}/bin/rg --hidden --glob '!.git' --sort path --pretty "$@" | less
     else
-      ${pkgs.ripgrep}/bin/rg --sort path "$@"
+      ${pkgs.ripgrep}/bin/rg --hidden --glob '!.git' --sort path "$@"
     fi
   '';
   wrappedTailscale = pkgs.writeShellScriptBin "tailscale" ''
