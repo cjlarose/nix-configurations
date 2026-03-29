@@ -89,7 +89,6 @@ in darwin.lib.darwinSystem {
         include1Password = true;
         includeGnuSed = false;
         includeCoder = true;
-        includeCopilotVim = true;
       };
     }
   ];
