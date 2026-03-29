@@ -189,6 +189,25 @@
 
       packages = additionalPackages;
 
+      homeManagerModules = {
+        neovim = import ./home-manager-modules/neovim.nix;
+        git = import ./home-manager-modules/git.nix;
+        shell = import ./home-manager-modules/shell.nix;
+        dev-tools = import ./home-manager-modules/dev-tools.nix;
+        karabiner = import ./home-manager-modules/karabiner.nix;
+        _1password = import ./home-manager-modules/_1password.nix;
+        default = { imports = [
+          ./home-manager-modules/neovim.nix
+          ./home-manager-modules/git.nix
+          ./home-manager-modules/shell.nix
+          ./home-manager-modules/dev-tools.nix
+        ]; };
+        darwinDefault = { imports = [
+          ./home-manager-modules/karabiner.nix
+          ./home-manager-modules/_1password.nix
+        ]; };
+      };
+
       checks.x86_64-linux = lib.listToAttrs (map (name: {
         name = "home-cjlarose-${name}";
         value = mkNixosCheck nixpkgs-24-05.legacyPackages.x86_64-linux name;
