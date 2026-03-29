@@ -1,0 +1,15 @@
+name = "PerfectPlushies"
+filename = "perfectplushies-fabric-1.20.1-1.13.4.jar"
+side = "both"
+
+[download]
+url = "https://github.com/cjlarose/PerfectPlushies/releases/download/v1.13.4-beta/perfectplushies-fabric-1.20.1-1.13.4.jar"
+hash-format = "sha256"
+hash = "9a2fe8336beba9f6efb0eef1fa7f4f2bdcb504365023c78c4da53bb605eb0e80"
+
+[update]
+[update.github]
+branch = "wandering-plushie-trader-animal-trades"
+regex = "^.+(?<!-api|-dev|-dev-preshadow|-sources)\\.jar$"
+slug = "cjlarose/PerfectPlushies"
+tag = "v1.13.4-beta"

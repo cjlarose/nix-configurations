@@ -1,0 +1,13 @@
+name = "Player Locator Plus"
+filename = "player-locator-plus-2.2.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/e0Yt2i7Q/versions/QEfYkHPa/player-locator-plus-2.2.0.jar"
+hash-format = "sha512"
+hash = "50593e668d29074836aff1b5c0d4ff7fa52b3d1ef015e5bb100b26bfe5648a926cdc1e3346dd201b2220639fa23244f8fd42a9766eed02b0d2e2a50c7159f744"
+
+[update]
+[update.modrinth]
+mod-id = "e0Yt2i7Q"
+version = "QEfYkHPa"

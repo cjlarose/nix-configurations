@@ -1,0 +1,13 @@
+name = "🐟Friendly AxolotlS🐟"
+filename = "friendly-axolotls-1.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/VC9RnJoq/versions/DSHeJ7WH/friendly-axolotls-1.0.jar"
+hash-format = "sha512"
+hash = "c0f903b1f2487fcd75768110364fba17bafc1ec1a1cffd692fdc2e2d5948595d6b72f546610558ba8f2cb337df3a444f5beb0d69aa2ca71e5187c818fa31ad7c"
+
+[update]
+[update.modrinth]
+mod-id = "VC9RnJoq"
+version = "DSHeJ7WH"

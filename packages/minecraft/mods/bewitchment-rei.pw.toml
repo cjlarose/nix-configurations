@@ -1,0 +1,13 @@
+name = "Bewitchment REI"
+filename = "bewitchment-rei-1.0.0.jar"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/IpKWxsn4/versions/7s0rjyBa/bewitchment-rei-1.0.0.jar"
+hash-format = "sha512"
+hash = "22ba962020f4a3d3f0d964adfb1fef4fa2bf029982d9e7c7f60f4c739cfd13981f0b09afe0b74408c922a054d067ae3f10a2986273cb0e47a9be78c10c344736"
+
+[update]
+[update.modrinth]
+mod-id = "IpKWxsn4"
+version = "7s0rjyBa"

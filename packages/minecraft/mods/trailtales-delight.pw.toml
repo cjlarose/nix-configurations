@@ -1,0 +1,13 @@
+name = "Trail&Tales Delight"
+filename = "trailandtales_delight-1.2.5.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/Koee7vhY/versions/PXTGC3FV/trailandtales_delight-1.2.5.jar"
+hash-format = "sha512"
+hash = "6fc447af24c578ccec77ac0a3ffa13f684333829903ef9f3cb34dd7ee95ed5b3c83847f101bd699b12d8aa3c5540a908b08055e5be1e9ca6b249b4b227889e69"
+
+[update]
+[update.modrinth]
+mod-id = "Koee7vhY"
+version = "PXTGC3FV"

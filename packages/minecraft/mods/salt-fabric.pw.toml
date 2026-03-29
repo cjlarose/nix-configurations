@@ -1,0 +1,13 @@
+name = "Salt for fabric"
+filename = "salt-1.0.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/wf0nnXoC/versions/Q2ehckP3/salt-1.0.0.jar"
+hash-format = "sha512"
+hash = "aa251e485d1cba2cd9789157ef239036da82b97fe603c71e979dd7a78643d63d1a9d431ed7439c084c49eab59645504b74e99fc1ead47edc0824ef869612f1b3"
+
+[update]
+[update.modrinth]
+mod-id = "wf0nnXoC"
+version = "Q2ehckP3"

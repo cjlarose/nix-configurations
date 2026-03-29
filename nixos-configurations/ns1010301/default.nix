@@ -1,12 +1,13 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, nix-minecraft, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
     determinate.nixosModules.default
+    nix-minecraft.nixosModules.minecraft-servers
     (import ./disk-config.nix { inherit disko; })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages nix-minecraft; })
     ({ pkgs, config, ... } : {
       imports = [
         impermanence.nixosModules.impermanence
@@ -20,6 +21,12 @@ in nixpkgs.lib.nixosSystem {
               user = "root";
               group = "root";
               mode = "0700";
+            }
+            {
+              directory = "/srv/minecraft";
+              user = "minecraft";
+              group = "minecraft";
+              mode = "0770";
             }
           ];
           users = {

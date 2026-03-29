@@ -1,0 +1,13 @@
+name = "The Bunger Project"
+filename = "Bunger Mod.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/PltjIimx/versions/gKjHmqrE/Bunger%20Mod.jar"
+hash-format = "sha512"
+hash = "f43d341cf3a242ea3d5d851b9770bc99e3fcf1ec0c1222c3a4a7d330e9ac1b180c4df936a87fe778b993e727f3be1b9d5666d046dfe3485044a547a751043e57"
+
+[update]
+[update.modrinth]
+mod-id = "PltjIimx"
+version = "gKjHmqrE"

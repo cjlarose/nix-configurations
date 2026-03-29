@@ -1,0 +1,13 @@
+name = "Fairy Rings"
+filename = "fairy-rings-1.0.0.jar"
+side = "server"
+
+[download]
+url = "https://cdn.modrinth.com/data/eIGAb5rB/versions/7oFOJ1OI/fairy-rings-1.0.0.jar"
+hash-format = "sha512"
+hash = "a04b8bb7937e1e2c6adf840e99b0a72ac3ed82415156b34f335199872f8f0f64954cd6164a00ebe0183eb3b1402266c8e3233f8683b34d9d9426d828cac83f43"
+
+[update]
+[update.modrinth]
+mod-id = "eIGAb5rB"
+version = "7oFOJ1OI"

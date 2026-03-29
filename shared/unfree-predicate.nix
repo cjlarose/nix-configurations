@@ -7,6 +7,7 @@ let
     "claude-code"
     "coder"
     "copilot.vim"
+    "minecraft-server"
     "plexmediaserver"
     "terraform"
   ];

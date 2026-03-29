@@ -1,0 +1,13 @@
+name = "Vanilla Backport"
+filename = "VanillaBackport-fabric-1.20.1-1.1.5.4.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/6xwxDTgf/versions/h4NWGgbG/VanillaBackport-fabric-1.20.1-1.1.5.4.2.jar"
+hash-format = "sha512"
+hash = "645b6949e1248c07984dffb35d4644c3ffd5f3ec54385ef94157c4a6ab91513e209078b0429991cb026d3af5c93a3764a2826a3424c8fc5918aaa1f37fb33c99"
+
+[update]
+[update.modrinth]
+mod-id = "6xwxDTgf"
+version = "h4NWGgbG"

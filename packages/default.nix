@@ -12,6 +12,7 @@
   trueColorTest,
   cs-automation,
   allowUnfreePredicate,
+  nix-minecraft,
   ...
 }:
 
@@ -82,4 +83,5 @@
     commit=$(git rev-parse ''${1:-HEAD})
     open "$GITLAB_HOST/$(basename $(git rev-parse --show-toplevel))/-/commit/$commit"
   '';
+  minecraft-modpack = import ./minecraft { inherit pkgs nix-minecraft; };
 }

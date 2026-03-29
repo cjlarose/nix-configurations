@@ -1,0 +1,13 @@
+name = "Hand_Lamp"
+filename = "hand_lamp-1.0.2_3D model.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "715dc57cb9e0890b9f4a60fb38235d933b0b567c"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 5785730
+project-id = 1113826

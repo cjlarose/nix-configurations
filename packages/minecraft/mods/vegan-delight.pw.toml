@@ -1,0 +1,13 @@
+name = "Vegan Delight"
+filename = "VeganDelightFabric-2.0.0-beta4.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/Na8nA0jA/versions/PESWQyFD/VeganDelightFabric-2.0.0-beta4.jar"
+hash-format = "sha512"
+hash = "c3cff0dbf08dea38afd591b257c084e6dce2c7dcf2aeae23e1d4a10ba8cb3f325c4396fb80df26d61a85523651d9d9dc8dbde776822b34a3f74c09816557b29c"
+
+[update]
+[update.modrinth]
+mod-id = "Na8nA0jA"
+version = "PESWQyFD"

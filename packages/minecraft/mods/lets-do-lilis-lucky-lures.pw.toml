@@ -1,0 +1,13 @@
+name = "[Let's Do] Lili's Lucky Lures"
+filename = "letsdo-lilis_lucky_lures-fabric-1.0.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/DMDVFZSF/versions/ioN1lw2R/letsdo-lilis_lucky_lures-fabric-1.0.2.jar"
+hash-format = "sha512"
+hash = "c348c7b77d2fce1b128aca03cd4b4fdfcb4cc3d5a5fd21a712b830abec7d6f8bc09f9ef80420419b2de500b8ad25dfae006829d9b9a4aad6794efc9eb22ececb"
+
+[update]
+[update.modrinth]
+mod-id = "DMDVFZSF"
+version = "ioN1lw2R"
