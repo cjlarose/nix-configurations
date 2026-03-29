@@ -86,7 +86,6 @@ in darwin.lib.darwinSystem {
       home-manager.users.${primaryUser} = (import ../../home/cjlarose) {
         inherit system additionalPackages;
         stateVersion = homeManagerStateVersion;
-        include1Password = true;
         includeGnuSed = false;
         includeCoder = true;
       };
