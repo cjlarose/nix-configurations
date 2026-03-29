@@ -6,7 +6,6 @@ let
     "1password-cli"
     "claude-code"
     "coder"
-    "copilot.vim"
     "minecraft-server"
     "plexmediaserver"
     "terraform"

@@ -1,11 +1,11 @@
-{ system, additionalPackages, stateVersion, include1Password ? false, includeDockerClient ? false, includeGnuSed ? true, includeCoder ? false, includeCopilotVim ? false }:
+{ system, additionalPackages, stateVersion, include1Password ? false, includeDockerClient ? false, includeGnuSed ? true, includeCoder ? false }:
 { pkgs, ... }: {
   imports = let
     baseImports = [
       ./neovim.nix
       ./karabiner-profile-switcher.nix
     ];
-  in baseImports ++ (if include1Password then [./1password.nix] else []) ++ (if includeCopilotVim then [./copilot-vim.nix] else []);
+  in baseImports ++ (if include1Password then [./1password.nix] else []);
 
   home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
   home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
