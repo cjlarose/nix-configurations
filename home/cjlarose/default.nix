@@ -2,7 +2,6 @@
 { pkgs, ... }: {
   imports = let
     baseImports = [
-      ./personal-scripts.nix
       ./neovim.nix
       ./karabiner-profile-switcher.nix
     ];
@@ -164,19 +163,6 @@
     matchBlocks = {
       "*.toothyshouse.com" = {
         forwardAgent = true;
-      };
-    };
-  };
-
-  programs.direnv = {
-    enable = true;
-    config = {
-      disable_stdin = true;
-      strict_env = true;
-      whitelist = {
-        prefix = [
-          "/home/cjlarose/workspace/picktrace"
-        ];
       };
     };
   };
