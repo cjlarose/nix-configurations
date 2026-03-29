@@ -6,7 +6,7 @@
       ../../home-manager-modules/neovim.nix
       ../../home-manager-modules/git.nix
       ../../home-manager-modules/shell.nix
-      ./karabiner-profile-switcher.nix
+      ../../home-manager-modules/karabiner.nix
     ];
   in baseImports ++ (if include1Password then [./1password.nix] else []);
 
@@ -15,7 +15,6 @@
   cjlarose.shell.dockerPrompt = true;
 
   home.file.".config/1Password/ssh/agent.toml".source = ../1Password/ssh/agent.toml;
-  home.file.".config/karabiner/karabiner.json".source = ../karabiner/karabiner.json;
 
   home.file.".claude/settings.json".text = builtins.toJSON {
     enabledPlugins = {
