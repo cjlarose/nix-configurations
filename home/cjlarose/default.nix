@@ -28,38 +28,31 @@
     THOR_MERGE = "${pkgs.neovim-remote}/bin/nvr -s -d";
   };
 
-  home.packages = let
-    commonPackages = [
-      additionalPackages.${system}.atlas
-      additionalPackages.${system}.bundix
-      additionalPackages.${system}.git-make-apply-command
-      (pkgs.google-cloud-sdk.withExtraComponents ([pkgs.google-cloud-sdk.components.pubsub-emulator]))
-      pkgs.gradle
-      pkgs.jdk11
-      pkgs.nodejs_22
-      pkgs.oha
-      pkgs.parallel
-      pkgs.postgresql
-      (additionalPackages.${system}.python39.withPackages (python-pkgs: with python-pkgs; [
-        faker
-        google-cloud-firestore
-        google-cloud-pubsub
-        ipython
-        psycopg2
-        pytz
-        requests
-        setuptools
-        shortuuid
-      ]))
-      pkgs.ruby
-      pkgs.socat
-      pkgs.speedtest-cli
-      pkgs.stack
-      additionalPackages.${system}.teleport_16
-      additionalPackages.${system}.trueColorTest
-      additionalPackages.${system}.claude-code
-    ];
-  in commonPackages;
+  home.packages = [
+    additionalPackages.${system}.bundix
+    additionalPackages.${system}.git-make-apply-command
+    pkgs.nodejs_22
+    pkgs.oha
+    pkgs.parallel
+    pkgs.postgresql
+    (additionalPackages.${system}.python39.withPackages (python-pkgs: with python-pkgs; [
+      faker
+      google-cloud-firestore
+      google-cloud-pubsub
+      ipython
+      psycopg2
+      pytz
+      requests
+      setuptools
+      shortuuid
+    ]))
+    pkgs.ruby
+    pkgs.socat
+    pkgs.speedtest-cli
+    pkgs.stack
+    additionalPackages.${system}.trueColorTest
+    additionalPackages.${system}.claude-code
+  ];
 
   programs.git.userName = "Chris LaRose";
   programs.git.userEmail = "cjlarose@gmail.com";
