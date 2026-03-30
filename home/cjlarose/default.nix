@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, includeDockerClient ? false, includeGnuSed ? true, includeCoder ? false }:
+{ system, additionalPackages, stateVersion, includeDockerClient ? false, includeGnuSed ? true }:
 { pkgs, ... }: {
   imports = [
     ../../home-manager-modules/dev-tools.nix
@@ -36,7 +36,6 @@
 
   home.sessionVariables = {
     THOR_MERGE = "${pkgs.neovim-remote}/bin/nvr -s -d";
-    CODER_SSH_CONFIG_FILE = "~/.ssh/config-coder";
   };
 
   home.packages = let
@@ -72,8 +71,7 @@
     ];
     dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
     gnuSedPackages = (if includeGnuSed then [pkgs.gnused] else []);
-    coderPackages = (if includeCoder then [pkgs.coder] else []);
-  in commonPackages ++ dockerClientPackages ++ gnuSedPackages ++ coderPackages;
+  in commonPackages ++ dockerClientPackages ++ gnuSedPackages;
 
   programs.git.userName = "Chris LaRose";
   programs.git.userEmail = "cjlarose@gmail.com";
@@ -83,9 +81,6 @@
   };
 
   programs.ssh = {
-    includes = [
-      "config-coder"
-    ];
     matchBlocks = {
       "*.toothyshouse.com" = {
         forwardAgent = true;
