@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, includeDockerClient ? false }:
+{ system, additionalPackages, stateVersion }:
 { pkgs, ... }: {
   imports = [
     ../../home-manager-modules/dev-tools.nix
@@ -59,8 +59,7 @@
       additionalPackages.${system}.trueColorTest
       additionalPackages.${system}.claude-code
     ];
-    dockerClientPackages = (if includeDockerClient then [pkgs.docker-client] else []);
-  in commonPackages ++ dockerClientPackages;
+  in commonPackages;
 
   programs.git.userName = "Chris LaRose";
   programs.git.userEmail = "cjlarose@gmail.com";
