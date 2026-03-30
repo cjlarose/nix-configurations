@@ -2,13 +2,14 @@
 let
   switcherScript = pkgs.writeScriptBin "karabiner-profile-switcher" ''
     #!${pkgs.python3}/bin/python3
-    ${builtins.readFile ./karabiner-profile-switcher.py}
+    ${builtins.readFile ./karabiner/profile-switcher.py}
   '';
 in
 {
   home.packages = [ switcherScript ];
 
-  home.file.".config/karabiner-profile-switcher/config.json".source = ./karabiner-profile-switcher-config.json;
+  home.file.".config/karabiner/karabiner.json".source = ./karabiner/karabiner.json;
+  home.file.".config/karabiner-profile-switcher/config.json".source = ./karabiner/profile-switcher-config.json;
 
   launchd.agents.karabiner-profile-switcher = {
     enable = true;
