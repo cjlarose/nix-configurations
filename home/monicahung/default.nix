@@ -136,7 +136,7 @@
 
   programs.go = {
     enable = true;
-    package = additionalPackages.${system}.go_1_24;
+    package = additionalPackages.${system}.go_1_26;
     goPrivate = [ "go.1password.io" "gitlab.1password.io" "proto.1infra.dev" "github.com/agilebits-inc" ];
   };
 
