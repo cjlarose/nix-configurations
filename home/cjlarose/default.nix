@@ -42,7 +42,6 @@
 
   home.packages = let
     commonPackages = [
-      pkgs.abduco
       additionalPackages.${system}.atlas
       additionalPackages.${system}.bundix
       pkgs.corepack
