@@ -18,7 +18,6 @@ let
   '';
 in {
   home.packages = [
-    pkgs.corepack
     pkgs.csvtool
     pkgs.dig
     pkgs.gh
