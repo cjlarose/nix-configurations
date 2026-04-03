@@ -101,6 +101,7 @@
       color.ui = true;
       commit.verbose = true;
       pull.ff = "only";
+      rerere.enabled = true;
       rebase.autosquash = true;
       rebase.autostash = true;
       "url \"ssh://git@ssh.gitlab.1password.io:2227\"".insteadOf = "https://gitlab.1password.io";
