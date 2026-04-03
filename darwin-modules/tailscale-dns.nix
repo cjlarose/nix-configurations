@@ -11,6 +11,15 @@ let
       STATE_FILE="/var/run/tailscale-dns.state"
 
       if "$TAILSCALE" status > /dev/null 2>&1; then
+        TAILSCALE_UP=1
+      else
+        TAILSCALE_UP=0
+      fi
+
+      # Even when Tailscale is connected, the DNS server may be unreachable
+      # (e.g. it's behind a subnet router that appears active but isn't forwarding).
+      # Probe the server directly with a short timeout before treating it as available.
+      if [ "$TAILSCALE_UP" -eq 1 ] && /usr/bin/dig @"$DNS_SERVER" +time=2 +tries=1 +short . NS > /dev/null 2>&1; then
         CONNECTED=1
       else
         CONNECTED=0
@@ -19,13 +28,13 @@ let
       PREV=$(cat "$STATE_FILE" 2>/dev/null || echo "unknown")
 
       if [ "$CONNECTED" -eq 1 ] && [ "$PREV" != "1" ]; then
-        echo "Tailscale connected: setting DNS to $DNS_SERVER"
+        echo "Tailscale connected and DNS server reachable: setting DNS to $DNS_SERVER"
         /usr/sbin/networksetup -listallnetworkservices | tail -n +2 | sed 's/^\*//' | while IFS= read -r svc; do
           /usr/sbin/networksetup -setdnsservers "$svc" "$DNS_SERVER" || true
         done
         echo "1" > "$STATE_FILE"
       elif [ "$CONNECTED" -eq 0 ] && [ "$PREV" != "0" ]; then
-        echo "Tailscale disconnected: clearing DNS"
+        echo "Tailscale disconnected or DNS server unreachable: clearing DNS"
         /usr/sbin/networksetup -listallnetworkservices | tail -n +2 | sed 's/^\*//' | while IFS= read -r svc; do
           /usr/sbin/networksetup -setdnsservers "$svc" "Empty" || true
         done
