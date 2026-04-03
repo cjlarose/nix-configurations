@@ -61,7 +61,6 @@ in {
           type = "lua";
         }
         vim-unimpaired
-        vim-grepper
         {
           plugin = vim-prettier;
           config = ''

@@ -104,9 +104,3 @@ nmap <leader>tg :CreateGitTerminalBuffer<CR>
 command! -nargs=* CreateClaudeTerminalBuffer :call s:create_named_terminal_buffer('claude', 'claude', <f-args>)
 nmap <leader>tc :CreateClaudeTerminalBuffer<CR>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-grepper configuration                                                    "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-nnoremap <leader>gr :Grepper -tool rg<cr>
-nnoremap <leader>* :Grepper -tool rg -cword -noprompt<cr>
