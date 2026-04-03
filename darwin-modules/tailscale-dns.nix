@@ -27,14 +27,18 @@ let
 
       PREV=$(cat "$STATE_FILE" 2>/dev/null || echo "unknown")
 
+      log() {
+        echo "$(date '+%Y-%m-%d %H:%M:%S') $*"
+      }
+
       if [ "$CONNECTED" -eq 1 ] && [ "$PREV" != "1" ]; then
-        echo "Tailscale connected and DNS server reachable: setting DNS to $DNS_SERVER"
+        log "Tailscale connected and DNS server reachable: setting DNS to $DNS_SERVER"
         /usr/sbin/networksetup -listallnetworkservices | tail -n +2 | sed 's/^\*//' | while IFS= read -r svc; do
           /usr/sbin/networksetup -setdnsservers "$svc" "$DNS_SERVER" || true
         done
         echo "1" > "$STATE_FILE"
       elif [ "$CONNECTED" -eq 0 ] && [ "$PREV" != "0" ]; then
-        echo "Tailscale disconnected or DNS server unreachable: clearing DNS"
+        log "Tailscale disconnected or DNS server unreachable: clearing DNS"
         /usr/sbin/networksetup -listallnetworkservices | tail -n +2 | sed 's/^\*//' | while IFS= read -r svc; do
           /usr/sbin/networksetup -setdnsservers "$svc" "Empty" || true
         done
