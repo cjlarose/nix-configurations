@@ -28,7 +28,7 @@ let
       PREV=$(cat "$STATE_FILE" 2>/dev/null || echo "unknown")
 
       log() {
-        echo "$(date '+%Y-%m-%d %H:%M:%S') $*"
+        echo "$(date '+%Y-%m-%d %H:%M:%S %z') $*"
       }
 
       if [ "$CONNECTED" -eq 1 ] && [ "$PREV" != "1" ]; then
