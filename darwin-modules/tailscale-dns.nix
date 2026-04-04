@@ -53,6 +53,11 @@ in {
       type = lib.types.str;
       description = "DNS server IP to use when connected to Tailscale";
     };
+    pollInterval = lib.mkOption {
+      type = lib.types.int;
+      default = 10;
+      description = "How often (in seconds) to check Tailscale connection status";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -60,7 +65,7 @@ in {
       command = "${tailscaleDnsScript}/bin/tailscale-dns-manager";
       serviceConfig = {
         RunAtLoad = true;
-        StartInterval = 10;
+        StartInterval = cfg.pollInterval;
         StandardOutPath = /var/log/tailscale-dns.log;
         StandardErrorPath = /var/log/tailscale-dns.log;
       };
