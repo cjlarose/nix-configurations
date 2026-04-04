@@ -60,7 +60,7 @@ in {
       command = "${tailscaleDnsScript}/bin/tailscale-dns-manager";
       serviceConfig = {
         RunAtLoad = true;
-        StartInterval = 30;
+        StartInterval = 10;
         StandardOutPath = /var/log/tailscale-dns.log;
         StandardErrorPath = /var/log/tailscale-dns.log;
       };
