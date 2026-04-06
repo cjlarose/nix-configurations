@@ -53,6 +53,9 @@ in { pkgs, config, ... }: {
   # No ports are forwarded — all guest services are accessed via SSH tunnel:
   # ssh -L 8443:10.0.0.2:8443 -L 9000:10.0.0.2:9000 -L 2376:10.0.0.2:2376 cjlarose@ns1010301.cjlarose.dev
 
+  boot.kernelParams = [ "console=ttyS1,115200" ];
+  systemd.services."serial-getty@ttyS1".enable = true;
+
   system.stateVersion = stateVersion;
 
   nix = {
