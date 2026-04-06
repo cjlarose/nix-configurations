@@ -13,11 +13,11 @@ in {
 
   config = {
     home.shellAliases = {
-      gs = "git status";
-      gd = "git diff";
-      gds = "git diff --staged";
       gap = "git add --patch";
       gc = "git commit";
+      gd = "git diff";
+      gds = "git diff --staged";
+      gs = "git status";
     };
 
     programs.git = {
