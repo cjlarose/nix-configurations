@@ -11,9 +11,47 @@ in { pkgs, config, ... }: {
     hostId = "eae273e3";
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 25565 ];
+      allowedTCPPorts = [
+        25565  # minecraft (existing)
+      ];
+      interfaces."microvm".allowedUDPPorts = [
+        67  # DHCP server for microvm bridge (bridge interface only)
+      ];
+    };
+    nat = {
+      enable = true;
+      externalInterface = "enp1s0f0";
+      internalInterfaces = [ "microvm" ];
     };
   };
+
+  systemd.network.enable = true;
+
+  # Bridge for microvm guests
+  systemd.network.netdevs."10-microvm".netdevConfig = {
+    Kind = "bridge";
+    Name = "microvm";
+  };
+
+  systemd.network.networks."10-microvm" = {
+    matchConfig.Name = "microvm";
+    networkConfig = {
+      DHCPServer = true;
+      IPv6SendRA = true;
+    };
+    addresses = [{
+      Address = "10.0.0.1/24";
+    }];
+  };
+
+  # Attach all VM TAP interfaces to the bridge
+  systemd.network.networks."11-microvm" = {
+    matchConfig.Name = "vm-*";
+    networkConfig.Bridge = "microvm";
+  };
+
+  # No ports are forwarded — all guest services are accessed via SSH tunnel:
+  # ssh -L 8443:10.0.0.2:8443 -L 9000:10.0.0.2:9000 -L 2376:10.0.0.2:2376 cjlarose@ns1010301.cjlarose.dev
 
   system.stateVersion = stateVersion;
 
@@ -134,6 +172,27 @@ in { pkgs, config, ... }: {
         };
       };
     };
+  };
+
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/docker" = {
+    device = "tank/microvms/pt-docker-cjlarose/docker";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/acme" = {
+    device = "tank/microvms/pt-docker-cjlarose/acme";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/ssh" = {
+    device = "tank/microvms/pt-docker-cjlarose/ssh";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/home" = {
+    device = "tank/microvms/pt-docker-cjlarose/home";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/secrets" = {
+    device = "tank/microvms/pt-docker-cjlarose/secrets";
+    fsType = "zfs";
   };
 
   services.zfs.expandOnBoot = "all";

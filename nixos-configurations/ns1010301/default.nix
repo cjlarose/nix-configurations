@@ -1,9 +1,16 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, nix-minecraft, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, nix-minecraft, microvm, picktrace-nix-configurations, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
+    microvm.nixosModules.host
+    ({ ... }: {
+      microvm.vms."pt-docker-cjlarose" = {
+        flake = picktrace-nix-configurations;
+      };
+      microvm.autostart = [ "pt-docker-cjlarose" ];
+    })
     determinate.nixosModules.default
     nix-minecraft.nixosModules.minecraft-servers
     (import ./disk-config.nix { inherit disko; })
