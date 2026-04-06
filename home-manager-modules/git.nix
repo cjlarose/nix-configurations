@@ -17,6 +17,7 @@ in {
       gc = "git commit";
       gd = "git diff";
       gds = "git diff --staged";
+      gpoh = "git push origin HEAD";
       gs = "git status";
     };
 
