@@ -54,7 +54,7 @@
     additionalPackages.${system}.claude-code
   ];
 
-  programs.git.userName = "Chris LaRose";
+  programs.git.userName = "Christopher La Rose";
   programs.git.userEmail = "cjlarose@gmail.com";
   programs.git.extraConfig = {
     "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
