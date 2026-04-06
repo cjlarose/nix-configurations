@@ -63,6 +63,8 @@
         bootstrap_dns = ["1.1.1.1" "1.0.0.1"];
         upstream_dns = [
           "https://dns.cloudflare.com/dns-query"
+          "[/cjlarose.dev/]192.168.2.105"
+          "[/mellowcatfe.com/]192.168.2.105"
           "[/picktrace.dev/]192.168.2.105"
           "[/toothyshouse.com/]192.168.2.105"
         ];
