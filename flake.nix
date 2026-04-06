@@ -91,6 +91,13 @@
       url = "github:cstyles/nvr";
       flake = false;
     };
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs-25-11";
+    };
+    picktrace-nix-configurations = {
+      url = "git+ssh://git@github.com/picktrace/nix-configurations";
+    };
   };
 
   outputs = {
@@ -120,6 +127,8 @@
     trueColorTest,
     nvr,
     cs-automation,
+    microvm,
+    picktrace-nix-configurations,
   }:
     let
       supportedPlatforms = [
@@ -172,7 +181,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft;
+          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft microvm;
         }
       );
 
