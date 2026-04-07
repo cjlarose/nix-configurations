@@ -14,6 +14,9 @@ in { pkgs, config, ... }: {
       allowedTCPPorts = [
         25565  # minecraft (existing)
       ];
+      interfaces."enp1s0f0".allowedUDPPorts = [
+        41642  # tailscale for pt-docker-cjlarose guest
+      ];
       interfaces."microvm".allowedUDPPorts = [
         67  # DHCP server for microvm bridge (bridge interface only)
       ];
@@ -22,6 +25,11 @@ in { pkgs, config, ... }: {
       enable = true;
       externalInterface = "enp1s0f0";
       internalInterfaces = [ "microvm" ];
+      forwardPorts = [{
+        destination = "10.0.0.2:41642";
+        proto = "udp";
+        sourcePort = 41642;
+      }];
     };
   };
 
@@ -195,6 +203,10 @@ in { pkgs, config, ... }: {
   };
   fileSystems."/var/lib/microvms/pt-docker-cjlarose/secrets" = {
     device = "tank/microvms/pt-docker-cjlarose/secrets";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/tailscale" = {
+    device = "tank/microvms/pt-docker-cjlarose/tailscale";
     fsType = "zfs";
   };
 
