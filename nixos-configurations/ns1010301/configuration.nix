@@ -209,6 +209,10 @@ in { pkgs, config, ... }: {
     device = "tank/microvms/pt-docker-cjlarose/tailscale";
     fsType = "zfs";
   };
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/nix-rw-store" = {
+    device = "tank/microvms/pt-docker-cjlarose/nix-rw-store";
+    fsType = "zfs";
+  };
 
   services.zfs.expandOnBoot = "all";
 
