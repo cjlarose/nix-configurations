@@ -14,9 +14,14 @@ in { pkgs, config, ... }: {
       allowedTCPPorts = [
         25565  # minecraft (existing)
       ];
-      interfaces."enp1s0f0".allowedUDPPorts = [
-        41642  # tailscale for pt-docker-cjlarose guest
-      ];
+      interfaces."enp1s0f0" = {
+        allowedTCPPorts = [
+          8443  # nginx proxy for pt-docker-cjlarose guest
+        ];
+        allowedUDPPorts = [
+          41642  # tailscale for pt-docker-cjlarose guest
+        ];
+      };
       interfaces."microvm".allowedUDPPorts = [
         67  # DHCP server for microvm bridge (bridge interface only)
       ];
@@ -25,11 +30,18 @@ in { pkgs, config, ... }: {
       enable = true;
       externalInterface = "enp1s0f0";
       internalInterfaces = [ "microvm" ];
-      forwardPorts = [{
-        destination = "10.0.0.2:41642";
-        proto = "udp";
-        sourcePort = 41642;
-      }];
+      forwardPorts = [
+        {
+          destination = "10.0.0.2:41642";
+          proto = "udp";
+          sourcePort = 41642;
+        }
+        {
+          destination = "10.0.0.2:8443";
+          proto = "tcp";
+          sourcePort = 8443;
+        }
+      ];
     };
   };
 
