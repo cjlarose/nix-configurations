@@ -197,10 +197,6 @@ in { pkgs, config, ... }: {
     };
   };
 
-  fileSystems."/var/lib/microvms/pt-docker-cjlarose/docker" = {
-    device = "tank/microvms/pt-docker-cjlarose/docker";
-    fsType = "zfs";
-  };
   fileSystems."/var/lib/microvms/pt-docker-cjlarose/acme" = {
     device = "tank/microvms/pt-docker-cjlarose/acme";
     fsType = "zfs";
