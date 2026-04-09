@@ -10,11 +10,13 @@
       karabiner = import ./karabiner.nix;
       _1password = import ./_1password.nix;
       coder = import ./coder.nix;
+      direnv = import ./direnv.nix;
       default = { imports = [
         ./neovim.nix
         ./git.nix
         ./shell.nix
         ./dev-tools.nix
+        ./direnv.nix
       ]; };
       darwinDefault = { imports = [
         ./karabiner.nix
