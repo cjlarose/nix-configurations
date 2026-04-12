@@ -15,13 +15,13 @@
     mac = "02:00:00:00:00:02";
   }];
 
-  microvm.writableStoreOverlay = "/nix/.rw-store";
+  microvm.storeOnDisk = false;
 
   microvm.shares = [
     {
-      tag = "persist-nix-rw-store";
-      source = "nix-rw-store";
-      mountPoint = "/nix/.rw-store";
+      tag = "ro-store";
+      source = "/nix/store";
+      mountPoint = "/nix/store";
       proto = "virtiofs";
     }
     {
