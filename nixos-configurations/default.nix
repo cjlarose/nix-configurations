@@ -16,6 +16,7 @@
   nix-minecraft,
   microvm,
   picktrace-nix-configurations,
+  self,
   ...
 }:
 let
@@ -134,12 +135,22 @@ let
     );
     "ns1010301" = (
       import ./ns1010301 {
-        inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations;
+        inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations self;
         nixpkgs = nixpkgs-25-11;
         home-manager = home-manager-25-11;
         stateVersion = "25.11";
       }
     );
+    "minecraft-mellowcatfe" = nixpkgs-25-11.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit sharedOverlays additionalPackages nix-minecraft microvm;
+        home-manager = home-manager-25-11;
+        stateVersion = "25.11";
+        system = "x86_64-linux";
+      };
+      modules = [ ./minecraft-mellowcatfe ];
+    };
   };
 in
   builtins.mapAttrs (_: host: host.extendModules {
