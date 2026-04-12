@@ -103,6 +103,9 @@
                 mountpoint = "/nix";
                 options.mountpoint = "legacy";
                 options.quota = "64G";
+                # Required for virtiofs shares to work with non-root systemd services
+                options.acltype = "posixacl";
+                options."xattr" = "sa";
               };
               persistence = {
                 type = "zfs_fs";
