@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, nix-minecraft, microvm, picktrace-nix-configurations, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, microvm, picktrace-nix-configurations, self, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -9,12 +9,14 @@ in nixpkgs.lib.nixosSystem {
       microvm.vms."pt-docker-cjlarose" = {
         flake = picktrace-nix-configurations;
       };
-      microvm.autostart = [ "pt-docker-cjlarose" ];
+      microvm.vms."minecraft-mellowcatfe" = {
+        flake = self;
+      };
+      microvm.autostart = [ "pt-docker-cjlarose" "minecraft-mellowcatfe" ];
     })
     determinate.nixosModules.default
-    nix-minecraft.nixosModules.minecraft-servers
     (import ./disk-config.nix { inherit disko; })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages nix-minecraft; })
+    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
     ({ pkgs, config, ... } : {
       imports = [
         impermanence.nixosModules.impermanence
@@ -28,12 +30,6 @@ in nixpkgs.lib.nixosSystem {
               user = "root";
               group = "root";
               mode = "0700";
-            }
-            {
-              directory = "/srv/minecraft";
-              user = "minecraft";
-              group = "minecraft";
-              mode = "0770";
             }
           ];
           users = {
