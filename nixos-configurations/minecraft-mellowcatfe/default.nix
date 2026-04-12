@@ -16,12 +16,19 @@
   }];
 
   microvm.storeOnDisk = false;
+  microvm.writableStoreOverlay = "/nix/.rw-store";
 
   microvm.shares = [
     {
       tag = "ro-store";
       source = "/nix/store";
-      mountPoint = "/nix/store";
+      mountPoint = "/nix/.ro-store";
+      proto = "virtiofs";
+    }
+    {
+      tag = "persist-nix-rw-store";
+      source = "nix-rw-store";
+      mountPoint = "/nix/.rw-store";
       proto = "virtiofs";
     }
     {
