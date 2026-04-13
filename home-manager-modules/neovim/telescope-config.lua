@@ -17,6 +17,14 @@ require('telescope').setup({
 -- MRU tab tracking
 local tab_mru = {}
 
+-- When a tab is about to be left (including right before being closed),
+-- record which other tab has the highest MRU time. On TabClosed we use this
+-- to override neovim's default choice of focused tab. We have to compute the
+-- target on TabLeave rather than TabClosed because by the time TabClosed
+-- fires, TabEnter has already bumped the MRU time of whichever tab neovim
+-- auto-focused, which would clobber the pre-close ranking.
+local tabclose_target = nil
+
 local tab_mru_group = vim.api.nvim_create_augroup('telescope_tab_mru', { clear = true })
 vim.api.nvim_create_autocmd('TabEnter', {
   group = tab_mru_group,
@@ -24,14 +32,35 @@ vim.api.nvim_create_autocmd('TabEnter', {
     tab_mru[vim.api.nvim_get_current_tabpage()] = vim.loop.now()
   end,
 })
+vim.api.nvim_create_autocmd('TabLeave', {
+  group = tab_mru_group,
+  callback = function()
+    local current = vim.api.nvim_get_current_tabpage()
+    local best, best_time = nil, -1
+    for tp, t in pairs(tab_mru) do
+      if tp ~= current and t > best_time then
+        best = tp
+        best_time = t
+      end
+    end
+    tabclose_target = best
+  end,
+})
 vim.api.nvim_create_autocmd('TabClosed', {
   group = tab_mru_group,
   callback = function()
-    -- Clean up stale entries
+    -- Build the set of still-valid tabpage handles.
     local valid = {}
     for _, tp in ipairs(vim.api.nvim_list_tabpages()) do
       valid[tp] = true
     end
+    -- Override neovim's auto-focus with the MRU target if it's still alive.
+    if tabclose_target and valid[tabclose_target]
+        and vim.api.nvim_get_current_tabpage() ~= tabclose_target then
+      vim.api.nvim_set_current_tabpage(tabclose_target)
+    end
+    tabclose_target = nil
+    -- Clean up stale entries.
     for tp, _ in pairs(tab_mru) do
       if not valid[tp] then
         tab_mru[tp] = nil
