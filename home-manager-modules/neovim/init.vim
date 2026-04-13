@@ -102,5 +102,5 @@ command! -nargs=0 CreateGitTerminalBuffer :call s:create_named_terminal_buffer('
 nmap <leader>tg :CreateGitTerminalBuffer<CR>
 
 command! -nargs=* CreateClaudeTerminalBuffer :call s:create_named_terminal_buffer('claude', 'claude', <f-args>)
-nmap <leader>tc :CreateClaudeTerminalBuffer<CR>
+nmap <leader>cc :CreateClaudeTerminalBuffer<CR>
 
