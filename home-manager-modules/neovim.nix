@@ -54,7 +54,11 @@ in {
         vim-fugitive
         vim-rhubarb
         vim-fubitive
-        diffview-nvim
+        {
+          plugin = diffview-nvim;
+          config = builtins.readFile ./neovim/diffview-config.lua;
+          type = "lua";
+        }
         {
           plugin = nvim-lspconfig;
           config = builtins.readFile ./neovim/lsp-config.lua;
