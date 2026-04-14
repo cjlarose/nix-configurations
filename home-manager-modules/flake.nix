@@ -11,6 +11,7 @@
       _1password = import ./_1password.nix;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;
+      ghostty = import ./ghostty.nix;
       default = { imports = [
         ./neovim.nix
         ./git.nix
@@ -21,6 +22,7 @@
       darwinDefault = { imports = [
         ./karabiner.nix
         ./_1password.nix
+        ./ghostty.nix
       ]; };
     };
   };
