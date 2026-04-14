@@ -5,7 +5,7 @@ description: Build and activate home-manager config changes on a microvm guest w
 
 # home-manager-switch
 
-For changes that only affect the cjlarose home-manager config (packages, shell config, git settings, Claude skills, etc.), apply them without rebuilding the entire microvm. Build on ns1010301 (the host), register the closure in the guest's nix DB, then activate via SSH.
+For changes that only affect a user's home-manager config (packages, shell config, git settings, Claude skills, etc.), apply them without rebuilding the entire microvm. Build on ns1010301 (the host), register the closure in the guest's nix DB, then activate via SSH.
 
 The guest's `/nix/store` is a virtiofs share of the host's nix store, so build outputs are on disk inside the guest immediately. However, the guest's nix database doesn't know about them until they're explicitly registered.
 

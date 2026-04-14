@@ -149,6 +149,11 @@
           import ./packages packageArgs
       );
 
+      # Evaluate the sub-flake to get { homeManagerModules = { default, coder, claude, ... }; }.
+      # The outputs function takes { self } but never references it, so {} is safe.
+      # If a self reference is ever added to the sub-flake, this will need updating.
+      cjlarose-home-manager-modules = (import ./home-manager-modules/flake.nix).outputs { self = {}; };
+
       sharedOverlays = [
         fzfProject.overlay
         fzfVim.overlay
@@ -181,7 +186,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations;
+          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules;
         }
       );
 

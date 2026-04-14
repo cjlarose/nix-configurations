@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, nix-minecraft, microvm, picktrace-nix-configurations, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, nix-minecraft, microvm, picktrace-nix-configurations, cjlarose-home-manager-modules, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -40,8 +40,24 @@ in nixpkgs.lib.nixosSystem {
             cjlarose = {
               home = "/home/cjlarose";
             };
+            picktrace = {
+              home = "/home/picktrace";
+            };
           };
         };
+      };
+    })
+    ({ pkgs, ... }: {
+      users.users.picktrace = {
+        uid = 10001;
+        isNormalUser = true;
+        home = "/home/picktrace";
+        extraGroups = [ "docker" "wheel" ];
+        shell = pkgs.zsh;
+        hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
+        ];
       };
     })
     home-manager.nixosModules.home-manager {
@@ -49,6 +65,11 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
+      };
+      home-manager.users.picktrace = picktrace-nix-configurations.homeManagerModules.picktrace-cjlarose;
+      home-manager.extraSpecialArgs = {
+        stateVersion = "25.11";
+        inherit cjlarose-home-manager-modules;
       };
     }
   ];
