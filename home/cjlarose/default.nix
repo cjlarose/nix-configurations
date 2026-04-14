@@ -1,26 +1,17 @@
 { system, additionalPackages, stateVersion }:
 { pkgs, ... }: {
+  _module.args = { inherit additionalPackages system; };
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
+    ../../home-manager-modules/claude
   ];
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
   cjlarose.shell.kubePrompt = true;
   cjlarose.shell.dockerPrompt = true;
-
-  home.file.".claude/settings.json".text = builtins.toJSON {
-    enabledPlugins = {
-      "superpowers@claude-plugins-official" = true;
-    };
-    skipDangerousModePermissionPrompt = true;
-    effortLevel = "medium";
-    permissions = {
-      defaultMode = "bypassPermissions";
-    };
-  };
 
   home.stateVersion = stateVersion;
 
@@ -51,7 +42,6 @@
     pkgs.speedtest-cli
     pkgs.stack
     additionalPackages.${system}.trueColorTest
-    additionalPackages.${system}.claude-code
   ];
 
   programs.git.userName = "Christopher La Rose";

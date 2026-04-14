@@ -9,6 +9,7 @@
       dev-tools = import ./dev-tools.nix;
       karabiner = import ./karabiner.nix;
       _1password = import ./_1password.nix;
+      claude = import ./claude;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;
       ghostty = import ./ghostty.nix;
