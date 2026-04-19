@@ -64,8 +64,6 @@
         upstream_dns = [
           "https://dns.cloudflare.com/dns-query"
           "[/cjlarose.dev/]192.168.2.105"
-          "[/mellowcatfe.com/]192.168.2.105"
-          "[/picktrace.dev/]192.168.2.105"
           "[/toothyshouse.com/]192.168.2.105"
         ];
       };
