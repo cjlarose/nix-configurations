@@ -9,7 +9,7 @@
     boot = {
       loader.systemd-boot.enable = true;
       zfs.devNodes = "/dev/disk/by-label/tank";
-      initrd.postDeviceCommands = lib.mkAfter ''
+      initrd.postResumeCommands = lib.mkAfter ''
         zfs rollback -r tank/root@blank
       '';
     };
