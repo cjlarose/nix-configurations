@@ -104,6 +104,11 @@
                 options.mountpoint = "legacy";
                 options.quota = "64G";
               };
+              home = {
+                type = "zfs_fs";
+                mountpoint = "/home";
+                options.mountpoint = "legacy";
+              };
               persistence = {
                 type = "zfs_fs";
                 mountpoint = "/persistence";

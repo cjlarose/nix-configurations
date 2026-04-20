@@ -23,6 +23,11 @@
       fsType = "vfat";
     };
 
+  fileSystems."/home" =
+    { device = "tank/home";
+      fsType = "zfs";
+    };
+
   fileSystems."/persistence" =
     { device = "tank/persistence";
       neededForBoot = true;

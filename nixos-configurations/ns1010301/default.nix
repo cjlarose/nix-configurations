@@ -36,20 +36,6 @@ in nixpkgs.lib.nixosSystem {
               mode = "0770";
             }
           ];
-          users = {
-            cjlarose = {
-              home = "/home/cjlarose";
-              directories = [
-                "worktrees"
-              ];
-            };
-            picktrace = {
-              home = "/home/picktrace";
-              directories = [
-                "worktrees"
-              ];
-            };
-          };
         };
       };
     })
