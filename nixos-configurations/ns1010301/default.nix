@@ -39,9 +39,15 @@ in nixpkgs.lib.nixosSystem {
           users = {
             cjlarose = {
               home = "/home/cjlarose";
+              directories = [
+                "worktrees"
+              ];
             };
             picktrace = {
               home = "/home/picktrace";
+              directories = [
+                "worktrees"
+              ];
             };
           };
         };
