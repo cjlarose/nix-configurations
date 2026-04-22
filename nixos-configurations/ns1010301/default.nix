@@ -37,6 +37,12 @@ in nixpkgs.lib.nixosSystem {
               group = "root";
               mode = "0755";
             }
+            {
+              directory = "/var/lib/acme";
+              user = "acme";
+              group = "acme";
+              mode = "0755";
+            }
           ];
         };
       };
