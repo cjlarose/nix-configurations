@@ -79,6 +79,7 @@
         mods = "${modpack}/mods";
       };
       files = let modpack = additionalPackages.${system}.minecraft-modpack; in {
+        "server-icon.png" = ./server-icon.png;
         "config/aether-common.toml" = "${modpack}/config/aether-common.toml";
         "config/amendments-common.json" = "${modpack}/config/amendments-common.json";
         "config/archers/items_v2.json" = "${modpack}/config/archers/items_v2.json";
