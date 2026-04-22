@@ -215,7 +215,9 @@ in { pkgs, config, ... }: {
         ${pkgs.mcrcon}/bin/mcrcon -H 10.0.0.3 -p "$RCON_PASSWORD" "save-on" || true
 
         ${pkgs.util-linux}/bin/umount /mnt/minecraft-mellowcatfe-backup 2>/dev/null || true
-        ${pkgs.zfs}/bin/zfs rename tank/microvms/minecraft-mellowcatfe/minecraft@restic-backup tank/microvms/minecraft-mellowcatfe/minecraft@daily-$(${pkgs.coreutils}/bin/date +%Y-%m-%d) 2>/dev/null || true
+        DAILY_NAME="daily-$(${pkgs.coreutils}/bin/date +%Y-%m-%d)"
+        ${pkgs.zfs}/bin/zfs destroy "tank/microvms/minecraft-mellowcatfe/minecraft@$DAILY_NAME" 2>/dev/null || true
+        ${pkgs.zfs}/bin/zfs rename tank/microvms/minecraft-mellowcatfe/minecraft@restic-backup "tank/microvms/minecraft-mellowcatfe/minecraft@$DAILY_NAME" 2>/dev/null || true
         ${pkgs.zfs}/bin/zfs list -t snapshot -o name -H -S creation tank/microvms/minecraft-mellowcatfe/minecraft | ${pkgs.coreutils}/bin/tail -n +31 | ${pkgs.findutils}/bin/xargs -r -n 1 ${pkgs.zfs}/bin/zfs destroy
       '';
     };
