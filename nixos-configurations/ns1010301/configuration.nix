@@ -171,6 +171,10 @@ in { pkgs, config, ... }: {
     device = "tank/microvms/minecraft-mellowcatfe/home";
     fsType = "zfs";
   };
+  fileSystems."/var/lib/microvms/minecraft-mellowcatfe/secrets" = {
+    device = "tank/microvms/minecraft-mellowcatfe/secrets";
+    fsType = "zfs";
+  };
 
   services.zfs.expandOnBoot = "all";
 

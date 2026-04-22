@@ -55,5 +55,11 @@
       mountPoint = "/var/lib/tailscale";
       proto = "virtiofs";
     }
+    {
+      tag = "persist-secrets";
+      source = "secrets";
+      mountPoint = "/persistence/secrets";
+      proto = "virtiofs";
+    }
   ];
 }
