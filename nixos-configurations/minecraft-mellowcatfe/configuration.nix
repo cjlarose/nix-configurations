@@ -70,6 +70,7 @@
   services.minecraft-servers = {
     enable = true;
     eula = true;
+    environmentFile = "/persistence/secrets/minecraft-env";
     servers.mellowcatfe = {
       enable = true;
       package = pkgs.minecraftServers.fabric-1_20_1;
@@ -114,6 +115,9 @@
         view-distance = 6;
         spawn-protection = 0;
         max-tick-time = -1;
+        enable-rcon = true;
+        "rcon.port" = 25575;
+        "rcon.password" = "@RCON_PASSWORD@";
       };
       whitelist = {
         "360NoScopeSWAG" = "6c6fc1f9-055e-4865-9527-bf65f3424b31";
