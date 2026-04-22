@@ -1,7 +1,7 @@
 { nixpkgs, sharedOverlays, stateVersion, system, additionalPackages, ... }:
 let
   allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
-in { pkgs, config, ... }: {
+in { pkgs, config, lib, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -222,6 +222,11 @@ in { pkgs, config, ... }: {
       '';
     };
   };
+
+  # PrivateTmp creates a private mount namespace, which prevents the
+  # ZFS snapshot mount in backupPrepareCommand from being visible to
+  # the restic backup process in ExecStart.
+  systemd.services.restic-backups-minecraft-mellowcatfe.serviceConfig.PrivateTmp = lib.mkForce false;
 
   services.zfs.expandOnBoot = "all";
 
