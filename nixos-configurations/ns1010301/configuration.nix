@@ -13,6 +13,8 @@ in { pkgs, config, lib, ... }: {
       enable = true;
       interfaces."enp1s0f0" = {
         allowedTCPPorts = [
+          80     # nginx for minecraft.mellowcatfe.com
+          443    # nginx for minecraft.mellowcatfe.com
           8443   # nginx proxy for pt-docker-cjlarose guest
           25565  # minecraft for minecraft-mellowcatfe guest
         ];
@@ -125,6 +127,22 @@ in { pkgs, config, lib, ... }: {
     enable = true;
     openFirewall = true;
     port = 41641;
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts = {
+      "minecraft.mellowcatfe.com" = {
+        enableACME = true;
+        forceSSL = true;
+        root = "${additionalPackages.${system}.minecraft-mods-zip}";
+      };
+    };
   };
 
   fileSystems."/var/lib/microvms/pt-docker-cjlarose/acme" = {
