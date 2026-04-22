@@ -176,6 +176,47 @@ in { pkgs, config, ... }: {
     fsType = "zfs";
   };
 
+  services.restic.backups = {
+    minecraft-mellowcatfe = {
+      initialize = true;
+
+      timerConfig = {
+        OnCalendar = "02:00 America/Los_Angeles";
+        Persistent = true;
+      };
+
+      environmentFile = "/persistence/restic/minecraft-mellowcatfe/env";
+      repositoryFile = "/persistence/restic/minecraft-mellowcatfe/repo";
+      passwordFile = "/persistence/restic/minecraft-mellowcatfe/password";
+
+      paths = [
+        "/var/lib/microvms/minecraft-mellowcatfe/minecraft/.zfs/snapshot/restic-backup"
+      ];
+
+      pruneOpts = [
+        "--keep-daily 30"
+      ];
+
+      backupPrepareCommand = ''
+        # Clean up stale snapshot from a previous failed run
+        ${pkgs.zfs}/bin/zfs destroy tank/microvms/minecraft-mellowcatfe/minecraft@restic-backup 2>/dev/null || true
+
+        RCON_PASSWORD=$(${pkgs.gnugrep}/bin/grep -oP 'RCON_PASSWORD=\K.*' /var/lib/microvms/minecraft-mellowcatfe/secrets/minecraft-env)
+        ${pkgs.mcrcon}/bin/mcrcon -H 10.0.0.3 -p "$RCON_PASSWORD" "save-all flush" "save-off"
+        ${pkgs.zfs}/bin/zfs snapshot tank/microvms/minecraft-mellowcatfe/minecraft@restic-backup
+      '';
+
+      backupCleanupCommand = ''
+        # Always re-enable saves, even if the backup failed
+        RCON_PASSWORD=$(${pkgs.gnugrep}/bin/grep -oP 'RCON_PASSWORD=\K.*' /var/lib/microvms/minecraft-mellowcatfe/secrets/minecraft-env)
+        ${pkgs.mcrcon}/bin/mcrcon -H 10.0.0.3 -p "$RCON_PASSWORD" "save-on" || true
+
+        ${pkgs.zfs}/bin/zfs rename tank/microvms/minecraft-mellowcatfe/minecraft@restic-backup tank/microvms/minecraft-mellowcatfe/minecraft@daily-$(${pkgs.coreutils}/bin/date +%Y-%m-%d) 2>/dev/null || true
+        ${pkgs.zfs}/bin/zfs list -t snapshot -o name -H -S creation tank/microvms/minecraft-mellowcatfe/minecraft | ${pkgs.coreutils}/bin/tail -n +31 | ${pkgs.findutils}/bin/xargs -r -n 1 ${pkgs.zfs}/bin/zfs destroy
+      '';
+    };
+  };
+
   services.zfs.expandOnBoot = "all";
 
   programs.ssh.startAgent = true;

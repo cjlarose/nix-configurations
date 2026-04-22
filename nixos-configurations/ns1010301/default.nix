@@ -31,6 +31,12 @@ in nixpkgs.lib.nixosSystem {
               group = "root";
               mode = "0700";
             }
+            {
+              directory = "/var/cache/restic-backups-minecraft-mellowcatfe";
+              user = "root";
+              group = "root";
+              mode = "0755";
+            }
           ];
         };
       };
