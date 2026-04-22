@@ -112,7 +112,7 @@
         server-port = 25565;
         difficulty = "hard";
         gamemode = "survival";
-        motd = "mellowcatfe";
+        motd = "\\u00a7kO\\u00a7r IT IS BED O'CLOCK \\u00a7kO\\u00a7r\\n\\u00a7kO\\u00a7r YOU BEST BE SLEEPING \\u00a7kO";
         white-list = true;
         view-distance = 6;
         spawn-protection = 0;
