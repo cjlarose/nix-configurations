@@ -84,4 +84,10 @@
     open "$GITLAB_HOST/$(basename $(git rev-parse --show-toplevel))/-/commit/$commit"
   '';
   minecraft-modpack = import ./minecraft { inherit pkgs nix-minecraft; };
+  minecraft-mods-zip = let modpack = import ./minecraft { inherit pkgs nix-minecraft; }; in
+    pkgs.runCommand "mellowcatfe-mods-zip" { nativeBuildInputs = [ pkgs.zip ]; } ''
+      mkdir -p $out
+      cd ${modpack}
+      zip -r $out/mods.zip mods/
+    '';
 }
