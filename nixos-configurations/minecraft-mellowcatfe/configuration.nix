@@ -11,6 +11,7 @@
       enable = true;
       allowedTCPPorts = [
         25565 # minecraft
+        25575 # rcon
       ];
     };
   };
