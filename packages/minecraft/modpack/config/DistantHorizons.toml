@@ -260,7 +260,7 @@ _version = 3
 		#  outside the vanilla render distance? 
 		# Depending on the generator mode, this will import existing chunks 
 		# and/or generating missing chunks.
-		enableDistantGeneration = false
+		enableDistantGeneration = true
 		#
 		# The center X chunk position that the world gen max radius is centered around.
 		generationCenterChunkX = 0

@@ -2,7 +2,7 @@ hash-format = "sha256"
 
 [[files]]
 file = "config/DistantHorizons.toml"
-hash = "c9d2598eba8e08382d7c0d43a680d7a41940aa87fb02ab53645a9f87774c7323"
+hash = "92cf15f75e8c1d5305fac9b0a482521b31582e4d770791be47b298069d41479d"
 
 [[files]]
 file = "config/aether-common.toml"
