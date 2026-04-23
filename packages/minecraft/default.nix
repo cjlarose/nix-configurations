@@ -5,5 +5,5 @@ in
 pkgsWithMinecraft.fetchPackwizModpack {
   src = ./modpack;
   side = "both";
-  packHash = "sha256-it8xUXsDiLB7Qov+l5qnL6CWw8R/mBG9WrOTz4bTOmY=";
+  packHash = "sha256-W1lDd8Y1LIbWwTzf3lnHx/HsqWa3waVmCx2M16C9IxE=";
 }
