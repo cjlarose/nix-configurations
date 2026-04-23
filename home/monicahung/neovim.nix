@@ -37,7 +37,7 @@
         plugin = fzf-project;
         config = ''
           let g:fzfSwitchProjectWorkspaces = [ '~/workspace', '~/go/src' ]
-          let g:fzfSwitchProjectProjectDepth = 2
+          let g:fzfSwitchProjectProjectDepth = 3
         '';
       }
       vim-fugitive

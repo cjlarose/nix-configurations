@@ -22,6 +22,7 @@
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     THOR_MERGE = "nvr -s -d";
     GOPATH = "$HOME/go";
+    GOTOOLCHAIN = "local";
   };
 
   home.packages = [
@@ -29,9 +30,12 @@
     pkgs.dig
     pkgs.docker-client
     pkgs.gh
+    pkgs.glab
     pkgs.git-absorb
     pkgs.htop
+    additionalPackages.${system}.jira-cli-go
     pkgs.jq
+    pkgs.k9s
     pkgs.mirrord
     pkgs.neovim-remote
     pkgs.nil
@@ -85,6 +89,11 @@
     nix-direnv = {
       enable = true;
       package = additionalPackages.${system}.nix-direnv;
+    };
+    config = {
+      whitelist = {
+        prefix = [ "~/workspace/agilebits-inc" ];
+      };
     };
   };
 

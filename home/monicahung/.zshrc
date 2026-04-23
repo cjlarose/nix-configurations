@@ -16,3 +16,5 @@ autoload -U zmv
 if [ -f ~/.zshlocalrc ]; then
   source ~/.zshlocalrc
 fi
+
+source /Users/monica.hung/.op/plugins.sh
