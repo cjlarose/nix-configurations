@@ -1,9 +1,13 @@
-{ nixpkgs, sharedOverlays, additionalPackages, stateVersion, impermanence, home-manager, disko, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, stateVersion, impermanence, home-manager, disko, self, ... }:
 let
   system = "x86_64-linux";
+  flakeInputs = builtins.attrValues (builtins.removeAttrs self.inputs [ "self" ]);
 in nixpkgs.lib.nixosSystem {
   inherit system;
   modules = [
+    {
+      system.extraDependencies = flakeInputs;
+    }
     (import ./disk-config.nix { inherit disko; })
     ({ pkgs, ... } : {
       imports = [
