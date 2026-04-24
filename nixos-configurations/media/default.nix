@@ -17,6 +17,14 @@
   microvm.storeOnDisk = false;
   microvm.writableStoreOverlay = "/nix/.rw-store";
 
+  microvm.volumes = [{
+    image = "docker.img";
+    mountPoint = "/var/lib/docker";
+    size = 65536; # 64 GiB
+    fsType = "xfs";
+    label = "docker";
+  }];
+
   microvm.shares = [
     {
       tag = "ro-store";
