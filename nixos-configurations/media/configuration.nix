@@ -64,7 +64,7 @@
     backend = "docker";
     containers = {
       transmission = {
-        image = "haugene/transmission-openvpn";
+        image = "haugene/transmission-openvpn:5.4.1";
         environment = {
           OPENVPN_PROVIDER = "PIA";
           OPENVPN_CONFIG = "ca_ontario";
