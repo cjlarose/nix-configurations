@@ -141,6 +141,7 @@
   users = {
     mutableUsers = false;
     users = {
+      jellyfin.uid = 998;
       cjlarose = {
         uid = 1000;
         isNormalUser = true;
@@ -153,6 +154,7 @@
         ];
       };
     };
+    groups.jellyfin.gid = 998;
   };
 
   home-manager.useGlobalPkgs = true;
