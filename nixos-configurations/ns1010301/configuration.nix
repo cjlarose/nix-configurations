@@ -21,6 +21,7 @@ in { pkgs, config, lib, ... }: {
         allowedUDPPorts = [
           41642  # tailscale for pt-docker-cjlarose guest
           41643  # tailscale for minecraft-mellowcatfe guest
+          41644  # tailscale for media guest
         ];
       };
       interfaces."microvm".allowedUDPPorts = [
@@ -51,6 +52,11 @@ in { pkgs, config, lib, ... }: {
           destination = "10.0.0.3:41643";
           proto = "udp";
           sourcePort = 41643;
+        }
+        {
+          destination = "10.0.0.4:41644";
+          proto = "udp";
+          sourcePort = 41644;
         }
       ];
     };
@@ -191,6 +197,39 @@ in { pkgs, config, lib, ... }: {
   };
   fileSystems."/var/lib/microvms/minecraft-mellowcatfe/secrets" = {
     device = "tank/microvms/minecraft-mellowcatfe/secrets";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/microvms/media/nix-rw-store" = {
+    device = "tank/microvms/media/nix-rw-store";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/ssh" = {
+    device = "tank/microvms/media/ssh";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/home" = {
+    device = "tank/microvms/media/home";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/tailscale" = {
+    device = "tank/microvms/media/tailscale";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/secrets" = {
+    device = "tank/microvms/media/secrets";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/acme" = {
+    device = "tank/microvms/media/acme";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/jellyfin" = {
+    device = "tank/microvms/media/jellyfin";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/media" = {
+    device = "tank/microvms/media/media";
     fsType = "zfs";
   };
 

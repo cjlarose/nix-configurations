@@ -78,14 +78,16 @@ let
         stateVersion = "24.11";
       }
     );
-    "media" = (
-      import ./media {
-        inherit sharedOverlays additionalPackages impermanence;
-        nixpkgs = nixpkgs-24-05;
-        home-manager = home-manager-24-05;
-        stateVersion = "23.11";
-      }
-    );
+    "media" = nixpkgs-25-11.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit sharedOverlays additionalPackages microvm;
+        home-manager = home-manager-25-11;
+        stateVersion = "25.11";
+        system = "x86_64-linux";
+      };
+      modules = [ ./media ];
+    };
     "memos" = (
       import ./memos {
         inherit sharedOverlays additionalPackages impermanence disko;

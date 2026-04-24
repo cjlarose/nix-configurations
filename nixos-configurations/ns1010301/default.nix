@@ -12,7 +12,10 @@ in nixpkgs.lib.nixosSystem {
       microvm.vms."minecraft-mellowcatfe" = {
         flake = self;
       };
-      microvm.autostart = [ "pt-docker-cjlarose" "minecraft-mellowcatfe" ];
+      microvm.vms."media" = {
+        flake = self;
+      };
+      microvm.autostart = [ "pt-docker-cjlarose" "minecraft-mellowcatfe" "media" ];
     })
     determinate.nixosModules.default
     (import ./disk-config.nix { inherit disko; })
