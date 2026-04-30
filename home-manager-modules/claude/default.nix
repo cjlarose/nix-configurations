@@ -21,7 +21,7 @@
       "nix-configurations/SKILL" = ./skills/nix-configurations/SKILL.md;
       "nix-configurations/home-manager-switch/SKILL" = ./skills/nix-configurations/home-manager-switch/SKILL.md;
       "nix-configurations/nixos-rebuild/SKILL" = ./skills/nix-configurations/nixos-rebuild/SKILL.md;
-      "nix-configurations/transcode-media/SKILL" = ./skills/nix-configurations/transcode-media/SKILL.md;
+      "transcode-media/SKILL" = ./skills/transcode-media/SKILL.md;
     };
   };
 
