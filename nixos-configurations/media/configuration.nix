@@ -33,6 +33,13 @@
   environment.systemPackages = with pkgs; [
     iotop
     lsof
+    (writeShellScriptBin "jellyfin-refresh" ''
+      set -euo pipefail
+      source /persistence/secrets/jellyfin.env
+      ${curl}/bin/curl -s -o /dev/null -w 'Library scan triggered (HTTP %{http_code})\n' \
+        -X POST "http://localhost:8096/Library/Refresh" \
+        -H "X-Emby-Token: $JELLYFIN_API_KEY"
+    '')
   ];
 
   services.openssh = {
