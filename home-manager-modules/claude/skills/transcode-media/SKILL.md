@@ -128,6 +128,14 @@ sudo chown 998:998 "/var/lib/microvms/media/media/jellyfin-media/Movies/<Title> 
 
 The original file in the transmission completed directory should be **kept** so that seeding continues to work.
 
+## Refresh Jellyfin library
+
+After adding or modifying media, trigger a Jellyfin library scan. Real-time file monitoring does not work over virtiofs, so this must be done manually:
+
+```sh
+ssh cjlarose@10.0.0.4 "sudo jellyfin-refresh"
+```
+
 ## Monitoring progress
 
 ffmpeg prints progress to stderr. Run the transcode as a background task and monitor it. Transcoding a full movie typically takes 10-30 minutes depending on length and resolution.
