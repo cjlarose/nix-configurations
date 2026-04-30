@@ -62,6 +62,18 @@ let
         stateVersion = "24.05";
       }
     );
+    "edge-lax" = nixpkgs-25-11.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit sharedOverlays additionalPackages impermanence disko;
+        nixpkgs = nixpkgs-25-11;
+        home-manager = home-manager-25-11;
+        stateVersion = "25.11";
+        system = "x86_64-linux";
+        intranetHosts = additionalPackages."x86_64-linux".intranetHosts;
+      };
+      modules = [ ./edge-lax ];
+    };
     "dns" = (
       import ./dns {
         inherit sharedOverlays additionalPackages impermanence disko self;
