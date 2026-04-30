@@ -50,10 +50,13 @@ Transcoding is mainly needed for high-bitrate BluRay remuxes (30+ Mbps) that exc
 
 If the files are already in a good format, symlink them into the Jellyfin library instead of transcoding.
 
+**Important**: Symlink targets must use the **VM-internal path** (`/persistence/media/...`), not the host path (`/var/lib/microvms/media/media/...`). Jellyfin runs inside the VM where the virtiofs mount is at `/persistence/media/`. The commands below run on the host but create symlinks with VM-internal target paths.
+
 ### Movies
 
 ```sh
-sudo ln -sf "<source-file>" "/var/lib/microvms/media/media/jellyfin-media/Movies/<Title> (<Year>).mkv"
+sudo ln -sf "/persistence/media/transmission-openvpn/data/completed/<source-file>" \
+  "/var/lib/microvms/media/media/jellyfin-media/Movies/<Title> (<Year>).mkv"
 sudo chown -h 998:998 "/var/lib/microvms/media/media/jellyfin-media/Movies/<Title> (<Year>).mkv"
 ```
 
@@ -69,7 +72,8 @@ sudo chown -R 998:998 "/var/lib/microvms/media/media/jellyfin-media/Shows/<Show 
 Then symlink each episode:
 
 ```sh
-sudo ln -sf "<source-file>" "/var/lib/microvms/media/media/jellyfin-media/Shows/<Show Name> (<Year>)/Season <N>/<Show Name> S<NN>E<NN>.mkv"
+sudo ln -sf "/persistence/media/transmission-openvpn/data/completed/<dir>/<source-file>" \
+  "/var/lib/microvms/media/media/jellyfin-media/Shows/<Show Name> (<Year>)/Season <N>/<Show Name> S<NN>E<NN>.mkv"
 ```
 
 ## Step 2b: Transcode (if not direct-playable)
