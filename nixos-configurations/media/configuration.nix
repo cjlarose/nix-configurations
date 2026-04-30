@@ -36,9 +36,10 @@
     (writeShellScriptBin "jellyfin-refresh" ''
       set -euo pipefail
       source /persistence/secrets/jellyfin.env
-      ${curl}/bin/curl -s -o /dev/null -w 'Library scan triggered (HTTP %{http_code})\n' \
+      ${curl}/bin/curl -sf -o /dev/null \
         -X POST "http://localhost:8096/Library/Refresh" \
         -H "X-Emby-Token: $JELLYFIN_API_KEY"
+      echo "Library scan triggered"
     '')
   ];
 
