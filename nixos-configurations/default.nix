@@ -116,14 +116,6 @@ let
         stateVersion = "23.11";
       }
     );
-    "pt-dev" = (
-      import ./pt-dev.nix {
-        inherit sharedOverlays additionalPackages;
-        nixpkgs = nixpkgs-24-05;
-        home-manager = home-manager-24-05;
-        stateVersion = "23.05";
-      }
-    );
     "photos" = (
       import ./photos.nix {
         inherit sharedOverlays additionalPackages;

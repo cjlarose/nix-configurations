@@ -176,7 +176,7 @@
 
       nixosConfigsWithCjlarose = [
         "builder" "bots" "cache" "coder" "dns" "immich" "media"
-        "memos" "palworld" "pt-dev" "photos" "splitpro" "unifi" "ns1010301"
+        "memos" "palworld" "photos" "splitpro" "unifi" "ns1010301"
       ];
 
       mkNixosCheck = pkgs: name:
