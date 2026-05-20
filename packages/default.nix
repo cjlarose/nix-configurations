@@ -47,7 +47,6 @@
   nvr = import ./nvr { inherit pkgs nvr; };
   go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
-  teleport_16 = nixpkgs-25-05.legacyPackages.${system}.teleport_16;
   trueColorTest = pkgs.stdenv.mkDerivation {
     name = "true-color-test";
     src = trueColorTest;
