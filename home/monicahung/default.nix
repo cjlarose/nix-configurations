@@ -51,7 +51,7 @@
     pkgs.wrk
     pkgs.yarn
     pkgs.gnupg
-    pkgs._1password
+    pkgs._1password-cli
   ];
 
   home.shellAliases = let
