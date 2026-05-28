@@ -1,5 +1,4 @@
 input=$(cat)
-echo "$input" > /tmp/claude-statusline-debug.json
 
 blue=$'\e[34m'
 green=$'\e[32m'
@@ -7,15 +6,14 @@ yellow=$'\e[33m'
 red=$'\e[31m'
 reset=$'\e[0m'
 
-repo_owner=$(echo "$input" | jq -r '.workspace.repo.owner // empty')
-repo_name=$(echo "$input" | jq -r '.workspace.repo.name // empty')
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
-if [ -n "$repo_owner" ] && [ -n "$repo_name" ]; then
-  location="${blue}${repo_owner}/${repo_name}${reset}"
-  # Detect git worktree name from ~/worktrees/<owner>/<repo>/<worktree> layout
-  worktree_name=$(echo "$cwd" | sed -n "s|^${HOME}/worktrees/${repo_owner}/${repo_name}/\([^/]*\).*|\1|p")
-  [ -n "$worktree_name" ] && location="${location} ${green}[${worktree_name}]${reset}"
+# Try to parse ~/worktrees/<owner>/<repo>/<worktree> layout
+if [[ "$cwd" =~ ^${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
+  repo_owner="${BASH_REMATCH[1]}"
+  repo_name="${BASH_REMATCH[2]}"
+  worktree_name="${BASH_REMATCH[3]}"
+  location="${blue}${repo_owner}/${repo_name}${reset} ${green}[${worktree_name}]${reset}"
 else
   location="${cwd/#"$HOME"/\~}"
 fi
