@@ -1,5 +1,5 @@
 ---
-name: nix-configurations:transcode-media
+name: transcode-media
 description: Add downloaded media to the Jellyfin library on the media microvm — probe, symlink, or transcode as needed
 ---
 

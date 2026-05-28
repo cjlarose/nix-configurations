@@ -1,5 +1,5 @@
 ---
-name: nix-configurations:nixos-rebuild
+name: nixos-rebuild
 description: Build and switch NixOS configuration for ns1010301 (and its microvm guests) with rollback support
 ---
 

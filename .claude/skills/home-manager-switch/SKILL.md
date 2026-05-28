@@ -1,5 +1,5 @@
 ---
-name: nix-configurations:home-manager-switch
+name: home-manager-switch
 description: Build and activate home-manager config changes on a microvm guest without a full rebuild
 ---
 

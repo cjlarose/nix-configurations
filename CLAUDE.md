@@ -1,8 +1,3 @@
----
-name: nix-configurations
-description: Reference material for the cjlarose nix-configurations repo — repo structure, conventions, and nix cache
----
-
 # nix-configurations
 
 ## Worktree Structure
