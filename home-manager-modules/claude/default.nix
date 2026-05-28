@@ -1,4 +1,12 @@
-{ additionalPackages, system, lib, ... }:
+{ additionalPackages, system, lib, pkgs, ... }:
+
+let
+  claudeCodeStatusline = pkgs.writeShellApplication {
+    name = "claude-code-statusline";
+    runtimeInputs = [ pkgs.jq pkgs.gawk ];
+    text = builtins.readFile ./claude-code-statusline.sh;
+  };
+in
 {
   programs.claude-code = {
     enable = true;
@@ -12,6 +20,10 @@
       effortLevel = "medium";
       permissions = {
         defaultMode = "bypassPermissions";
+      };
+      statusLine = {
+        type = "command";
+        command = "${claudeCodeStatusline}/bin/claude-code-statusline";
       };
     };
 
