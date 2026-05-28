@@ -1,14 +1,22 @@
 input=$(cat)
+echo "$input" > /tmp/claude-statusline-debug.json
+
+blue=$'\e[34m'
+green=$'\e[32m'
+yellow=$'\e[33m'
+red=$'\e[31m'
+reset=$'\e[0m'
 
 repo_owner=$(echo "$input" | jq -r '.workspace.repo.owner // empty')
 repo_name=$(echo "$input" | jq -r '.workspace.repo.name // empty')
-worktree=$(echo "$input" | jq -r '.workspace.git_worktree // empty')
+cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
 if [ -n "$repo_owner" ] && [ -n "$repo_name" ]; then
-  location="${repo_owner}/${repo_name}"
-  [ -n "$worktree" ] && location="${location} [${worktree}]"
+  location="${blue}${repo_owner}/${repo_name}${reset}"
+  # Detect git worktree name from ~/worktrees/<owner>/<repo>/<worktree> layout
+  worktree_name=$(echo "$cwd" | sed -n "s|^${HOME}/worktrees/${repo_owner}/${repo_name}/\([^/]*\).*|\1|p")
+  [ -n "$worktree_name" ] && location="${location} ${green}[${worktree_name}]${reset}"
 else
-  cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
   location="${cwd/#"$HOME"/\~}"
 fi
 
@@ -26,7 +34,13 @@ if [ -n "$input_tokens" ] && [ -n "$used_pct" ]; then
     tokens_fmt="${input_tokens}"
   fi
   pct_fmt=$(printf "%.1f%%" "$used_pct")
-  token_part="${tokens_fmt} (${pct_fmt})"
+  if [ "$input_tokens" -ge 100000 ]; then
+    token_part="${red}${tokens_fmt} (${pct_fmt})${reset}"
+  elif [ "$input_tokens" -ge 80000 ]; then
+    token_part="${yellow}${tokens_fmt} (${pct_fmt})${reset}"
+  else
+    token_part="${tokens_fmt} (${pct_fmt})"
+  fi
 else
   token_part=""
 fi
