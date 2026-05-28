@@ -7,41 +7,34 @@ description: Build and switch NixOS configuration for ns1010301 (and its microvm
 
 Required for changes to NixOS system config, microvm settings, or nixpkgs version bumps. Run from the **cjlarose** nix-configurations worktree on ns1010301.
 
-This is a **two-step process** — build first, then switch only after the user approves. The guest uses the host's `/nix/store` via virtiofs (no erofs disk image), so builds are fast. The switch restarts the VM.
+Switching the host config does **not** restart microvms — it only activates host-level changes. The switch output will list which microvm units changed but were not restarted (e.g. `NOT restarting the following changed units: microvm@media.service`).
 
-## Step 1: Build (no disruption to the running VM)
+## Build and switch
+
+Record the rollback path, then build and switch in one step:
 
 ```sh
 cd ~/worktrees/cjlarose/nix-configurations/<branch>
-sudo nixos-rebuild build --flake .#ns1010301
+ROLLBACK_PATH="$(readlink -f /nix/var/nix/profiles/system)"
+sudo nixos-rebuild switch --flake .#ns1010301
 ```
 
 To build with changes from a guest flake input (including unpushed ones), override the input to a local path:
 
 ```sh
-sudo nixos-rebuild build --flake .#ns1010301 \
+sudo nixos-rebuild switch --flake .#ns1010301 \
   --override-input <input-name> path:<local-path>
 ```
 
-Run the build as a background task. **After it completes, notify the user and wait for their approval before proceeding to Step 2.** The user may be actively working on the VM and needs to choose when it restarts.
+## After switching
 
-## Step 2: Switch (restarts the VM — requires user approval)
+If the switch output lists microvm units that changed but were not restarted, **ask the user** whether they want to restart those microvms. Do not restart them automatically — the user may be actively working on them.
 
-Before switching, record the current system profile so rollback is instant:
-
-```sh
-ROLLBACK_PATH="$(readlink -f /nix/var/nix/profiles/system)"
-echo "Rollback path: $ROLLBACK_PATH"
-```
-
-Then switch:
+To restart a microvm:
 
 ```sh
-cd ~/worktrees/cjlarose/nix-configurations/<branch>
-sudo nixos-rebuild switch --flake .#ns1010301
+sudo systemctl restart microvm@<name>.service
 ```
-
-(Include the same `--override-input` flags used in Step 1 if applicable.)
 
 ## Rollback (if something goes wrong)
 
@@ -49,7 +42,7 @@ sudo nixos-rebuild switch --flake .#ns1010301
 sudo "$ROLLBACK_PATH/bin/switch-to-configuration" switch
 ```
 
-This instantly reverts the host and restarts the VM with the previous configuration. No rebuild needed.
+This instantly reverts the host configuration. No rebuild needed.
 
 ## Serial console (OVH)
 
