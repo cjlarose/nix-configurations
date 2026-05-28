@@ -25,14 +25,15 @@
         config.allowUnfreePredicate = allowUnfreePredicate;
       }).claude-code;
     in
-    pkgs.symlinkJoin {
-      name = "claude-code";
-      paths = [ base ];
-      buildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/claude --unset TMUX
-      '';
-    };
+    pkgs.writeShellScriptBin "claude" ''
+      # Set terminal title based on worktree layout: owner/repo [worktree]
+      if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
+        printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
+      fi
+      unset TMUX
+      export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
+      exec ${base}/bin/claude "$@"
+    '';
   cs-automation = cs-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   immich = nixpkgs-25-11.legacyPackages.${system}.immich;

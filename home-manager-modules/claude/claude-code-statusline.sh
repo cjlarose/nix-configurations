@@ -1,22 +1,8 @@
 input=$(cat)
 
-blue=$'\e[34m'
-green=$'\e[32m'
 yellow=$'\e[33m'
 red=$'\e[31m'
 reset=$'\e[0m'
-
-cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
-
-# Try to parse ~/worktrees/<owner>/<repo>/<worktree> layout
-if [[ "$cwd" =~ ^${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
-  repo_owner="${BASH_REMATCH[1]}"
-  repo_name="${BASH_REMATCH[2]}"
-  worktree_name="${BASH_REMATCH[3]}"
-  location="${blue}${repo_owner}/${repo_name}${reset} ${green}[${worktree_name}]${reset}"
-else
-  location="${cwd/#"$HOME"/\~}"
-fi
 
 model=$(echo "$input" | jq -r '.model.display_name')
 effort=$(echo "$input" | jq -r '.output_style.name // "default"')
@@ -44,7 +30,6 @@ else
 fi
 
 parts=()
-parts+=("$location")
 parts+=("$model")
 [ -n "$effort" ] && parts+=("effort:$effort")
 [ -n "$token_part" ] && parts+=("$token_part")
