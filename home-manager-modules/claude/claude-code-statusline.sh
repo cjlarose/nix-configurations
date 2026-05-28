@@ -22,7 +22,7 @@ model=$(echo "$input" | jq -r '.model.display_name')
 effort=$(echo "$input" | jq -r '.output_style.name // "default"')
 
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
-input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // empty')
+input_tokens=$(echo "$input" | jq -r '.context_window.current_usage | if . then (.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens) else empty end')
 
 if [ -n "$input_tokens" ] && [ -n "$used_pct" ]; then
   # Format tokens: if >= 1000, display as e.g. 24.4k
