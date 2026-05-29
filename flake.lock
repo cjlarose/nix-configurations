@@ -460,6 +460,22 @@
         "url": "ssh://git@github.com/cjlarose/intranet-hosts"
       }
     },
+    "mattpocock-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779983310,
+        "narHash": "sha256-RRVV4V4h/9GkwnHU4G4PLQtwdU1Lm4istvGncwmQ9dg=",
+        "owner": "mattpocock",
+        "repo": "skills",
+        "rev": "e3b90b5238f38cdea5996e16861dcae28ef52eda",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mattpocock",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "microvm": {
       "inputs": {
         "nixpkgs": [
@@ -982,6 +998,7 @@
         "home-manager-25-11": "home-manager-25-11",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
+        "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",
         "nixpkgs-23-05": "nixpkgs-23-05",

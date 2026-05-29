@@ -87,6 +87,10 @@
       url = "git+https://gist.github.com/db6c5654fa976be33808b8b33a6eb861.git";
       flake = false;
     };
+    mattpocock-skills = {
+      url = "github:mattpocock/skills";
+      flake = false;
+    };
     nvr = {
       url = "github:cstyles/nvr";
       flake = false;
@@ -127,6 +131,7 @@
     trueColorTest,
     nvr,
     cs-automation,
+    mattpocock-skills,
     microvm,
     picktrace-nix-configurations,
   }:
@@ -186,7 +191,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules self;
+          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
         }
       );
 

@@ -1,6 +1,7 @@
-{ system, additionalPackages, stateVersion }:
+{ system, additionalPackages, stateVersion, mattpocock-skills ? null }:
 { pkgs, ... }: {
   _module.args = { inherit additionalPackages system; };
+  cjlarose.claude.mattpocock-skills = mattpocock-skills;
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix

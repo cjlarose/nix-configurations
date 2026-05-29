@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-home-manager-modules, self, ... }:
+{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-home-manager-modules, mattpocock-skills, self, ... }:
 let
   system = "x86_64-linux";
 in nixpkgs.lib.nixosSystem {
@@ -67,7 +67,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
-        inherit system stateVersion additionalPackages;
+        inherit system stateVersion additionalPackages mattpocock-skills;
       };
       home-manager.users.picktrace = picktrace-nix-configurations.homeManagerModules.picktrace-cjlarose;
       home-manager.extraSpecialArgs = {
