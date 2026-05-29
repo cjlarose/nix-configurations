@@ -285,6 +285,11 @@ in { pkgs, config, lib, ... }: {
   # the restic backup process in ExecStart.
   systemd.services.restic-backups-minecraft-mellowcatfe.serviceConfig.PrivateTmp = lib.mkForce false;
 
+  services.openiscsi = {
+    enable = true;
+    name = "iqn.2026-04.dev.cjlarose:ns1010301";
+  };
+
   services.zfs.expandOnBoot = "all";
 
   programs.ssh.startAgent = true;
