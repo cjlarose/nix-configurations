@@ -36,15 +36,15 @@ in
 
       memory.text = lib.mkBefore (builtins.readFile ./CLAUDE.md);
 
-      skills = lib.mkIf (config.cjlarose.claude.mattpocock-skills != null) (let
-        src = config.cjlarose.claude.mattpocock-skills;
-      in {
-        handoff = "${src}/skills/productivity/handoff/SKILL.md";
-        grill-me = "${src}/skills/productivity/grill-me/SKILL.md";
-      });
-
     };
 
-    home.file."agent-docs/neovim-integration.md".source = ./agent-docs/neovim-integration.md;
+    home.file = {
+      "agent-docs/neovim-integration.md".source = ./agent-docs/neovim-integration.md;
+    } // lib.optionalAttrs (config.cjlarose.claude.mattpocock-skills != null) (let
+      src = config.cjlarose.claude.mattpocock-skills;
+    in {
+      ".claude/skills/handoff" = { source = "${src}/skills/productivity/handoff"; recursive = true; };
+      ".claude/skills/grill-me" = { source = "${src}/skills/productivity/grill-me"; recursive = true; };
+    });
   };
 }

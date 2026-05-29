@@ -36,11 +36,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1780011327,
-        "narHash": "sha256-e945Xf8M2FWoy6AxYCj1qO91PT46j7rk1rq0+Rdh2pk=",
+        "lastModified": 1780012893,
+        "narHash": "sha256-d0+meBqsw+vmjNyel7jcaBAbnqKa7dzK1HP7PQY4AYY=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "96ad0895d40858e2c15a89d2ffa00b776992c595",
+        "rev": "1b82a27f264ca63315c250dcf28b41281ebb4fc2",
         "type": "github"
       },
       "original": {
@@ -959,6 +959,9 @@
         "home-manager-24-11": "home-manager-24-11_2",
         "home-manager-25-11": "home-manager-25-11_2",
         "impermanence": "impermanence_2",
+        "mattpocock-skills": [
+          "mattpocock-skills"
+        ],
         "microvm": "microvm_2",
         "nix-darwin-25-11": "nix-darwin-25-11",
         "nixpkgs-23-05": "nixpkgs-23-05_2",
@@ -970,11 +973,11 @@
         "tfenv": "tfenv"
       },
       "locked": {
-        "lastModified": 1780011922,
-        "narHash": "sha256-wKAotHW2aCB16iutt/U0P7es1GxmMNJyUDf/66WIv0o=",
+        "lastModified": 1780013276,
+        "narHash": "sha256-fQpJAIPUks1RTUYzhYpsldbdjwy54xL+AZr1+bJ957s=",
         "ref": "refs/heads/main",
-        "rev": "ec032c36cd124ab8fb14fe6abdb0bd795d78c303",
-        "revCount": 256,
+        "rev": "68246a25480b61b419b5118a8c1519b46dd94f38",
+        "revCount": 257,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },

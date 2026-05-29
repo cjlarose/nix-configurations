@@ -101,6 +101,7 @@
     };
     picktrace-nix-configurations = {
       url = "git+ssh://git@github.com/picktrace/nix-configurations";
+      inputs.mattpocock-skills.follows = "mattpocock-skills";
     };
   };
 
