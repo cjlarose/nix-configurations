@@ -24,6 +24,8 @@
     };
   };
 
+  time.timeZone = "America/Los_Angeles";
+
   system.stateVersion = stateVersion;
 
   nixpkgs.overlays = sharedOverlays;
