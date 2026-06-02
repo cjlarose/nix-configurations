@@ -68,6 +68,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages mattpocock-skills;
+        llm-wiki-path = "/home/cjlarose/worktrees/cjlarose/llm-wiki/default";
       };
       home-manager.users.picktrace = picktrace-nix-configurations.homeManagerModules.picktrace-cjlarose;
       home-manager.extraSpecialArgs = {

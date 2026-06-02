@@ -1,7 +1,8 @@
-{ system, additionalPackages, stateVersion, mattpocock-skills ? null }:
+{ system, additionalPackages, stateVersion, mattpocock-skills ? null, llm-wiki-path ? null }:
 { pkgs, ... }: {
   _module.args = { inherit additionalPackages system; };
   cjlarose.claude.mattpocock-skills = mattpocock-skills;
+  cjlarose.claude.llm-wiki-path = llm-wiki-path;
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
