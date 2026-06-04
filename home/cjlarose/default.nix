@@ -22,6 +22,7 @@
   };
 
   home.packages = [
+    pkgs._1password-cli
     additionalPackages.${system}.bundix
     additionalPackages.${system}.git-make-apply-command
     pkgs.nodejs_22

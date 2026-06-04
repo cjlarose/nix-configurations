@@ -23,6 +23,7 @@
 }:
 let
   ghosttyTerminfoModule = import ../nixos-modules/ghostty-terminfo.nix;
+  allowUnfreeModule = import ../nixos-modules/allow-unfree.nix;
   hosts = {
     "builder" = (
       import ./builder {
@@ -162,6 +163,6 @@ let
   };
 in
   builtins.mapAttrs (_: host: host.extendModules {
-    modules = [ ghosttyTerminfoModule ];
+    modules = [ ghosttyTerminfoModule allowUnfreeModule ];
     specialArgs = { inherit additionalPackages; };
   }) hosts

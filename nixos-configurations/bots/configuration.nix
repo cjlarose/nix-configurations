@@ -1,7 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, ... }: { pkgs, ... }:
-let
-  allowUnfreePredicate = import ../../shared/unfree-predicate.nix { inherit nixpkgs; };
-in {
+{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, ... }: { pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -33,10 +30,7 @@ in {
     };
   };
 
-  nixpkgs = {
-    overlays = sharedOverlays;
-    config.allowUnfreePredicate = allowUnfreePredicate;
-  };
+  nixpkgs.overlays = sharedOverlays;
 
   security.sudo.wheelNeedsPassword = false;
 

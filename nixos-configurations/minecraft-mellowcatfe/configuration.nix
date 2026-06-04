@@ -30,9 +30,6 @@
   system.stateVersion = stateVersion;
 
   nixpkgs.overlays = sharedOverlays ++ [ nix-minecraft.overlays.default ];
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "minecraft-server"
-  ];
 
   security.sudo.wheelNeedsPassword = false;
 
