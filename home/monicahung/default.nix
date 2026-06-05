@@ -22,7 +22,7 @@
     LESS = "--quit-if-one-screen --RAW-CONTROL-CHARS --no-init";
     THOR_MERGE = "nvr -s -d";
     GOPATH = "$HOME/go";
-    GOTOOLCHAIN = "local";
+    GOTOOLCHAIN = "auto";
   };
 
   home.packages = [
@@ -35,8 +35,15 @@
     pkgs.htop
     additionalPackages.${system}.jira-cli-go
     pkgs.jq
+    pkgs.age
+    pkgs.go-task
+    pkgs.eksctl
+    pkgs.kubernetes-helm
+    pkgs.kubelogin-oidc
     pkgs.k9s
+    pkgs.kyverno
     pkgs.mirrord
+    pkgs.mysql-client
     pkgs.neovim-remote
     pkgs.nil
     pkgs.nodePackages.bash-language-server
@@ -58,6 +65,7 @@
     pkgs.wrk
     pkgs.yq
     pkgs.yarn
+    pkgs.sops
     pkgs.gnupg
     pkgs._1password
   ];
@@ -78,6 +86,7 @@
       gcp = "git cherry-pick";
       gdn = "git diff --name-only";
       cdb5 = "cd ~/go/src/go.1password.io/b5";
+      pnpm = "op run --account agilebits --no-masking -- pnpm";
     };
     yarnAliases = (if yarnOverride then {yarn="op run --account agilebits --no-masking -- yarn";} else {});
   in standardAliases // yarnAliases;
@@ -124,6 +133,9 @@
           "https://github.com/agilebits-inc/"
           "git@github.com:agilebits-inc/"
         ];
+      };
+      "url \"ssh://git@github-enterprise/agilebits-inc/\"" = {
+        insteadOf = "ssh://git@github.com/agilebits-inc/";
       };
     };
     ignores = [
