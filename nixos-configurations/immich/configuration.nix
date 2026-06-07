@@ -142,6 +142,7 @@
         current_date=$(date +%Y-%m-%d)
         file_name="/persistence/immich-sql-dumps/immich-$current_date.sql"
         /run/wrappers/bin/su - postgres -c "pg_dumpall --clean --if-exists > $file_name"
+        find /persistence/immich-sql-dumps -name 'immich-*.sql' -mtime +7 -delete
       '';
     };
   };
