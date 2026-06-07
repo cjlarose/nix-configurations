@@ -87,8 +87,8 @@ let
     "immich" = (
       import ./immich {
         inherit sharedOverlays additionalPackages impermanence disko;
-        nixpkgs = nixpkgs-25-05;
-        home-manager = home-manager-25-05;
+        nixpkgs = nixpkgs-25-11;
+        home-manager = home-manager-25-11;
         stateVersion = "24.11";
       }
     );

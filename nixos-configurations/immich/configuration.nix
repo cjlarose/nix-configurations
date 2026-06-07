@@ -59,7 +59,6 @@
 
   services.immich = {
     enable = true;
-    package = additionalPackages.${system}.immich;
   };
 
   services.nginx = {
