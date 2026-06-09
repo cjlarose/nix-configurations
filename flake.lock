@@ -36,11 +36,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1780506208,
-        "narHash": "sha256-t7B9XNIWUp/vaP5v9wT2nqJht4gG9SV1MvUZiCH61gc=",
+        "lastModified": 1780530514,
+        "narHash": "sha256-jBfSy/cEPvCDxLYp1QgmMVZjorr/YUr1W1+ptHRF/9A=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "2243f0bc8f71bdd52c2e69059ee25f88e7c9f3b7",
+        "rev": "3e06b7523931730d90dd0e58eb512b103f77748b",
         "type": "github"
       },
       "original": {
@@ -778,11 +778,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1779877693,
-        "narHash": "sha256-NOF9NAREhxr50bbBfVcVOq+ArCMSoe8dP79Pk2uyARk=",
+        "lastModified": 1780930886,
+        "narHash": "sha256-rppURzHviaQN131F+nLiLdGfcb0uCd9gGP0E5+iw9MI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "4100e830e085863741bc69b156ec4ccd53ab5be0",
+        "rev": "8c3cede7ddc26bd659d2d383b5610efbd2c7a16e",
         "type": "github"
       },
       "original": {
@@ -794,11 +794,11 @@
     },
     "nixpkgs-unstable_2": {
       "locked": {
-        "lastModified": 1779877693,
-        "narHash": "sha256-NOF9NAREhxr50bbBfVcVOq+ArCMSoe8dP79Pk2uyARk=",
+        "lastModified": 1780930886,
+        "narHash": "sha256-rppURzHviaQN131F+nLiLdGfcb0uCd9gGP0E5+iw9MI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "4100e830e085863741bc69b156ec4ccd53ab5be0",
+        "rev": "8c3cede7ddc26bd659d2d383b5610efbd2c7a16e",
         "type": "github"
       },
       "original": {
@@ -973,11 +973,11 @@
         "tfenv": "tfenv"
       },
       "locked": {
-        "lastModified": 1780507438,
-        "narHash": "sha256-E8oB0X2utcosE741rHBD+LW6DkMuv1s6fOkLKs38/fE=",
+        "lastModified": 1781040897,
+        "narHash": "sha256-epm/EluuLov0nP0vc6/eCCc6SY8B5T/LGItZjc1V2hs=",
         "ref": "refs/heads/main",
-        "rev": "69900b3b215250ef137b46b08876eb567e63f612",
-        "revCount": 261,
+        "rev": "600409bafb78707992eb6b548c1a2130eff9b292",
+        "revCount": 263,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
