@@ -10,6 +10,7 @@
       karabiner = import ./karabiner.nix;
       _1password = import ./_1password.nix;
       claude = import ./claude;
+      opencode = import ./opencode;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;
       ghostty = import ./ghostty.nix;

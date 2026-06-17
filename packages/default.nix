@@ -45,6 +45,7 @@
       $out/share/terminfo/
   '';
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
+  opencode = nixpkgs-unstable.legacyPackages.${system}.opencode;
   nvr = import ./nvr { inherit pkgs nvr; };
   go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;

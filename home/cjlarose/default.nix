@@ -9,6 +9,7 @@
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/claude
+    ../../home-manager-modules/opencode
   ];
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
