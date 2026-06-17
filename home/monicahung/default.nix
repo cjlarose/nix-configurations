@@ -87,6 +87,7 @@
       gdn = "git diff --name-only";
       cdb5 = "cd ~/go/src/go.1password.io/b5";
       pnpm = "op run --account agilebits --no-masking -- pnpm";
+      cowsay = "nix run nixpkgs#cowsay --";
     };
     yarnAliases = (if yarnOverride then {yarn="op run --account agilebits --no-masking -- yarn";} else {});
   in standardAliases // yarnAliases;
