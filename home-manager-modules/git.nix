@@ -35,6 +35,7 @@ in {
         merge.tool = "nvr";
         mergetool.nvr.cmd = "${cfg.neovimRemotePackage}/bin/nvr -s -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd J | wincmd ='";
         pull.ff = "only";
+        push.autoSetupRemote = true;
         rebase.autosquash = true;
         rebase.autostash = true;
         rebase.updateRefs = true;
