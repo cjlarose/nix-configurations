@@ -973,11 +973,11 @@
         "tfenv": "tfenv"
       },
       "locked": {
-        "lastModified": 1781894732,
-        "narHash": "sha256-nX+MElQEbd3JdRc24b8CjPYMZTb9iUNhIEDf7o9BAEU=",
+        "lastModified": 1781896758,
+        "narHash": "sha256-WPjZh/bfo5orCrBf/Xu9ZzM1QGFFQhPzZrWR52BSpGM=",
         "ref": "refs/heads/main",
-        "rev": "28e9e0ee6c9e1a478f4d099e3c4d7205cf72f1ce",
-        "revCount": 279,
+        "rev": "a043d0d1915f397ed4309e2148b3babffc857405",
+        "revCount": 280,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
