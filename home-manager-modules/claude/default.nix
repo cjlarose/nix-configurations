@@ -43,7 +43,30 @@ in
           type = "command";
           command = "${claudeCodeStatusline}/bin/claude-code-statusline";
         };
-      };
+      } // lib.optionalAttrs (config.cjlarose.claude.llm-wiki-path != null) (let
+        injector = "${config.cjlarose.claude.llm-wiki-path}/.claude/hooks/inject-wiki-index.sh";
+      in {
+        # Surface the llm-wiki index at the start of every session so the model
+        # knows what the wiki covers and can use wiki-query proactively. The
+        # script self-guards on a missing index.md; the command additionally
+        # tolerates the script file itself being absent (e.g. an older wiki
+        # checkout at this path, or a stale llm-wiki-path), staying a silent
+        # no-op instead of erroring on every session start. Gated on the same
+        # option as the LLM_WIKI_PATH export and the wiki skill symlinks.
+        hooks = {
+          SessionStart = [
+            {
+              matcher = "startup|resume|clear|compact";
+              hooks = [
+                {
+                  type = "command";
+                  command = ''if [ -x "${injector}" ]; then exec "${injector}"; fi'';
+                }
+              ];
+            }
+          ];
+        };
+      });
 
       memory.text = lib.mkBefore (builtins.readFile ./CLAUDE.md);
 
