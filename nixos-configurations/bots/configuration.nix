@@ -137,6 +137,12 @@
   systemd.services."pce-discord-bot" = {
     description = "Pixel Cat's End discord bot";
     wantedBy = [ "multi-user.target" ];
+    # Give up (leave the unit failed) after 5 restarts within an hour rather
+    # than crash-looping indefinitely on a persistent failure like a revoked
+    # Discord token. The slow ~10s+runtime cycle never trips systemd's default
+    # 5-starts-per-10s limit, so widen the window.
+    startLimitIntervalSec = 3600;
+    startLimitBurst = 5;
     serviceConfig = {
       StandardInput = "null";
       StandardOutput = "journal";
@@ -238,6 +244,12 @@
   systemd.services."cs-discord-bot" = {
     description = "Chicken Smoothie Automation discord bot";
     wantedBy = [ "multi-user.target" ];
+    # Give up (leave the unit failed) after 5 restarts within an hour rather
+    # than crash-looping indefinitely on a persistent failure like a revoked
+    # Discord token. The slow ~10s+runtime cycle never trips systemd's default
+    # 5-starts-per-10s limit, so widen the window.
+    startLimitIntervalSec = 3600;
+    startLimitBurst = 5;
     serviceConfig = {
       StandardInput = "null";
       StandardOutput = "journal";
