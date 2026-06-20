@@ -31,9 +31,9 @@ in {
     pkgs.kubeseal
     pkgs.kustomize
     pkgs.nil
-    pkgs.nodePackages.bash-language-server
-    pkgs.nodePackages.typescript-language-server
-    pkgs.nodePackages.vscode-langservers-extracted
+    pkgs.bash-language-server
+    pkgs.typescript-language-server
+    pkgs.vscode-langservers-extracted
     pkgs.pyright
     pkgs.shellcheck
     pkgs.tfenv
