@@ -6,7 +6,6 @@ This repository contains a [Nix](https://nixos.org/) [flake](https://nixos.wiki/
 
 Some NixOS configurations in the repository of note:
 
-* `.#nixosConfigurations.bootstrap` is used to set up new NixOS VMs. It contains a [disko](https://github.com/nix-community/disko) configuration that describes a disk layout I like, an [impermanence](https://github.com/nix-community/impermanence) configuration, some SSH server config so I can log in, and not much else. As soon as I can SSH into a VM built with this config, I'll switch to the config I actually want to use.
 * `.#nixosConfigurations.cache` is used as a Nix [substituter (binary cache)](https://nixos.wiki/wiki/Binary_Cache). I have many machines on my LAN that download the same set of packages, and they're all configured to use this machine as a cache before hitting `cache.nixos.org`.
 * `.#nixosConfigurations.dns` provides two DNS servers on two different addresses. One is an [Adguard Home](https://github.com/AdguardTeam/AdGuardHome) instance and the other is Dnsmasq server that acts as the authority for hosts on my LAN.
 * `.#nixosConfigurations.media` runs Plex and `transmission`.

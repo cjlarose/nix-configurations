@@ -25,21 +25,6 @@ let
   ghosttyTerminfoModule = import ../nixos-modules/ghostty-terminfo.nix;
   allowUnfreeModule = import ../nixos-modules/allow-unfree.nix;
   hosts = {
-    "builder" = (
-      import ./builder {
-        inherit sharedOverlays additionalPackages;
-        nixpkgs = nixpkgs-24-05;
-        home-manager = home-manager-24-05;
-        stateVersion = "23.05";
-      }
-    );
-    "bootstrap" = (
-      import ./bootstrap {
-        inherit sharedOverlays disko impermanence;
-        nixpkgs = nixpkgs-24-11;
-        stateVersion = "24.11";
-      }
-    );
     "bots" = (
       import ./bots {
         inherit sharedOverlays additionalPackages pce impermanence disko;
@@ -108,14 +93,6 @@ let
         nixpkgs = nixpkgs-25-05;
         home-manager = home-manager-25-05;
         stateVersion = "25.05";
-      }
-    );
-    "palworld" = (
-      import ./palworld {
-        inherit sharedOverlays additionalPackages;
-        nixpkgs = nixpkgs-24-05;
-        home-manager = home-manager-24-05;
-        stateVersion = "23.11";
       }
     );
     "photos" = (
