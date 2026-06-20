@@ -3,12 +3,14 @@
   nixpkgs-24-11,
   nixpkgs-25-05,
   nixpkgs-25-11,
+  nixpkgs-26-05,
   sharedOverlays,
   additionalPackages,
   home-manager-24-05,
   home-manager-24-11,
   home-manager-25-05,
   home-manager-25-11,
+  home-manager-26-05,
   pce,
   impermanence,
   disko,
@@ -122,8 +124,8 @@ let
     "ns1010301" = (
       import ./ns1010301 {
         inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
-        nixpkgs = nixpkgs-25-11;
-        home-manager = home-manager-25-11;
+        nixpkgs = nixpkgs-26-05;
+        home-manager = home-manager-26-05;
         stateVersion = "25.11";
       }
     );
