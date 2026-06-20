@@ -8,7 +8,10 @@
   config = {
     boot = {
       loader.systemd-boot.enable = true;
-      zfs.devNodes = "/dev/disk/by-label/tank";
+      # Both mirror members share the fs label "tank", so by-label/tank resolves
+      # to only one device and ZFS faults the other (pool DEGRADED). The
+      # partlabels (disk-nvme0-zfs / disk-nvme1-zfs) are unique.
+      zfs.devNodes = "/dev/disk/by-partlabel";
       # Roll the root dataset back to a pristine snapshot on every boot
       # (impermanence). Under systemd stage-1 initrd this is a oneshot
       # service ordered after the pool import and before the root mount;

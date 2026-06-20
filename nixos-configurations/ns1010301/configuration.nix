@@ -288,6 +288,12 @@
 
   services.zfs.expandOnBoot = "all";
 
+  # ZFS block cloning (copy_file_range/BRT) deadlocks the txg_sync task when
+  # virtiofsd copies through the ZFS-backed microvm shares, wedging the host at
+  # boot once VMs start (on any kernel). Disable it (the OpenZFS default) so
+  # copy_file_range falls back to a plain copy. Ref openzfs/zfs#16680
+  boot.extraModprobeConfig = "options zfs zfs_bclone_enabled=0";
+
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
