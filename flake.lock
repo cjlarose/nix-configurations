@@ -414,6 +414,27 @@
         "type": "github"
       }
     },
+    "home-manager-26-05": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-26-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1781319724,
+        "narHash": "sha256-ZGuxexEMo4Xv28KJ0dX/m/PHN4oZIOnxHZpNTyrvx4M=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "8355f0a16b2dbb06a97959a918af5b239bbe05ae",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-26.05",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "impermanence": {
       "locked": {
         "lastModified": 1703656108,
@@ -760,6 +781,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-26-05": {
+      "locked": {
+        "lastModified": 1781216227,
+        "narHash": "sha256-9mUW6gNwoN2SWc/l0fW4svPNOulXLl8ijqKyeSOGgJE=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "a0374025a863d007d98e3297f6aa46cc3141c2f0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-26.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-regression": {
       "locked": {
         "lastModified": 1643052045,
@@ -999,6 +1036,7 @@
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-05": "home-manager-25-05",
         "home-manager-25-11": "home-manager-25-11",
+        "home-manager-26-05": "home-manager-26-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
         "mattpocock-skills": "mattpocock-skills",
@@ -1009,6 +1047,7 @@
         "nixpkgs-24-11": "nixpkgs-24-11",
         "nixpkgs-25-05": "nixpkgs-25-05",
         "nixpkgs-25-11": "nixpkgs-25-11",
+        "nixpkgs-26-05": "nixpkgs-26-05",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nvr": "nvr",
         "omnisharpVim": "omnisharpVim",
