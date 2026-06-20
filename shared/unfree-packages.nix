@@ -5,4 +5,6 @@
   "minecraft-server"
   "plexmediaserver"
   "terraform"
+  "vim-fubitive"
+  "vimplugin-vim-fubitive"
 ]
