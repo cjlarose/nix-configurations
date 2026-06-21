@@ -36,11 +36,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1781925547,
-        "narHash": "sha256-g0exS0bll/XZneN7kdr1amJ4pKzvPPY/y3X7H4YEabg=",
+        "lastModified": 1782065800,
+        "narHash": "sha256-3MSsZ/NfSYFf4tVZ77+ni8IGpJzimgXu8wm+egrzkAA=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "d6fde26b2aa5dee037b4e69463fac4686569e56b",
+        "rev": "74dd6fb3482d5ad0673f03cf284a42bec2b3135c",
         "type": "github"
       },
       "original": {
@@ -608,24 +608,24 @@
         "url": "https://flakehub.com/f/DeterminateSystems/nix-src/%2A"
       }
     },
-    "nix-darwin-25-11": {
+    "nix-darwin-26-05": {
       "inputs": {
         "nixpkgs": [
           "picktrace-nix-configurations",
-          "nixpkgs-25-11"
+          "nixpkgs-26-05"
         ]
       },
       "locked": {
-        "lastModified": 1772129556,
-        "narHash": "sha256-Utk0zd8STPsUJPyjabhzPc5BpPodLTXrwkpXBHYnpeg=",
+        "lastModified": 1781772065,
+        "narHash": "sha256-xIbRSwDB1GBAUsWsQZUjudGfAGQt3BOpsWaO/ugVa4w=",
         "owner": "lnl7",
         "repo": "nix-darwin",
-        "rev": "ebec37af18215214173c98cf6356d0aca24a2585",
+        "rev": "adda04f0bf4819575b1978c2f8d78401b3c2be12",
         "type": "github"
       },
       "original": {
         "owner": "lnl7",
-        "ref": "nix-darwin-25.11",
+        "ref": "nix-darwin-26.05",
         "repo": "nix-darwin",
         "type": "github"
       }
@@ -1080,7 +1080,7 @@
           "mattpocock-skills"
         ],
         "microvm": "microvm_2",
-        "nix-darwin-25-11": "nix-darwin-25-11",
+        "nix-darwin-26-05": "nix-darwin-26-05",
         "nixpkgs-23-05": "nixpkgs-23-05_2",
         "nixpkgs-24-05": "nixpkgs-24-05_2",
         "nixpkgs-24-11": "nixpkgs-24-11_2",
@@ -1091,11 +1091,11 @@
         "tfenv": "tfenv"
       },
       "locked": {
-        "lastModified": 1781936467,
-        "narHash": "sha256-u5MDZfD0PoTz+MfnyJcE/ztZyZWaoQF96JqW1fdhVhQ=",
+        "lastModified": 1782065841,
+        "narHash": "sha256-1I8zuOyZ46Sb7njgT4sEul6012VsRM4dOu9119Dedt8=",
         "ref": "refs/heads/main",
-        "rev": "022ad2f596ce38bfb5801a01c0d68c0deb1ff037",
-        "revCount": 283,
+        "rev": "f8306f33f7fe83dc511c3af6199a1d8b6e89c63a",
+        "revCount": 286,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
