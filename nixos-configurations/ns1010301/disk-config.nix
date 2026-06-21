@@ -12,6 +12,11 @@
       # to only one device and ZFS faults the other (pool DEGRADED). The
       # partlabels (disk-nvme0-zfs / disk-nvme1-zfs) are unique.
       zfs.devNodes = "/dev/disk/by-partlabel";
+      # Don't force-import the root pool on hostid mismatch. networking.hostId
+      # is pinned declaratively, this box has no shared-disk peer, and a hard
+      # failure on mismatch is safer than silently winning a race against
+      # another system. Matches the new default in NixOS 26.11.
+      zfs.forceImportRoot = false;
       # Roll the root dataset back to a pristine snapshot on every boot
       # (impermanence). Under systemd stage-1 initrd this is a oneshot
       # service ordered after the pool import and before the root mount;
