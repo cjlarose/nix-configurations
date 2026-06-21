@@ -38,8 +38,8 @@ let
     "cache" = (
       import ./cache {
         inherit sharedOverlays additionalPackages impermanence;
-        nixpkgs = nixpkgs-25-05;
-        home-manager = home-manager-25-05;
+        nixpkgs = nixpkgs-26-05;
+        home-manager = home-manager-26-05;
         stateVersion = "24.05";
       }
     );
