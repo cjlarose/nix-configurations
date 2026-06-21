@@ -79,11 +79,11 @@ let
         stateVersion = "24.11";
       }
     );
-    "media" = nixpkgs-25-11.lib.nixosSystem {
+    "media" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
         inherit sharedOverlays additionalPackages microvm;
-        home-manager = home-manager-25-11;
+        home-manager = home-manager-26-05;
         stateVersion = "25.11";
         system = "x86_64-linux";
       };
