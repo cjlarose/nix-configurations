@@ -33,15 +33,6 @@ in nixpkgs.lib.nixosSystem {
             mode = "0700";
           }
         ];
-        users = {
-          cjlarose = {
-            directories = [
-              ".ssh"
-              "gc-roots"
-              "workspace"
-            ];
-          };
-        };
       };
     })
     home-manager.nixosModules.home-manager {

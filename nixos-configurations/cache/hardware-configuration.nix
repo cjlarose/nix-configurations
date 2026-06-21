@@ -20,6 +20,11 @@
       fsType = "zfs";
     };
 
+  fileSystems."/home" =
+    { device = "tank/home";
+      fsType = "zfs";
+    };
+
   fileSystems."/boot" =
     { device = "/dev/disk/by-partlabel/disk-main-ESP";
       fsType = "vfat";
