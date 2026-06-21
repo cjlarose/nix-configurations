@@ -57,7 +57,9 @@ let
         url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.112.tgz";
         hash = "sha256-hDeZaepToOX9IxqPd96+THyxfdlx9ICdENM/muyl3gk=";
       };
-      # npm tarball unpacks to ./package (the default sourceRoot); no build step.
+      # The npm tarball's single top-level dir (package/) is auto-detected as
+      # sourceRoot and cd'd into, so installPhase's "." is the package contents
+      # (cli.js, vendor/, ...). No build step.
       dontBuild = true;
       dontConfigure = true;
       nativeBuildInputs = [ pkgs.makeWrapper ];
