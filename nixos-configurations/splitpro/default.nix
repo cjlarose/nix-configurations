@@ -53,6 +53,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
+        claudeUseNodeRuntime = true;
       };
     }
   ];
