@@ -211,10 +211,6 @@
         }
       );
 
-      diskoConfigurations = (
-        import ./disko-configurations {}
-      );
-
       packages = additionalPackages;
 
       checks.x86_64-linux = lib.listToAttrs (map (name: {
