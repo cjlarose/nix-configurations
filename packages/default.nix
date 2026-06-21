@@ -20,10 +20,16 @@
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
   claude-code =
     let
-      base = (import nixpkgs-unstable {
+      base = ((import nixpkgs-unstable {
         inherit system;
         config.allowUnfreePredicate = allowUnfreePredicate;
-      }).claude-code;
+      }).claude-code).overrideAttrs (_: {
+        # The upstream versionCheckPhase runs `claude --version` at build time.
+        # claude-code is a Bun standalone binary that segfaults on CPUs without
+        # AVX (e.g. the cache host), which fails the build. Skip the check; it
+        # does not affect the produced binary.
+        doInstallCheck = false;
+      });
     in
     pkgs.writeShellScriptBin "claude" ''
       # Set terminal title based on worktree layout: owner/repo [worktree]
