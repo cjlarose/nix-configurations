@@ -37,7 +37,7 @@ let
     );
     "cache" = (
       import ./cache {
-        inherit sharedOverlays additionalPackages impermanence;
+        inherit sharedOverlays additionalPackages impermanence disko;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "24.05";
