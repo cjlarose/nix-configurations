@@ -77,6 +77,7 @@ in nixpkgs.lib.nixosSystem {
       home-manager.backupFileExtension = "hm-backup";
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
         inherit system stateVersion additionalPackages;
+        claudeUseNodeRuntime = true;
       };
     }
   ];
