@@ -25,10 +25,24 @@ in
     '';
   };
 
+  options.cjlarose.claude.useNodeRuntime = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Use the node-pinned claude-code build (frozen at npm 2.1.112) instead of
+      the latest Bun standalone. Required on CPUs without AVX (the Goldmont-based
+      pve guests), where the Bun binary segfaults at launch. Leave false on
+      AVX-capable hosts so they keep receiving the latest claude-code.
+    '';
+  };
+
   config = {
     programs.claude-code = {
       enable = true;
-      package = additionalPackages.${system}.claude-code;
+      package =
+        if config.cjlarose.claude.useNodeRuntime
+        then additionalPackages.${system}.claude-code-node
+        else additionalPackages.${system}.claude-code;
 
       settings = {
         enabledPlugins = {
