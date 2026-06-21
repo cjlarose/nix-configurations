@@ -31,17 +31,15 @@ let
     exec ${underlying}/bin/claude "$@"
   '';
 
-  # Latest Bun standalone claude-code. doInstallCheck is disabled because the
-  # upstream versionCheckPhase runs `claude --version` at build time, and the
-  # Bun binary segfaults on no-AVX CPUs (e.g. the pve guests), failing the
-  # build. Skipping the check does not affect the produced binary. NOTE: the
-  # binary still cannot RUN on a no-AVX CPU — those hosts use claude-code-node.
-  claude-code-bun = ((import nixpkgs-unstable {
+  # Latest Bun standalone claude-code, used by AVX-capable hosts. The no-AVX pve
+  # guests use claude-code-node instead — the Bun binary's JIT requires AVX, so
+  # it segfaults at launch (and its build-time versionCheckPhase segfaults too)
+  # on those CPUs. Since no no-AVX host builds this anymore, the upstream
+  # versionCheckPhase is left enabled (it passes on the AVX hosts that build it).
+  claude-code-bun = (import nixpkgs-unstable {
     inherit system;
     config.allowUnfreePredicate = allowUnfreePredicate;
-  }).claude-code).overrideAttrs (_: {
-    doInstallCheck = false;
-  });
+  }).claude-code;
 
   # Node-runnable claude-code, pinned to 2.1.112 (the last npm release whose
   # bin is a node-runnable cli.js; 2.1.113+ ship the Bun native binary). Runs
