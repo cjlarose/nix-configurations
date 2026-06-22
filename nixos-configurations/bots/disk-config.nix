@@ -9,6 +9,10 @@
     boot = {
       loader.systemd-boot.enable = true;
       zfs.devNodes = "/dev/disk/by-label/tank";
+      # Don't pass `-f` to the root pool import (the 26.11 default). Safe here:
+      # networking.hostId is pinned and this is a single-tenant VM with no
+      # SAN/failover peer, so the hostid + clean-export checks are meaningful.
+      zfs.forceImportRoot = false;
       # Roll the root dataset back to a pristine snapshot on every boot
       # (impermanence). Under 26.05's systemd stage-1 initrd this is a oneshot
       # service ordered after the pool import and before the root mount; the
