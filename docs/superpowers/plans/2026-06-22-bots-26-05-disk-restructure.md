@@ -83,53 +83,63 @@ Expected: a `nixos-minimal-26.05*.iso` present. **If absent:** download it to th
 
 ---
 
-## Phase 2 — Grow the virtual disk (no downtime)
+## Phase 2 — Enter maintenance window: stop, shut down, grow disk  ⛔ DOWNTIME BEGINS
 
-- [ ] **Step 2.1 — Resize virtio0 to 128 G**
+The disk is grown while the VM is **powered off** (the surgery is offline anyway, so there's no reason to live-resize).
 
-```sh
-ssh root@pve.toothyshouse.com 'qm resize 117 virtio0 128G'
-```
-Expected: returns cleanly (thin LV; backing pool used% unchanged). Ignore the benign `ubuntu-vg` duplicate-VG / `LVMPlugin.pm` warnings.
-
-- [ ] **Step 2.2 — Verify the guest sees the larger disk (still 64 G partitions)**
-
-```sh
-ssh cjlarose@bots.toothyshouse.com 'lsblk -b -o NAME,SIZE /dev/vda | head -1; cat /sys/block/vda/size'
-```
-Expected: `vda` now ~137438953472 bytes (128 G). Partitions unchanged until surgery.
-
----
-
-## Phase 3 — Maintenance window: boot the ISO  ⛔ DOWNTIME BEGINS
-
-- [ ] **Step 3.1 — (Optional) Stop PCE services cleanly first**
+- [ ] **Step 2.1 — Stop PCE services + postgres cleanly**
 
 ```sh
 ssh cjlarose@bots.toothyshouse.com 'sudo systemctl stop pce-rails pce-discord-bot pce-worker pce-id-watcher cs-discord-bot 2>/dev/null; sudo systemctl stop postgresql'
 ```
 
-- [ ] **Step 3.2 — Attach ISO and set one-time boot to it**
+- [ ] **Step 2.2 — Shut down the VM**
+
+```sh
+ssh root@pve.toothyshouse.com 'qm shutdown 117 && sleep 5; qm status 117'
+```
+Expected: `status: stopped`. (If it hangs, `qm stop 117` after confirming services are down.)
+
+- [ ] **Step 2.3 — Resize virtio0 to 128 G (VM off)**
+
+```sh
+ssh root@pve.toothyshouse.com 'qm resize 117 virtio0 128G; qm config 117 | grep virtio0'
+```
+Expected: `virtio0: …,size=128G`. Ignore the benign `ubuntu-vg` duplicate-VG / `LVMPlugin.pm` warnings.
+
+- [ ] **Step 2.4 — Attach the 26.05 ISO and boot from it**
 
 ```sh
 ssh root@pve.toothyshouse.com '
   qm set 117 --ide2 local:iso/nixos-minimal-26.05<EXACT-NAME>.iso,media=cdrom
   qm set 117 --boot order=ide2
+  qm start 117
 '
 ```
 (Substitute the exact ISO filename from Step 1.4.)
 
-- [ ] **Step 3.3 — Reboot into the ISO**
+---
+
+## Phase 3 — Reach the ISO environment
+
+bots' MAC (`a2:ce:70:c6:cc:c2`) is DHCP-reserved, so the ISO comes up at the **same LAN IP `192.168.2.111`**. Tailscale is *not* running in the installer, but this host reaches `192.168.2.111` directly.
+
+- [ ] **Step 3.1 — Operator: set a root password in the PVE console**
+
+In `https://pve.toothyshouse.com:8006` → VM 117 → Console, once the installer prompt is up: run `passwd` and set a password. Put that same password (no trailing newline) into **`/tmp/nixos-iso-password` on the deploy host** (this machine) so I can read it.
+
+- [ ] **Step 3.2 — Connect over SSH with the password**
+
+No local `sshpass`, so use the one from nixpkgs. The installer has a fresh ephemeral host key → bypass known-hosts for installer sessions only.
 
 ```sh
-ssh cjlarose@bots.toothyshouse.com 'sudo reboot' || true
+nix shell nixpkgs#sshpass --command sshpass -f /tmp/nixos-iso-password \
+  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@192.168.2.111 \
+  'nixos-version; which sgdisk zpool zfs'
 ```
+Expected: connects; prints the installer version and the three tool paths (`sgdisk` is in the minimal ISO).
 
-- [ ] **Step 3.4 — Reach the ISO environment**
-
-Access via the **PVE web console** (`https://pve.toothyshouse.com:8006` → VM 117 → Console) or SSH once the installer's sshd is up. The installer presents a **fresh ephemeral host key** → for installer SSH only, use `-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no`. Set a root password in the console (`passwd`) or use the console directly. Confirm `sgdisk`, `zpool`, `zfs` are available (they are in the minimal ISO).
-
-**GATE:** Confirm you are in the ISO (`nixos-version` shows the installer / `mount | grep -q iso`), the pool is **NOT imported** (`zpool list` → "no pools available"), and `/persistence` is **not** mounted, before touching partitions.
+**GATE:** Confirm you are in the ISO (installer `nixos-version`), the pool is **NOT imported** (`zpool list` → "no pools available"), and `/persistence` is **not** mounted, before touching partitions.
 
 ---
 
