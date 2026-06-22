@@ -111,12 +111,11 @@ Expected: `virtio0: …,size=128G`. Ignore the benign `ubuntu-vg` duplicate-VG /
 
 ```sh
 ssh root@pve.toothyshouse.com '
-  qm set 117 --ide2 local:iso/nixos-minimal-26.05<EXACT-NAME>.iso,media=cdrom
+  qm set 117 --ide2 local:iso/nixos-26-05-minimal-x86_64-linux.iso,media=cdrom
   qm set 117 --boot order=ide2
   qm start 117
 '
 ```
-(Substitute the exact ISO filename from Step 1.4.)
 
 ---
 
