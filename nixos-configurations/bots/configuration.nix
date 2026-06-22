@@ -62,6 +62,11 @@
 
   services.zfs.expandOnBoot = "all";
 
+  # PVE VM has `agent: 1`; run the guest agent so `qm shutdown` and clean
+  # host-reboot shutdowns reach the guest (otherwise PVE waits on a dead
+  # agent channel — the qemu-guest.nix profile only provides virtio drivers).
+  services.qemuGuest.enable = true;
+
   services.openssh = {
     enable = true;
     settings = {
