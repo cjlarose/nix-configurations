@@ -47,6 +47,7 @@
     pkgs.speedtest-cli
     pkgs.stack
     additionalPackages.${system}.trueColorTest
+    additionalPackages.${system}.tuicr
   ];
 
   programs.git.userName = "Christopher La Rose";

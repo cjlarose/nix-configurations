@@ -14,6 +14,7 @@
   cs-automation,
   allowUnfreePredicate,
   nix-minecraft,
+  llm-agents,
   ...
 }:
 
@@ -98,6 +99,7 @@ in
   '';
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
   opencode = nixpkgs-unstable.legacyPackages.${system}.opencode;
+  tuicr = llm-agents.packages.${system}.tuicr;
   nvr = import ./nvr { inherit pkgs nvr; };
   go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
