@@ -6,10 +6,13 @@ in nixpkgs.lib.nixosSystem {
   modules = [
     (import ./disk-config.nix { inherit disko; })
     (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system additionalPackages; })
-    ({ pkgs, ... } : {
+    ({ ... } : {
       imports = [
         impermanence.nixosModules.impermanence
       ];
+      # Home now lives on the persistent tank/home dataset (see
+      # hardware-configuration.nix + disk-config.nix), not per-dir impermanence.
+      # Only system dirs are cherry-picked into /persistence here.
       environment.persistence."/persistence" = {
         hideMounts = true;
         directories = [
@@ -23,25 +26,6 @@ in nixpkgs.lib.nixosSystem {
             mode = "0755";
           }
         ];
-        users = {
-          bot = {
-            directories = [
-              ".config/cs-automation"
-              ".config/chromium"
-              ".config/pce"
-              ".local/share/pce-dailies"
-              ".vnc"
-            ];
-          };
-          cjlarose = {
-            directories = [
-              ".config/chromium"
-              ".local/share/pce-dailies"
-              ".ssh"
-              "workspace"
-            ];
-          };
-        };
       };
     })
     home-manager.nixosModules.home-manager {

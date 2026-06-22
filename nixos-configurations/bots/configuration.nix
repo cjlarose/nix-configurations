@@ -21,6 +21,10 @@
     registry.nixpkgs.flake = nixpkgs;
     nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
     settings = {
+      # Allow the operator to push closures here (push-deploy via
+      # `nixos-rebuild --target-host`). cjlarose already has passwordless sudo,
+      # so trusting the nix user grants no additional privilege.
+      trusted-users = [ "root" "cjlarose" ];
       substituters = [
         "https://nixcache.toothyshouse.com"
       ];

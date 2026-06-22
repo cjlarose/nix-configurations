@@ -30,8 +30,8 @@ let
     "bots" = (
       import ./bots {
         inherit sharedOverlays additionalPackages pce impermanence disko;
-        nixpkgs = nixpkgs-25-11;
-        home-manager = home-manager-25-11;
+        nixpkgs = nixpkgs-26-05;
+        home-manager = home-manager-26-05;
         stateVersion = "23.11";
       }
     );

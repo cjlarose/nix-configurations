@@ -1,4 +1,4 @@
-{ disko }: { lib, ... }:
+{ disko }: { lib, pkgs, ... }:
 
 {
   imports = [
@@ -9,9 +9,23 @@
     boot = {
       loader.systemd-boot.enable = true;
       zfs.devNodes = "/dev/disk/by-label/tank";
-      initrd.postDeviceCommands = lib.mkAfter ''
-        zfs rollback -r tank/root@blank
-      '';
+      # Roll the root dataset back to a pristine snapshot on every boot
+      # (impermanence). Under 26.05's systemd stage-1 initrd this is a oneshot
+      # service ordered after the pool import and before the root mount; the
+      # scripted-initrd `boot.initrd.postDeviceCommands` form is not supported
+      # by systemd initrd.
+      initrd.systemd.services.rollback-root = {
+        description = "Roll back tank/root to its blank snapshot";
+        wantedBy = [ "initrd.target" ];
+        after = [ "zfs-import-tank.service" ];
+        before = [ "sysroot.mount" ];
+        unitConfig.DefaultDependencies = "no";
+        serviceConfig.Type = "oneshot";
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs rollback -r tank/root@blank
+        '';
+      };
     };
 
     disko = {
@@ -89,6 +103,11 @@
               nix = {
                 type = "zfs_fs";
                 mountpoint = "/nix";
+                options.mountpoint = "legacy";
+              };
+              home = {
+                type = "zfs_fs";
+                mountpoint = "/home";
                 options.mountpoint = "legacy";
               };
             };
