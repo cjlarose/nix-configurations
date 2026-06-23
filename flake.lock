@@ -1287,11 +1287,11 @@
         "tfenv": "tfenv"
       },
       "locked": {
-        "lastModified": 1782150230,
-        "narHash": "sha256-OcLgLWfNXegJwZx4vEkqIDgySh5pyIdnF7S1Lq24EuY=",
+        "lastModified": 1782239377,
+        "narHash": "sha256-jZW7F9boBoj9fQhm/AS2hiLwscVm2/3GKVcSdviE1vk=",
         "ref": "refs/heads/main",
-        "rev": "d528704924d7b37f41e36b51f4ce6ea7826a03ff",
-        "revCount": 288,
+        "rev": "ae02aecc7389896e47b04f463131fbc5199e8490",
+        "revCount": 289,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
