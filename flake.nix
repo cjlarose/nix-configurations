@@ -190,8 +190,8 @@
         self.nixosConfigurations.${name}.config.home-manager.users.cjlarose;
 
       nixosConfigsWithCjlarose = [
-        "bots" "cache" "coder" "dns" "immich" "media"
-        "memos" "photos" "splitpro" "unifi" "ns1010301"
+        "bots" "cache" "dns" "immich" "media"
+        "splitpro" "ns1010301"
       ];
 
       mkNixosCheck = pkgs: name:

@@ -43,14 +43,6 @@ let
         stateVersion = "24.05";
       }
     );
-    "coder" = (
-      import ./coder {
-        inherit sharedOverlays additionalPackages impermanence;
-        nixpkgs = nixpkgs-24-05;
-        home-manager = home-manager-24-05;
-        stateVersion = "24.05";
-      }
-    );
     "edge-lax" = nixpkgs-25-11.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
@@ -89,35 +81,11 @@ let
       };
       modules = [ ./media ];
     };
-    "memos" = (
-      import ./memos {
-        inherit sharedOverlays additionalPackages impermanence disko;
-        nixpkgs = nixpkgs-25-05;
-        home-manager = home-manager-25-05;
-        stateVersion = "25.05";
-      }
-    );
-    "photos" = (
-      import ./photos.nix {
-        inherit sharedOverlays additionalPackages;
-        nixpkgs = nixpkgs-24-05;
-        home-manager = home-manager-24-05;
-        stateVersion = "23.05";
-      }
-    );
     "splitpro" = (
       import ./splitpro {
         inherit sharedOverlays additionalPackages impermanence;
         nixpkgs = nixpkgs-25-05;
         home-manager = home-manager-25-05;
-        stateVersion = "24.11";
-      }
-    );
-    "unifi" = (
-      import ./unifi {
-        inherit sharedOverlays additionalPackages impermanence;
-        nixpkgs = nixpkgs-24-11;
-        home-manager = home-manager-24-11;
         stateVersion = "24.11";
       }
     );
