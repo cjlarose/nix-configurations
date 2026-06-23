@@ -30,6 +30,12 @@
     };
     registry.nixpkgs.flake = nixpkgs;
     nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
+    settings = {
+      # Allow the operator to push closures here (push-deploy via
+      # `nix copy` / `nixos-rebuild --target-host`). cjlarose already has
+      # passwordless sudo, so trusting the nix user grants no additional privilege.
+      trusted-users = [ "root" "cjlarose" ];
+    };
   };
 
   nixpkgs.overlays = sharedOverlays;
@@ -102,6 +108,7 @@
     hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILXv1L7zwTqnZJUfqOUVvAe7HI8CoAbVAHBPJhQsohxw cjlarose@ns1010301"
     ];
   };
 }
