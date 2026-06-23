@@ -30,8 +30,8 @@
       url = "github:Infinidoge/nix-minecraft";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
+    tuicr = {
+      url = "github:cjlarose/tuicr";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     home-manager-24-05 = {
@@ -143,7 +143,7 @@
     mattpocock-skills,
     microvm,
     picktrace-nix-configurations,
-    llm-agents,
+    tuicr,
   }:
     let
       supportedPlatforms = [
@@ -158,7 +158,7 @@
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           allowUnfreePredicate = import ./shared/unfree-predicate.nix { nixpkgs = nixpkgs-24-05; };
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft llm-agents;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft tuicr;
           };
         in
           import ./packages packageArgs
