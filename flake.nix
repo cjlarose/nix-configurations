@@ -34,14 +34,6 @@
       url = "github:cjlarose/tuicr";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    home-manager-24-05 = {
-      url = "github:nix-community/home-manager/release-24.05";
-      inputs.nixpkgs.follows = "nixpkgs-24-05";
-    };
-    home-manager-24-11 = {
-      url = "github:nix-community/home-manager/release-24.11";
-      inputs.nixpkgs.follows = "nixpkgs-24-05";
-    };
     home-manager-25-05 = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs-25-05";
@@ -118,8 +110,6 @@
     disko,
     fzfProject,
     fzfVim,
-    home-manager-24-05,
-    home-manager-24-11,
     home-manager-25-05,
     home-manager-25-11,
     home-manager-26-05,
@@ -201,7 +191,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-24-05 nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-24-05 home-manager-24-11 home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
+          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
         }
       );
 

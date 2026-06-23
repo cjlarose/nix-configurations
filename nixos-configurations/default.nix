@@ -1,13 +1,9 @@
 {
-  nixpkgs-24-05,
-  nixpkgs-24-11,
   nixpkgs-25-05,
   nixpkgs-25-11,
   nixpkgs-26-05,
   sharedOverlays,
   additionalPackages,
-  home-manager-24-05,
-  home-manager-24-11,
   home-manager-25-05,
   home-manager-25-11,
   home-manager-26-05,
