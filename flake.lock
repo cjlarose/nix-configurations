@@ -985,16 +985,16 @@
     },
     "nixpkgs_5": {
       "locked": {
-        "lastModified": 1722087241,
-        "narHash": "sha256-2ShmEaFi0kJVOEEu5gmlykN5dwjWYWYUJmlRTvZQRpU=",
+        "lastModified": 1782116945,
+        "narHash": "sha256-G3tw/IXmaH6IQ2upZvhuN9sG8CkuX+BLuJDpE8hz0Ds=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8c50662509100d53229d4be607f1a3a31157fa12",
+        "rev": "34268251cf5547d39063f2c5ea9a196246f7f3a6",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-24.05",
+        "ref": "nixos-26.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -1068,11 +1068,11 @@
         "pce-dailies": "pce-dailies"
       },
       "locked": {
-        "lastModified": 1782311714,
-        "narHash": "sha256-KvKroZaAQ/hk1wn2N06izUa+KnkgWtDZQNwviVWKcOY=",
+        "lastModified": 1782312244,
+        "narHash": "sha256-cGjpPN2iF1LamDniEtt+kSucjYJHDWZkXgsYTOxISY8=",
         "ref": "refs/heads/main",
-        "rev": "4c62eb1cdbd3ba002cdbfc8d554e3661673ef922",
-        "revCount": 434,
+        "rev": "ddb0d7b0976a7e71d999c004ac2a85804a7db575",
+        "revCount": 435,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
