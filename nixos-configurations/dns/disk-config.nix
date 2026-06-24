@@ -1,4 +1,4 @@
-{ disko }: { lib, ... }:
+{ disko }: { lib, pkgs, ... }:
 
 {
   imports = [
@@ -8,20 +8,34 @@
   config = {
     boot = {
       loader.systemd-boot.enable = true;
+      # Single disk — no duplicate-label mirror issue, by-label is fine.
       zfs.devNodes = "/dev/disk/by-label/tank";
-      initrd.postDeviceCommands = lib.mkAfter ''
-        zfs rollback -r tank/root@blank
-      '';
+      # hostId is pinned and storage is single-tenant; the 26.11 default.
+      zfs.forceImportRoot = false;
+      # Roll the root dataset back to a pristine snapshot on every boot
+      # (impermanence). 26.05 defaults to systemd stage-1 initrd, which
+      # silently ignores the old `boot.initrd.postDeviceCommands` form, so this
+      # is a oneshot ordered after the pool import and before the root mount.
+      initrd.systemd.services.rollback-root = {
+        description = "Roll back tank/root to its blank snapshot";
+        wantedBy = [ "initrd.target" ];
+        after = [ "zfs-import-tank.service" ];
+        before = [ "sysroot.mount" ];
+        unitConfig.DefaultDependencies = "no";
+        serviceConfig.Type = "oneshot";
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs rollback -r tank/root@blank
+        '';
+      };
     };
 
     disko = {
-      memSize = 2048; # megabytes
       enableConfig = false; # disable setting filesystems.* automatically
       extraRootModules = [ "zfs" ];
       devices = {
         disk = {
           main = {
-            imageSize = "4G";
             device = "/dev/vda";
             type = "disk";
             content = {
@@ -89,6 +103,11 @@
               nix = {
                 type = "zfs_fs";
                 mountpoint = "/nix";
+                options.mountpoint = "legacy";
+              };
+              home = {
+                type = "zfs_fs";
+                mountpoint = "/home";
                 options.mountpoint = "legacy";
               };
             };
