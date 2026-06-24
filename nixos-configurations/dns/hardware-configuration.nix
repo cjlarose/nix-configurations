@@ -20,6 +20,11 @@
       fsType = "zfs";
     };
 
+  fileSystems."/home" =
+    { device = "tank/home";
+      fsType = "zfs";
+    };
+
   fileSystems."/boot" =
     { device = "/dev/disk/by-partlabel/disk-main-ESP";
       fsType = "vfat";
@@ -31,7 +36,9 @@
       fsType = "ext4";
     };
 
-  swapDevices = [ ];
+  swapDevices = [
+    { device = "/dev/disk/by-partlabel/disk-main-swap"; }
+  ];
 
   networking.interfaces.ens18 = {
     ipv4.addresses = [
