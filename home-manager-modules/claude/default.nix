@@ -99,6 +99,14 @@ in
 
       memory.text = lib.mkBefore (builtins.readFile ./CLAUDE.md);
 
+      # Skills authored in this repo, deployed via the upstream
+      # programs.claude-code.skills option (key = bare skill directory name,
+      # value = its SKILL.md; never append /SKILL — that double-nests post
+      # home-manager #8770). Output: ~/.claude/skills/<name>/SKILL.md.
+      skills = {
+        "launch-remote-session" = ./skills/launch-remote-session/SKILL.md;
+      };
+
     };
 
     home.sessionVariables = lib.optionalAttrs (config.cjlarose.claude.llm-wiki-path != null) {
