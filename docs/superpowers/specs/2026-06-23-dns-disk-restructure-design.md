@@ -115,17 +115,21 @@ Validate by building the dns closure on ns1010301
 `nix shell nixpkgs#rsync -c rsync …` (nix is available on the host). Use
 `-aHAX` for full attribute/xattr fidelity; rsync is restartable if interrupted.
 
+**The dataset mounts at `/home`, so the user's home is `/home/cjlarose`. Populate under a `cjlarose/` subdirectory, NOT at the dataset root** — otherwise the new generation boots with `/home/.ssh` but no `/home/cjlarose`, and `home-manager-cjlarose.service` fails (`cd: /home/cjlarose: No such file or directory`).
+
 ```
 zfs create -o mountpoint=legacy tank/home
 mount -t zfs tank/home /mnt              # temporary
+mkdir -p /mnt/cjlarose                   # the user's home dir within the dataset
 nix shell nixpkgs#rsync -c sh -c '
-  rsync -aHAX /persistence/home/cjlarose/.ssh     /mnt/
-  rsync -aHAX /persistence/home/cjlarose/gc-roots /mnt/   # keep path stable for /nix gcroots
-  mkdir -p /mnt/worktrees/cjlarose/nix-configurations
+  rsync -aHAX /persistence/home/cjlarose/.ssh     /mnt/cjlarose/
+  rsync -aHAX /persistence/home/cjlarose/gc-roots /mnt/cjlarose/   # keep path stable for /nix gcroots
+  mkdir -p /mnt/cjlarose/worktrees/cjlarose/nix-configurations
   rsync -aHAX /persistence/home/cjlarose/workspace/cjlarose/nix-configurations/ \
-              /mnt/worktrees/cjlarose/nix-configurations/default/
+              /mnt/cjlarose/worktrees/cjlarose/nix-configurations/default/
 '
-chown -R 1000:100 /mnt
+chown -R 1000:100 /mnt/cjlarose
+chmod 700 /mnt/cjlarose
 umount /mnt
 ```
 

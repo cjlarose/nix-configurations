@@ -369,17 +369,21 @@ REMOTE
 - [ ] **Step 2: Populate from `/persistence` with rsync (`nix shell` provides rsync)**
 
 `rsync` is not in the host's default packages; run it via `nix shell nixpkgs#rsync`. Note the trailing slash on the `nix-configurations/` source so its *contents* land in the `default/` worktree.
+
+**CRITICAL — the dataset mounts at `/home`, so the user's home is `/home/cjlarose`. Populate under a `cjlarose/` subdirectory (`DST=/mnt/newhome/cjlarose`), NOT at the dataset root.** Populating at the root yields `/home/.ssh` etc. with no `/home/cjlarose`, which fails `home-manager-cjlarose.service` ("cd: /home/cjlarose: No such file or directory") and leaves the user with no home dir on the next boot.
 ```bash
 SSH_AUTH_SOCK= ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes cjlarose@192.168.2.104 'sudo nix shell nixpkgs#rsync -c bash -s' <<'REMOTE'
 set -euo pipefail
 SRC=/persistence/home/cjlarose
-DST=/mnt/newhome
+DST=/mnt/newhome/cjlarose          # the user's home dir within the dataset
+mkdir -p "$DST"
 rsync -aHAX "$SRC/.ssh"     "$DST/"
 rsync -aHAX "$SRC/gc-roots" "$DST/"
 mkdir -p "$DST/worktrees/cjlarose/nix-configurations"
 rsync -aHAX "$SRC/workspace/cjlarose/nix-configurations/" \
             "$DST/worktrees/cjlarose/nix-configurations/default/"
 chown -R 1000:100 "$DST"
+chmod 700 "$DST"
 REMOTE
 ```
 
@@ -389,13 +393,14 @@ REMOTE
 SSH_AUTH_SOCK= ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes cjlarose@192.168.2.104 'sudo bash -s' <<'REMOTE'
 set -euo pipefail
 find /mnt/newhome -type s -delete 2>/dev/null || true
-echo "--- top level ---"; ls -la /mnt/newhome
-echo "--- worktree ---";  ls -la /mnt/newhome/worktrees/cjlarose/nix-configurations/default | head
+echo "--- dataset root (expect a single cjlarose/ dir) ---"; ls -la /mnt/newhome
+echo "--- user home ---"; ls -la /mnt/newhome/cjlarose
+echo "--- worktree ---";  ls -la /mnt/newhome/cjlarose/worktrees/cjlarose/nix-configurations/default | head
 umount /mnt/newhome
 rmdir /mnt/newhome
 REMOTE
 ```
-Expected: `/mnt/newhome` contains `.ssh`, `gc-roots`, `worktrees/`; the `default/` worktree contains a `.git` and `flake.nix`. `tank/home` lives in pool state, so it survives the `tank/root@blank` rollback on reboot.
+Expected: the dataset root contains exactly `cjlarose/`; `/mnt/newhome/cjlarose` contains `.ssh`, `gc-roots`, `worktrees/`; the `default/` worktree contains a `.git` and `flake.nix`. `tank/home` lives in pool state, so it survives the `tank/root@blank` rollback on reboot.
 
 ---
 
