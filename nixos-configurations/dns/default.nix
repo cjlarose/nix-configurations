@@ -20,14 +20,6 @@ in nixpkgs.lib.nixosSystem {
             directory = "/etc/nixos";
           }
         ];
-        users = {
-          cjlarose = {
-            directories = [
-              ".ssh"
-              "workspace"
-            ];
-          };
-        };
       };
     })
     (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
