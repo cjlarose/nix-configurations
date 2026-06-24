@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, system, ... }: { pkgs, config, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, config, pkgs, lib, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];
@@ -30,9 +30,33 @@
     '';
     registry.nixpkgs.flake = nixpkgs;
     nixPath = [ "nixpkgs=${nixpkgs.outPath}" ];
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 14d";
+    };
+    settings = {
+      # Allow the operator to push closures here (push-deploy via
+      # `nixos-rebuild --target-host` / `nix copy`). cjlarose already has
+      # passwordless sudo, so trusting the nix user grants no additional privilege.
+      trusted-users = [ "root" "cjlarose" ];
+      substituters = [
+        "https://nixcache.toothyshouse.com"
+      ];
+      trusted-public-keys = [
+        "nixcache.toothyshouse.com:kAyteiBuGtyLHPkrYNjDY8G5nNT/LHYgClgTwyVCnNQ="
+      ];
+    };
   };
 
   nixpkgs.overlays = sharedOverlays;
+
+  # minio was abandoned by upstream and is flagged insecure in nixpkgs 26.05
+  # (multiple unfixed CVEs). Kept deliberately until the splitpro stack migrates
+  # off it (e.g. to Garage/SeaweedFS). Predicate form so it survives version bumps.
+  nixpkgs.config.allowInsecurePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "minio"
+    ];
 
   security.sudo.wheelNeedsPassword = false;
 
@@ -185,8 +209,19 @@
 
   users.mutableUsers = false;
 
+  # acme is dynamically allocated but owns the persistent /var/lib/acme certs.
+  # /var/lib/nixos (the uid/gid map) lives on the impermanence-rolled-back root,
+  # so pin acme's ids to their current on-disk values to keep cert ownership
+  # stable across reboots (same approach as media's jellyfin pin). postgres (71)
+  # and minio (280) already have static nixpkgs-assigned ids, so need no pin.
+  users.users.acme.uid = 995;
+  users.groups.acme.gid = 993;
+
   users.users = {
     cjlarose = {
+      # Pin the uid: /home is now a persistent tank/home dataset owned by 1000,
+      # but /var/lib/nixos is rolled back each boot, so an unpinned uid could be
+      # reassigned and break home ownership. Matches the cache/bots/dns hosts.
       uid = 1000;
       isNormalUser = true;
       home = "/home/cjlarose";
@@ -195,6 +230,7 @@
       hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILXv1L7zwTqnZJUfqOUVvAe7HI8CoAbVAHBPJhQsohxw cjlarose@ns1010301"
       ];
     };
   };

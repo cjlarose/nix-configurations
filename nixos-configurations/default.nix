@@ -1,10 +1,8 @@
 {
-  nixpkgs-25-05,
   nixpkgs-25-11,
   nixpkgs-26-05,
   sharedOverlays,
   additionalPackages,
-  home-manager-25-05,
   home-manager-25-11,
   home-manager-26-05,
   pce,
@@ -89,14 +87,17 @@ let
       };
       modules = [ ./media ];
     };
-    "splitpro" = (
-      import ./splitpro {
-        inherit sharedOverlays additionalPackages impermanence;
-        nixpkgs = nixpkgs-25-05;
-        home-manager = home-manager-25-05;
+    "splitpro" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit sharedOverlays additionalPackages impermanence disko;
+        nixpkgs = nixpkgs-26-05;
+        home-manager = home-manager-26-05;
         stateVersion = "24.11";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./splitpro ];
+    };
     "ns1010301" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {

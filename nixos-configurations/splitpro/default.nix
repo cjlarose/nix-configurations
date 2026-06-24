@@ -1,23 +1,14 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, ... }:
-let
-  system = "x86_64-linux";
-in nixpkgs.lib.nixosSystem {
-  inherit system;
-  modules = [
-    ({ pkgs, lib, ... }: {
-      boot = {
-        loader.systemd-boot.enable = true;
-        zfs.devNodes = "/dev/disk/by-label/tank";
-        initrd.postDeviceCommands = lib.mkAfter ''
-          zfs rollback -r tank/root@blank
-        '';
-      };
-    })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system; })
-    ({ pkgs, ... } : {
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, ... }: {
+  imports = [
+    (import ./disk-config.nix { inherit disko; })
+    ./configuration.nix
+    ({ ... }: {
       imports = [
         impermanence.nixosModules.impermanence
       ];
+      # Home now lives on the persistent tank/home dataset (see
+      # hardware-configuration.nix + disk-config.nix), not per-dir impermanence.
+      # Only system dirs are cherry-picked into /persistence here.
       environment.persistence."/persistence" = {
         hideMounts = true;
         directories = [
@@ -37,18 +28,10 @@ in nixpkgs.lib.nixosSystem {
             mode = "0700";
           }
         ];
-        users = {
-          cjlarose = {
-            directories = [
-              ".ssh"
-              ".mc"
-              "workspace"
-            ];
-          };
-        };
       };
     })
-    home-manager.nixosModules.home-manager {
+    home-manager.nixosModules.home-manager
+    {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
