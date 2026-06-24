@@ -44,6 +44,8 @@ in {
         "[._]*.s[a-w][a-z]"
         "[._]s[a-w][a-z]"
         ".claude"
+        "docs/superpowers/"
+        ".superpowers/"
       ];
       delta = {
         enable = true;
