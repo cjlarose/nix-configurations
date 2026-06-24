@@ -263,7 +263,7 @@
       StandardInput = "null";
       StandardOutput = "journal";
       StandardError = "journal";
-      WorkingDirectory = "${additionalPackages.${system}.cs-automation}";
+      WorkingDirectory = "${additionalPackages.${system}.cs-automation}/share/chicken-smoothie-automation";
       ExecStart = ''
         ${pkgs.bash}/bin/bash -c 'source ~/.config/cs-automation/.env && \
         exec ${additionalPackages.${system}.cs-automation}/bin/discord_bot'
@@ -282,7 +282,7 @@
       StandardInput = "null";
       StandardOutput = "journal";
       StandardError = "journal";
-      WorkingDirectory = "${additionalPackages.${system}.cs-automation}";
+      WorkingDirectory = "${additionalPackages.${system}.cs-automation}/share/chicken-smoothie-automation";
       ExecStart = ''
         ${pkgs.bash}/bin/bash -c 'source ~/.config/cs-automation/.env && \
         exec ${additionalPackages.${system}.cs-automation}/bin/rake solid_queue:start'

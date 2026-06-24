@@ -55,11 +55,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1781842157,
-        "narHash": "sha256-ZE2bO2MJ32pO/dy91fgfCJcr12/PeTzG58VIiDkjbPY=",
+        "lastModified": 1782326597,
+        "narHash": "sha256-aoDopRgy8Gn0fLwMARCRSh3chQ8PS/qC4RRmfmMfGZI=",
         "ref": "refs/heads/main",
-        "rev": "8fb233c3bd3dec555c75e11a6a72bf0cb8f7dc97",
-        "revCount": 74,
+        "rev": "a725ae91c04fe3feb08050ab22caa8576aeb7a68",
+        "revCount": 86,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/cs-automation"
       },
@@ -685,17 +685,17 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1722087241,
-        "narHash": "sha256-2ShmEaFi0kJVOEEu5gmlykN5dwjWYWYUJmlRTvZQRpU=",
+        "lastModified": 1782116945,
+        "narHash": "sha256-G3tw/IXmaH6IQ2upZvhuN9sG8CkuX+BLuJDpE8hz0Ds=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8c50662509100d53229d4be607f1a3a31157fa12",
+        "rev": "34268251cf5547d39063f2c5ea9a196246f7f3a6",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-24.05",
         "repo": "nixpkgs",
+        "rev": "34268251cf5547d39063f2c5ea9a196246f7f3a6",
         "type": "github"
       }
     },
