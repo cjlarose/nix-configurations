@@ -97,14 +97,17 @@ let
         stateVersion = "24.11";
       }
     );
-    "ns1010301" = (
-      import ./ns1010301 {
+    "ns1010301" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "25.11";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./ns1010301 ];
+    };
     "minecraft-mellowcatfe" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
