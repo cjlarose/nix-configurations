@@ -101,6 +101,11 @@
   users.mutableUsers = false;
 
   users.users.cjlarose = {
+    # Pin the uid: /home is now a persistent tank/home dataset owned by 1000,
+    # but /var/lib/nixos (the uid-map) lives on the ephemeral root and is
+    # rolled back each boot, so an unpinned uid could be reassigned and break
+    # home ownership. Matches the cache/bots hosts.
+    uid = 1000;
     isNormalUser = true;
     home = "/home/cjlarose";
     shell = pkgs.zsh;
