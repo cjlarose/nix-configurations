@@ -27,6 +27,11 @@
             group = "root";
             mode = "0700";
           }
+          {
+            # Podman/oci-container storage (overlay driver). Persisting it stops
+            # the splitpro image being re-pulled on every boot.
+            directory = "/var/lib/containers";
+          }
         ];
       };
     })
