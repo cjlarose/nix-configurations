@@ -68,14 +68,17 @@ let
       };
       modules = [ ./dns ];
     };
-    "immich" = (
-      import ./immich {
+    "immich" = nixpkgs-25-11.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko;
         nixpkgs = nixpkgs-25-11;
         home-manager = home-manager-25-11;
         stateVersion = "24.11";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./immich ];
+    };
     "media" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
