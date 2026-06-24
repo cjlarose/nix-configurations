@@ -54,8 +54,8 @@ let
     "dns" = (
       import ./dns {
         inherit sharedOverlays additionalPackages impermanence disko self;
-        nixpkgs = nixpkgs-25-11;
-        home-manager = home-manager-25-11;
+        nixpkgs = nixpkgs-26-05;
+        home-manager = home-manager-26-05;
         stateVersion = "23.11";
       }
     );
