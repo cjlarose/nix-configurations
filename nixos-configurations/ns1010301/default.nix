@@ -1,9 +1,5 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-home-manager-modules, mattpocock-skills, self, ... }:
-let
-  system = "x86_64-linux";
-in nixpkgs.lib.nixosSystem {
-  inherit system;
-  modules = [
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-home-manager-modules, mattpocock-skills, self, ... }: {
+  imports = [
     microvm.nixosModules.host
     ({ ... }: {
       microvm.vms."pt-docker-cjlarose" = {
@@ -19,8 +15,8 @@ in nixpkgs.lib.nixosSystem {
     })
     determinate.nixosModules.default
     (import ./disk-config.nix { inherit disko; })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
-    ({ pkgs, config, ... } : {
+    ./configuration.nix
+    ({ pkgs, config, ... }: {
       imports = [
         impermanence.nixosModules.impermanence
       ];
@@ -63,7 +59,8 @@ in nixpkgs.lib.nixosSystem {
         ];
       };
     })
-    home-manager.nixosModules.home-manager {
+    home-manager.nixosModules.home-manager
+    {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {

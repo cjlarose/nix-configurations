@@ -1,15 +1,13 @@
-{ nixpkgs, sharedOverlays, additionalPackages, stateVersion, impermanence, home-manager, disko, self, ... }:
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, self, ... }:
 let
-  system = "x86_64-linux";
   flakeInputs = builtins.attrValues (builtins.removeAttrs self.inputs [ "self" ]);
-in nixpkgs.lib.nixosSystem {
-  inherit system;
-  modules = [
+in {
+  imports = [
     {
       system.extraDependencies = flakeInputs;
     }
     (import ./disk-config.nix { inherit disko; })
-    ({ pkgs, ... } : {
+    ({ pkgs, ... }: {
       imports = [
         impermanence.nixosModules.impermanence
       ];
@@ -22,8 +20,9 @@ in nixpkgs.lib.nixosSystem {
         ];
       };
     })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion system additionalPackages; })
-    home-manager.nixosModules.home-manager {
+    ./configuration.nix
+    home-manager.nixosModules.home-manager
+    {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {

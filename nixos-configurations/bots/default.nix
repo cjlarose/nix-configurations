@@ -1,12 +1,8 @@
-{ nixpkgs, sharedOverlays, additionalPackages, home-manager, stateVersion, pce, impermanence, disko, ... }:
-let
-  system = "x86_64-linux";
-in nixpkgs.lib.nixosSystem {
-  inherit system;
-  modules = [
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, ... }: {
+  imports = [
     (import ./disk-config.nix { inherit disko; })
-    (import ./configuration.nix { inherit nixpkgs sharedOverlays stateVersion pce system additionalPackages; })
-    ({ ... } : {
+    ./configuration.nix
+    ({ ... }: {
       imports = [
         impermanence.nixosModules.impermanence
       ];
@@ -28,7 +24,8 @@ in nixpkgs.lib.nixosSystem {
         ];
       };
     })
-    home-manager.nixosModules.home-manager {
+    home-manager.nixosModules.home-manager
+    {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
       home-manager.users.cjlarose = (import ../../home/cjlarose) {

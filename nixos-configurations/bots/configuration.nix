@@ -1,4 +1,4 @@
-{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, ... }: { pkgs, ... }: {
+{ nixpkgs, sharedOverlays, stateVersion, pce, system, additionalPackages, pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
   ];

@@ -23,22 +23,28 @@ let
   ghosttyTerminfoModule = import ../nixos-modules/ghostty-terminfo.nix;
   allowUnfreeModule = import ../nixos-modules/allow-unfree.nix;
   hosts = {
-    "bots" = (
-      import ./bots {
+    "bots" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages pce impermanence disko;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "23.11";
-      }
-    );
-    "cache" = (
-      import ./cache {
+        system = "x86_64-linux";
+      };
+      modules = [ ./bots ];
+    };
+    "cache" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "24.05";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./cache ];
+    };
     "edge-lax" = nixpkgs-25-11.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
@@ -51,22 +57,28 @@ let
       };
       modules = [ ./edge-lax ];
     };
-    "dns" = (
-      import ./dns {
+    "dns" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko self;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "23.11";
-      }
-    );
-    "immich" = (
-      import ./immich {
+        system = "x86_64-linux";
+      };
+      modules = [ ./dns ];
+    };
+    "immich" = nixpkgs-25-11.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko;
         nixpkgs = nixpkgs-25-11;
         home-manager = home-manager-25-11;
         stateVersion = "24.11";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./immich ];
+    };
     "media" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
@@ -85,14 +97,17 @@ let
         stateVersion = "24.11";
       }
     );
-    "ns1010301" = (
-      import ./ns1010301 {
+    "ns1010301" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "25.11";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./ns1010301 ];
+    };
     "minecraft-mellowcatfe" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
