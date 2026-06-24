@@ -47,6 +47,17 @@ in
       settings = {
         enabledPlugins = {
           "superpowers@claude-plugins-official" = true;
+          # nixd Nix language server, provided by the local marketplace below.
+          "nixd@cjlarose-lsps" = true;
+        };
+        # Local plugin marketplace (files materialized via home.file below) that
+        # ships a single LSP plugin wiring nixd as the Nix language server, so
+        # Claude Code gets real diagnostics on .nix edits (unused bindings,
+        # undefined vars, flake/option-aware analysis). nixd binary comes from
+        # home.packages so the bare "nixd" command resolves on PATH.
+        extraKnownMarketplaces."cjlarose-lsps".source = {
+          source = "directory";
+          path = "${config.home.homeDirectory}/.claude/lsp-marketplace";
         };
         skipDangerousModePermissionPrompt = true;
         effortLevel = "medium";
@@ -94,8 +105,35 @@ in
       LLM_WIKI_PATH = config.cjlarose.claude.llm-wiki-path;
     };
 
+    home.packages = [ pkgs.nixd ];
+
     home.file = {
       "agent-docs/neovim-integration.md".source = ./agent-docs/neovim-integration.md;
+
+      # Local LSP plugin marketplace consumed via settings.extraKnownMarketplaces
+      # + enabledPlugins above. Ships nixd as the Nix language server.
+      ".claude/lsp-marketplace/.claude-plugin/marketplace.json".text = builtins.toJSON {
+        name = "cjlarose-lsps";
+        owner.name = "cjlarose";
+        description = "cjlarose local LSP plugins";
+        plugins = [{
+          name = "nixd";
+          source = "./nixd";
+          description = "Nix language server (nixd)";
+        }];
+      };
+      ".claude/lsp-marketplace/nixd/.claude-plugin/plugin.json".text = builtins.toJSON {
+        name = "nixd";
+        description = "Nix language server (nixd)";
+        version = "1.0.0";
+        author.name = "cjlarose";
+      };
+      ".claude/lsp-marketplace/nixd/.lsp.json".text = builtins.toJSON {
+        nix = {
+          command = "nixd";
+          extensionToLanguage.".nix" = "nix";
+        };
+      };
     } // lib.optionalAttrs (config.cjlarose.claude.mattpocock-skills != null) (let
       src = config.cjlarose.claude.mattpocock-skills;
     in {
