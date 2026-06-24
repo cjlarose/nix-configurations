@@ -57,14 +57,17 @@ let
       };
       modules = [ ./edge-lax ];
     };
-    "dns" = (
-      import ./dns {
+    "dns" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
         inherit sharedOverlays additionalPackages impermanence disko self;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "23.11";
-      }
-    );
+        system = "x86_64-linux";
+      };
+      modules = [ ./dns ];
+    };
     "immich" = (
       import ./immich {
         inherit sharedOverlays additionalPackages impermanence disko;
