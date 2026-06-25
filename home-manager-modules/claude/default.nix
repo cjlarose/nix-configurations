@@ -19,9 +19,9 @@ in
     default = null;
     description = ''
       Absolute path to a local llm-wiki working tree. When set, exports
-      LLM_WIKI_PATH and out-of-store-symlinks the repo's wiki-capture and
-      wiki-query skills under ~/.claude/skills/ so edits in the working
-      tree are visible without a home-manager rebuild.
+      LLM_WIKI_PATH and out-of-store-symlinks the repo's wiki-capture,
+      wiki-query, and wiki-ingest skills under ~/.claude/skills/ so edits
+      in the working tree are visible without a home-manager rebuild.
     '';
   };
 
@@ -154,6 +154,8 @@ in
         config.lib.file.mkOutOfStoreSymlink "${src}/skills/wiki-capture";
       ".claude/skills/wiki-query".source =
         config.lib.file.mkOutOfStoreSymlink "${src}/skills/wiki-query";
+      ".claude/skills/wiki-ingest".source =
+        config.lib.file.mkOutOfStoreSymlink "${src}/skills/wiki-ingest";
     });
   };
 }
