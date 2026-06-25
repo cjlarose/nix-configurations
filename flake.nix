@@ -98,6 +98,9 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs-25-11";
     };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+    };
     picktrace-nix-configurations = {
       url = "git+ssh://git@github.com/picktrace/nix-configurations";
       inputs.mattpocock-skills.follows = "mattpocock-skills";
@@ -132,6 +135,7 @@
     cs-automation,
     mattpocock-skills,
     microvm,
+    hermes-agent,
     picktrace-nix-configurations,
     tuicr,
   }:
@@ -191,7 +195,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
+          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-home-manager-modules mattpocock-skills self;
         }
       );
 
