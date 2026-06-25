@@ -19,6 +19,7 @@
           41642  # tailscale for pt-docker-cjlarose guest
           41643  # tailscale for minecraft-mellowcatfe guest
           41644  # tailscale for media guest
+          41645  # tailscale for hermes guest
         ];
       };
       interfaces."microvm".allowedUDPPorts = [
@@ -54,6 +55,11 @@
           destination = "10.0.0.4:41644";
           proto = "udp";
           sourcePort = 41644;
+        }
+        {
+          destination = "10.0.0.5:41645";
+          proto = "udp";
+          sourcePort = 41645;
         }
       ];
     };
@@ -229,6 +235,31 @@
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/microvms/hermes/nix-rw-store" = {
+    device = "tank/microvms/hermes/nix-rw-store";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/hermes/ssh" = {
+    device = "tank/microvms/hermes/ssh";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/hermes/home" = {
+    device = "tank/microvms/hermes/home";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/hermes/tailscale" = {
+    device = "tank/microvms/hermes/tailscale";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/hermes/secrets" = {
+    device = "tank/microvms/hermes/secrets";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/hermes/hermes" = {
+    device = "tank/microvms/hermes/hermes";
+    fsType = "zfs";
+  };
+
   services.restic.backups = {
     minecraft-mellowcatfe = {
       initialize = true;
@@ -310,6 +341,7 @@
         hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIE/eSSGLl3ZFEAANiIJf0pXbvIKDM5ke5Ryf3ywvlZg hermes-deploy"
         ];
       };
     };

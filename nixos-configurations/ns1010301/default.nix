@@ -11,7 +11,10 @@
       microvm.vms."media" = {
         flake = self;
       };
-      microvm.autostart = [ "pt-docker-cjlarose" "minecraft-mellowcatfe" "media" ];
+      microvm.vms."hermes" = {
+        flake = self;
+      };
+      microvm.autostart = [ "pt-docker-cjlarose" "minecraft-mellowcatfe" "media" "hermes" ];
     })
     determinate.nixosModules.default
     (import ./disk-config.nix { inherit disko; })
