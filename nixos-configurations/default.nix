@@ -12,6 +12,7 @@
   nix-minecraft,
   mattpocock-skills,
   microvm,
+  hermes-agent,
   picktrace-nix-configurations,
   cjlarose-home-manager-modules,
   self,
@@ -86,6 +87,17 @@ let
         system = "x86_64-linux";
       };
       modules = [ ./media ];
+    };
+    "hermes" = nixpkgs-26-05.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit sharedOverlays additionalPackages microvm hermes-agent;
+        intranetHosts = additionalPackages."x86_64-linux".intranetHosts;
+        home-manager = home-manager-26-05;
+        stateVersion = "25.11";
+        system = "x86_64-linux";
+      };
+      modules = [ ./hermes ];
     };
     "splitpro" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
