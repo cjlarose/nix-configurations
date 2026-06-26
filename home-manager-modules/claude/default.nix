@@ -25,6 +25,17 @@ in
     '';
   };
 
+  options.cjlarose.claude.enablePlaywrightMcp = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Register the Playwright MCP server with Claude Code, using the pinned
+      pkgs.playwright-mcp build (chromium baked in via PLAYWRIGHT_BROWSERS_PATH,
+      so no runtime npx/network). Default off because it pulls a chromium
+      browser closure; enable only on hosts where browser automation is wanted.
+    '';
+  };
+
   options.cjlarose.claude.useNodeRuntime = lib.mkOption {
     type = lib.types.bool;
     default = false;
@@ -43,6 +54,18 @@ in
         if config.cjlarose.claude.useNodeRuntime
         then additionalPackages.${system}.claude-code-node
         else additionalPackages.${system}.claude-code;
+
+      # Pinned, self-contained Playwright MCP (chromium baked in via the
+      # package's PLAYWRIGHT_BROWSERS_PATH wrapper, so no runtime npx/network).
+      # Gated default-off so headless hosts don't pull the chromium closure.
+      # The HM module surfaces this as a .mcp.json in a generated plugin-dir
+      # wired onto claude-code via --plugin-dir.
+      mcpServers = lib.optionalAttrs config.cjlarose.claude.enablePlaywrightMcp {
+        playwright = {
+          type = "stdio";
+          command = "${pkgs.playwright-mcp}/bin/playwright-mcp";
+        };
+      };
 
       settings = {
         enabledPlugins = {
