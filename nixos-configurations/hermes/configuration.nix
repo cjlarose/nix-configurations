@@ -280,4 +280,26 @@ in
   home-manager.users.cjlarose = (import ../../home/cjlarose) {
     inherit system stateVersion additionalPackages;
   };
+
+  # The agent commits to git repos (e.g. the LLM wiki, nix-configurations) as the
+  # hermes user, so it needs a durable git author identity — without it, commits
+  # fail with "Author identity unknown". Set it via a minimal home-manager profile
+  # (matching how cjlarose's identity is managed fleet-wide), NOT the full
+  # home/cjlarose profile, which the agent doesn't need. home-manager writes this
+  # to ~/.config/git/config (XDG), which does NOT collide with the ~/.gitconfig
+  # that the ghAuthScript's `gh auth setup-git` writes the credential helper into —
+  # git reads both files.
+  home-manager.users.hermes = { ... }: {
+    home.stateVersion = stateVersion;
+    programs.git = {
+      enable = true;
+      userName = "Christopher La Rose";
+      userEmail = "cjlarose@gmail.com";
+      extraConfig = {
+        init.defaultBranch = "main";
+        pull.ff = "only";
+        push.autoSetupRemote = true;
+      };
+    };
+  };
 }
