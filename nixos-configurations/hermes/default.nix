@@ -61,5 +61,17 @@
       mountPoint = "/var/lib/hermes";
       proto = "virtiofs";
     }
+    {
+      tag = "persist-acme";
+      source = "acme";
+      mountPoint = "/var/lib/acme";
+      proto = "virtiofs";
+    }
+    {
+      tag = "persist-www";
+      source = "www";
+      mountPoint = "/var/www";
+      proto = "virtiofs";
+    }
   ];
 }

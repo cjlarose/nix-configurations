@@ -49,6 +49,9 @@ in
     # without depending on tailnet split-DNS for cjlarose.dev.
     extraHosts = builtins.readFile "${intranetHosts}/hosts";
     firewall.enable = true;
+    # Static file server (nginx) is reachable only over the tailnet — open 443
+    # on tailscale0 only, never on the microvm bridge or any public path.
+    firewall.interfaces.tailscale0.allowedTCPPorts = [ 443 ];
   };
 
   systemd.network.enable = true;
@@ -102,6 +105,84 @@ in
     openFirewall = true;
     port = 41645;
   };
+
+  # Static file server for bingy.mellowcatfe.com. Serves generated HTML out of
+  # /var/www (a dedicated persistent virtiofs share, tank/microvms/hermes/www)
+  # over the tailnet only. The webroot is a *separate* share from the agent's
+  # home (/var/lib/hermes, mode 0770) specifically so nginx (uid 60) can traverse
+  # and read it without loosening the agent's home or its secrets. The dir is
+  # owned hermes:nginx mode 2750 (setgid): the agent (hermes) writes generated
+  # pages as owner; nginx reads them via the nginx group.
+  #
+  # Public DNS (DigitalOcean A record) points bingy.mellowcatfe.com at this
+  # guest's *tailnet* IP (100.66.120.5), not ns1010301's public IP — so the site
+  # is reachable only by tailnet members (owner + anyone the node is shared with),
+  # the same "auth = tailnet reachability" model as jellyfin.cjlarose.dev. There is
+  # no app-layer auth.
+  #
+  # TLS: DNS-01 ACME (not HTTP-01) is mandatory here — a 100.x CGNAT address is not
+  # reachable from Let's Encrypt's HTTP validators, so only the DNS challenge can
+  # succeed. Reuses the fleet's DigitalOcean token (full-zone scope, also used by
+  # media/splitpro). Same idiom as splitpro's certs.
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "cjlarose@gmail.com";
+    certs."bingy.mellowcatfe.com" = {
+      dnsPropagationCheck = false;
+      dnsProvider = "digitalocean";
+      dnsResolver = "1.1.1.1:53";
+      domain = "bingy.mellowcatfe.com";
+      environmentFile = "/persistence/secrets/digitalocean.secret";
+    };
+  };
+
+  services.nginx = {
+    enable = true;
+    virtualHosts."bingy.mellowcatfe.com" = {
+      # Bind only to the tailnet IP so the static root is unreachable over the
+      # microvm bridge (10.0.0.0/24) or any other interface — belt-and-suspenders
+      # on top of the tailscale0-only firewall rule above.
+      listenAddresses = [ "100.66.120.5" ];
+      enableACME = true;
+      acmeRoot = null; # DNS-01: no HTTP webroot challenge directory
+      forceSSL = true;
+      root = "/var/www";
+      locations."/".extraConfig = ''
+        autoindex on;
+      '';
+    };
+  };
+
+  # nginx binds a fixed tailnet IP and reads its root + ACME-managed certs off
+  # virtiofs shares (/var/www, /var/lib/acme) that mount *after* system
+  # activation on this microvm (the documented activation-before-mount gotcha).
+  # Order nginx and the per-cert ACME units after the mounts exist and after
+  # tailscaled has assigned 100.66.120.5, so the listen address is bindable.
+  systemd.services.nginx = {
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
+    unitConfig.RequiresMountsFor = [ "/var/www" "/var/lib/acme" ];
+  };
+  systemd.services."acme-bingy.mellowcatfe.com".unitConfig.RequiresMountsFor = [ "/var/lib/acme" ];
+
+  # The /var/www webroot is a persistent virtiofs share owned hermes:nginx with
+  # setgid (2750) so the agent (hermes) writes generated pages as owner and nginx
+  # reads them via the nginx group. tmpfiles enforces ownership/mode each boot
+  # (RequiresMountsFor keeps it ordered after the share mounts). 'z' (not 'Z')
+  # so it only touches the top dir, not recursively every generated file.
+  systemd.tmpfiles.settings."10-bingy-www"."/var/www".z = {
+    user = "hermes";
+    group = "nginx";
+    mode = "2750";
+  };
+
+  # acme is dynamically allocated but owns the persistent /var/lib/acme certs
+  # (its own virtiofs share). /var/lib/nixos (the uid/gid map) lives on the
+  # impermanence-rolled-back root, so pin acme's ids to keep cert ownership stable
+  # across reboots — same approach splitpro/media use. Verify free with
+  # `getent passwd 995` / `getent group 993` on the guest if unsure.
+  users.users.acme.uid = 995;
+  users.groups.acme.gid = 993;
 
   programs.zsh.enable = true;
 
