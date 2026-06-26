@@ -67,11 +67,5 @@
       mountPoint = "/var/lib/acme";
       proto = "virtiofs";
     }
-    {
-      tag = "persist-www";
-      source = "www";
-      mountPoint = "/var/www";
-      proto = "virtiofs";
-    }
   ];
 }

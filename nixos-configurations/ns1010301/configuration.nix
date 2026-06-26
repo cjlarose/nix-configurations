@@ -263,10 +263,6 @@
     device = "tank/microvms/hermes/acme";
     fsType = "zfs";
   };
-  fileSystems."/var/lib/microvms/hermes/www" = {
-    device = "tank/microvms/hermes/www";
-    fsType = "zfs";
-  };
 
   services.restic.backups = {
     minecraft-mellowcatfe = {

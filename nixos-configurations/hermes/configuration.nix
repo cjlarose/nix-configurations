@@ -107,12 +107,22 @@ in
   };
 
   # Static file server for bingy.mellowcatfe.com. Serves generated HTML out of
-  # /var/www (a dedicated persistent virtiofs share, tank/microvms/hermes/www)
-  # over the tailnet only. The webroot is a *separate* share from the agent's
-  # home (/var/lib/hermes, mode 0770) specifically so nginx (uid 60) can traverse
-  # and read it without loosening the agent's home or its secrets. The dir is
-  # owned hermes:nginx mode 2750 (setgid): the agent (hermes) writes generated
-  # pages as owner; nginx reads them via the nginx group.
+  # /var/lib/hermes/www over the tailnet only. The webroot MUST live under
+  # /var/lib/hermes: the hermes-agent service runs the agent's terminal/file
+  # tools in a hardened mount namespace whose only writable path is its home
+  # (/var/lib/hermes) — every other path, including a dedicated share, is
+  # read-only *to the agent*, so the agent could not write generated pages
+  # anywhere else. (This was learned the hard way: a dedicated /srv/bingy share
+  # was rw in the real guest but read-only inside the agent sandbox.)
+  #
+  # The catch is traversal: /var/lib/hermes is mode 0770 hermes:hermes, so nginx
+  # (uid 60) can't even enter it to reach www/. Rather than loosen the home (it
+  # holds .hermes/.env secrets, .ssh, etc.), grant nginx a narrow POSIX ACL of
+  # traverse-only (--x) on /var/lib/hermes — enabled by the dataset's
+  # acltype=posix. --x lets nginx pass *through* to www/ but not list or read the
+  # home's other entries (which keep their own restrictive modes regardless).
+  # The www dir itself is hermes:nginx 2750 setgid so generated files inherit
+  # group nginx and are readable by the web server.
   #
   # Public DNS (DigitalOcean A record) points bingy.mellowcatfe.com at this
   # guest's *tailnet* IP (100.66.120.5), not ns1010301's public IP — so the site
@@ -146,34 +156,48 @@ in
       enableACME = true;
       acmeRoot = null; # DNS-01: no HTTP webroot challenge directory
       forceSSL = true;
-      root = "/var/www";
+      root = "/var/lib/hermes/www";
       locations."/".extraConfig = ''
         autoindex on;
       '';
     };
   };
 
-  # nginx binds a fixed tailnet IP and reads its root + ACME-managed certs off
-  # virtiofs shares (/var/www, /var/lib/acme) that mount *after* system
-  # activation on this microvm (the documented activation-before-mount gotcha).
-  # Order nginx and the per-cert ACME units after the mounts exist and after
-  # tailscaled has assigned 100.66.120.5, so the listen address is bindable.
+  # nginx binds a fixed tailnet IP and reads its root (under /var/lib/hermes) +
+  # ACME-managed certs (/var/lib/acme) off virtiofs shares that mount *after*
+  # system activation on this microvm (the activation-before-mount gotcha). Order
+  # nginx and the per-cert ACME units after the mounts exist and after tailscaled
+  # has assigned 100.66.120.5, so the listen address is bindable.
   systemd.services.nginx = {
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
-    unitConfig.RequiresMountsFor = [ "/var/www" "/var/lib/acme" ];
+    unitConfig.RequiresMountsFor = [ "/var/lib/hermes" "/var/lib/acme" ];
   };
   systemd.services."acme-bingy.mellowcatfe.com".unitConfig.RequiresMountsFor = [ "/var/lib/acme" ];
 
-  # The /var/www webroot is a persistent virtiofs share owned hermes:nginx with
-  # setgid (2750) so the agent (hermes) writes generated pages as owner and nginx
-  # reads them via the nginx group. tmpfiles enforces ownership/mode each boot
-  # (RequiresMountsFor keeps it ordered after the share mounts). 'z' (not 'Z')
-  # so it only touches the top dir, not recursively every generated file.
-  systemd.tmpfiles.settings."10-bingy-www"."/var/www".z = {
-    user = "hermes";
-    group = "nginx";
-    mode = "2750";
+  # Create the webroot (hermes:nginx 2750 setgid so generated files inherit the
+  # nginx group) and grant nginx traverse-only (--x) on the agent home so it can
+  # reach into www/. tmpfiles runs after the /var/lib/hermes mount.
+  #
+  # Serving works because: (1) setgid on www/ makes new files group=nginx;
+  # (2) the agent publishes pages via a shell redirect (umask 0007) so files land
+  # mode 0640 — group-readable by nginx. NOTE: do NOT publish with a tool that
+  # forces mode 0600 (the agent's write_file does) — a 0600 file zeroes the ACL
+  # mask and nginx 403s; write via the shell (printf/cat > file) instead. The
+  # default ACL below is belt-and-suspenders for group read on inherited entries.
+  systemd.tmpfiles.settings."10-bingy-www" = {
+    "/var/lib/hermes/www".d = {
+      user = "hermes";
+      group = "nginx";
+      mode = "2750";
+    };
+    # Default ACL: new entries under www/ carry nginx group r-x (backs up the
+    # setgid+umask path; ineffective if a writer forces mode 0600, see note above).
+    "/var/lib/hermes/www".a.argument = "d:g:nginx:r-x,d:m::r-x";
+    # POSIX ACL: append nginx traverse-only on the home dir (does not disturb the
+    # existing owner/group/other bits, and the home's sensitive subdirs keep their
+    # own modes so --x here exposes nothing but the path to www/).
+    "/var/lib/hermes".a.argument = "u:nginx:x";
   };
 
   # acme is dynamically allocated but owns the persistent /var/lib/acme certs
