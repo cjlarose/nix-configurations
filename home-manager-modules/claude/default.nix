@@ -51,6 +51,17 @@ in
     '';
   };
 
+  options.cjlarose.claude.remoteControlAtStartup = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Enable Remote Control for every new session at startup (the
+      remoteControlAtStartup setting). Default off; enabled on cjlarose's own
+      hosts via home/cjlarose/default.nix. Left off on pt-docker-cjlarose,
+      whose picktrace Claude subscription doesn't have Remote Control.
+    '';
+  };
+
   options.cjlarose.claude.useNodeRuntime = lib.mkOption {
     type = lib.types.bool;
     default = false;
@@ -99,6 +110,7 @@ in
           path = "${config.home.homeDirectory}/.claude/lsp-marketplace";
         };
         skipDangerousModePermissionPrompt = true;
+        remoteControlAtStartup = config.cjlarose.claude.remoteControlAtStartup;
         effortLevel = "medium";
         autoMemoryEnabled = false;
         env = {

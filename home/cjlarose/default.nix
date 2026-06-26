@@ -4,6 +4,7 @@
   cjlarose.claude.mattpocock-skills = mattpocock-skills;
   cjlarose.claude.llm-wiki-path = llm-wiki-path;
   cjlarose.claude.useNodeRuntime = claudeUseNodeRuntime;
+  cjlarose.claude.remoteControlAtStartup = true;
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
