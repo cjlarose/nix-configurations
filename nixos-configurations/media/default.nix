@@ -17,13 +17,24 @@
   microvm.storeOnDisk = false;
   microvm.writableStoreOverlay = "/nix/.rw-store";
 
-  microvm.volumes = [{
-    image = "docker.img";
-    mountPoint = "/var/lib/docker";
-    size = 65536; # 64 GiB
-    fsType = "xfs";
-    label = "docker";
-  }];
+  microvm.volumes = [
+    {
+      image = "docker.img";
+      mountPoint = "/var/lib/docker";
+      size = 65536; # 64 GiB
+      fsType = "xfs";
+      label = "docker";
+    }
+    # Disk-backed /tmp so nix build scratch spills to disk instead of the
+    # RAM-backed tmpfs root. Sparse image: costs only what's used.
+    {
+      image = "tmp.img";
+      mountPoint = "/tmp";
+      size = 32768; # 32 GiB
+      fsType = "ext4";
+      label = "tmp";
+    }
+  ];
 
   microvm.shares = [
     {

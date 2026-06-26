@@ -28,6 +28,19 @@
 
   system.stateVersion = stateVersion;
 
+  # Compressed RAM-backed swap — cushions bursty memory spikes into compressed
+  # RAM rather than OOM-killing. zstd backs ~2-3x its real RAM cost.
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
+
+  # /tmp is a disk-backed block volume (see default.nix), not the RAM tmpfs root.
+  # Clear it on boot to keep the tmpfs-style clear-on-reboot semantics (and set
+  # the 1777 perms a freshly-formatted /tmp lacks).
+  boot.tmp.cleanOnBoot = true;
+
   nixpkgs.overlays = sharedOverlays;
 
   security.sudo.wheelNeedsPassword = false;

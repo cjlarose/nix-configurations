@@ -18,6 +18,16 @@
   microvm.storeOnDisk = false;
   microvm.writableStoreOverlay = "/nix/.rw-store";
 
+  # Disk-backed /tmp so nix build scratch spills to disk instead of the
+  # RAM-backed tmpfs root. Sparse image: costs only what's used.
+  microvm.volumes = [{
+    image = "tmp.img";
+    mountPoint = "/tmp";
+    size = 32768; # 32 GiB
+    fsType = "ext4";
+    label = "tmp";
+  }];
+
   microvm.shares = [
     {
       tag = "ro-store";
