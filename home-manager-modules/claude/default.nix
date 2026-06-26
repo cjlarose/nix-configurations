@@ -6,6 +6,21 @@ let
     runtimeInputs = [ pkgs.jq pkgs.gawk ];
     text = builtins.readFile ./claude-code-statusline.sh;
   };
+
+  # playwright-mcp 0.0.69 ignores the PLAYWRIGHT_MCP_BROWSER env var that
+  # nixpkgs sets, so it falls back to the "chrome" channel and tries to
+  # provision a chrome-for-testing build by writing into its (read-only) Nix
+  # store browsers path — which fails with ENOENT/mkdir. Point it explicitly at
+  # the nix-provided chromium instead (the same playwright-driver.browsers
+  # derivation the upstream wrapper already exports, so versions stay in sync).
+  # The chromium revision is globbed at runtime to survive nixpkgs bumps.
+  # Headless because this targets displayless hosts; isolated keeps the profile
+  # in memory.
+  playwrightMcp = pkgs.writeShellScriptBin "playwright-mcp-chromium" ''
+    chrome=( ${pkgs.playwright-driver.browsers}/chromium-*/chrome-linux*/chrome )
+    exec ${pkgs.playwright-mcp}/bin/playwright-mcp \
+      --headless --isolated --executable-path "''${chrome[0]}" "$@"
+  '';
 in
 {
   options.cjlarose.claude.mattpocock-skills = lib.mkOption {
@@ -59,11 +74,12 @@ in
       # package's PLAYWRIGHT_BROWSERS_PATH wrapper, so no runtime npx/network).
       # Gated default-off so headless hosts don't pull the chromium closure.
       # The HM module surfaces this as a .mcp.json in a generated plugin-dir
-      # wired onto claude-code via --plugin-dir.
+      # wired onto claude-code via --plugin-dir. Uses the chromium-pinned
+      # wrapper above so the browser actually launches (see its comment).
       mcpServers = lib.optionalAttrs config.cjlarose.claude.enablePlaywrightMcp {
         playwright = {
           type = "stdio";
-          command = "${pkgs.playwright-mcp}/bin/playwright-mcp";
+          command = "${playwrightMcp}/bin/playwright-mcp-chromium";
         };
       };
 
