@@ -291,8 +291,8 @@ in
     home.stateVersion = stateVersion;
     programs.git = {
       enable = true;
-      userName = "Christopher La Rose";
-      userEmail = "cjlarose@gmail.com";
+      userName = "Bingus Bongus";
+      userEmail = "bingy@cjlarose.dev";
       extraConfig = {
         init.defaultBranch = "main";
         pull.ff = "only";
