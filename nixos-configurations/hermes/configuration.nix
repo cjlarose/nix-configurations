@@ -34,6 +34,27 @@ let
     printf %s "$token" | gh auth login --with-token
     gh auth setup-git
   '';
+
+  # Fail-closed allowlist guard. hermes-agent 0.17.0 treats an EMPTY user+role
+  # allowlist as "single-tenant, all guild members trusted" (adapter.py
+  # _is_allowed_user: `if not has_users and not has_roles: return True`). If
+  # /persistence/secrets/hermes.env ever fails to materialize with an allowlist
+  # — e.g. a bad secret mount — the gateway would silently open to every guild
+  # member. Refuse to start instead. Only trips when BOTH lists are empty (the
+  # exact condition that triggers the open default); a normal config sails through.
+  hermesEnvGuard = pkgs.writeShellScript "hermes-env-guard" ''
+    set -euo pipefail
+    export PATH=${lib.makeBinPath [ pkgs.gnugrep pkgs.coreutils ]}:$PATH
+    env_file=/var/lib/hermes/.hermes/.env
+    users=$(grep -m1 '^DISCORD_ALLOWED_USERS=' "$env_file" | cut -d= -f2- || true)
+    roles=$(grep -m1 '^DISCORD_ALLOWED_ROLES=' "$env_file" | cut -d= -f2- || true)
+    if [ -z "$users" ] && [ -z "$roles" ]; then
+      echo "FATAL: DISCORD_ALLOWED_USERS and DISCORD_ALLOWED_ROLES both empty in $env_file." >&2
+      echo "Refusing to start: empty allowlist = all guild members trusted." >&2
+      exit 1
+    fi
+    echo "[hermes-env-guard] allowlist present (users=''${users:+set} roles=''${roles:+set}); continuing."
+  '';
 in
 {
 
@@ -267,6 +288,9 @@ in
     serviceConfig.ExecStartPre = lib.mkAfter [
       "+${pkgs.coreutils}/bin/install -D -o hermes -g hermes -m 0600 /persistence/secrets/hermes.env /var/lib/hermes/.hermes/.env"
       "+${pkgs.coreutils}/bin/install -D -o hermes -g hermes -m 0600 ${hermesConfigYaml} /var/lib/hermes/.hermes/config.yaml"
+      # Fail-closed allowlist check — runs as hermes (owns the 0600 .env),
+      # after the install above, no `-` prefix so an empty allowlist is fatal.
+      "${hermesEnvGuard}"
       # Runs as the hermes user (no `+`) after .env is installed; `-` makes a
       # missing/invalid token non-fatal so it never blocks the gateway.
       "-${ghAuthScript}"
