@@ -152,8 +152,6 @@ in
         };
       });
 
-      memory.text = lib.mkBefore (builtins.readFile ./CLAUDE.md);
-
       # Skills authored in this repo, deployed via the upstream
       # programs.claude-code.skills option (key = bare skill directory name,
       # value = its SKILL.md; never append /SKILL — that double-nests post
@@ -171,8 +169,6 @@ in
     home.packages = [ pkgs.nixd ];
 
     home.file = {
-      "agent-docs/neovim-integration.md".source = ./agent-docs/neovim-integration.md;
-
       # Local LSP plugin marketplace consumed via settings.extraKnownMarketplaces
       # + enabledPlugins above. Ships nixd as the Nix language server.
       ".claude/lsp-marketplace/.claude-plugin/marketplace.json".text = builtins.toJSON {
