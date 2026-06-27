@@ -247,10 +247,9 @@ in
 
   # Pin the hermes uid/gid. The agent persists state under /var/lib/hermes (a
   # ZFS-backed virtiofs share), so a stable uid keeps ownership consistent across
-  # rebuilds — the same reason media pins jellyfin to 998:998. It also lets the
-  # host chown the deploy key to a known uid so the in-guest hermes user can read
-  # it (Task 5 Step 2). 994 is below NixOS's auto-allocation range; verify it's
-  # free with `getent passwd 994` on the guest if unsure.
+  # rebuilds — the same reason media pins jellyfin to 998:998. 994 is below NixOS's
+  # auto-allocation range; verify it's free with `getent passwd 994` on the guest
+  # if unsure.
   users.users.hermes.uid = 994;
   users.groups.hermes.gid = 994;
 
