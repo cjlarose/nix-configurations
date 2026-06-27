@@ -9,6 +9,12 @@ Add downloaded media from the transmission completed directory to the Jellyfin l
 
 This runs on **ns1010301** (the microvm host). ffmpeg is not installed — use `nix-shell -p ffmpeg` to get it.
 
+> **Reference knowledge for this skill lives in the LLM wiki** — query it (the index is injected at session start; use `wiki-query`):
+> - **`[[Jellyfin]]`** — the full client codec / direct-play matrix (macOS Media Player vs. web browser, verified against jellyfin.org) and the library naming convention.
+> - **`[[Media Microvm]]`** — the host↔guest virtiofs dual-path layout, the `998:998` ownership rule, and the `jellyfin-refresh` mechanism.
+>
+> This skill keeps only the operational paths, commands, and decision heuristic; consult those pages for the why.
+
 ## Paths
 
 All paths are on the media microvm's virtiofs-mounted storage, accessible from the host at `/var/lib/microvms/media/media/`:
@@ -33,18 +39,12 @@ Report the following to the user:
 - **Subtitles**: whether they exist, how many tracks, and their format (SRT/subrip = text-based, PGS/hdmv_pgs_subtitle = bitmap-based)
 - **Direct play assessment**: whether the file is likely to direct play without transcoding
 
-### Direct play compatibility (macOS Jellyfin Media Player)
+### Decision heuristic
 
-The macOS desktop client (Jellyfin Media Player) has broad codec support:
-- **Video**: H.264, H.265/HEVC (8-bit and 10-bit), VP9, AV1 all direct play.
-- **Audio**: All formats direct play, including AAC, EAC3, AC3, DTS, DTS-HD MA, TrueHD, FLAC, and Opus.
-- **Containers**: MKV, MP4, WebM, TS all supported.
-- **Subtitles**: SRT, ASS/SSA, PGS, VobSub all render natively without server-side transcoding.
-- **Bitrate**: Under ~15 Mbps for reliable streaming over the network.
+Full per-client support is in the `[[Jellyfin]]` codec / direct-play matrix — query the wiki for it. The short rule:
 
-Transcoding is mainly needed for high-bitrate BluRay remuxes (30+ Mbps) that exceed the available network bandwidth. If bitrate is acceptable, prefer symlinking over transcoding.
-
-**Web browser clients** are more limited: no MKV containers in Firefox (will remux), no DTS audio, limited H.265 support. If users will stream from a browser, transcoding audio to AAC and using MP4 containers may be needed.
+- **macOS Jellyfin Media Player** direct-plays almost everything (all common video/audio/subtitle codecs) → **prefer symlinking**. Transcode only when bitrate exceeds the ~15 Mbps network ceiling (high-bitrate BluRay remuxes, 30+ Mbps).
+- **Web browser clients** are limited (Firefox won't play MKV, no DTS/TrueHD) → if the target is a browser, transcode audio to AAC and use an MP4 container.
 
 ## Step 2a: Symlink (if direct-playable)
 

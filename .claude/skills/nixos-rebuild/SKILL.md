@@ -9,6 +9,11 @@ Apply nix-configurations changes to ns1010301 and its microvm guests. Run from t
 
 Switching the host config does **not** restart microvms — it only activates host-level changes. The switch output lists changed-but-not-restarted guest units. For each, the user picks how to bring it up to parity: full system switch in-place, home-manager switch only, restart, or skip. The first two avoid downtime because the guest's `/nix/store` is a virtiofs share — closure files are already on disk; only the guest's nix DB needs to learn about them.
 
+> **Reference knowledge for this skill lives in the LLM wiki** — query it (`wiki-query`; the index is injected at session start) for the why behind these mechanics:
+> - **`[[Microvm No-Downtime Activation]]`** — why a host switch doesn't restart guests, and the `nix-store --dump-db`/`--load-db` closure-sync recipe (Steps 3–4) including the CRLF-corruption-via-`sudo`-pty gotcha.
+> - **`[[Private Flake Inputs and nixos-rebuild as Root]]`** — the full treatment of the git+ssh-input-as-root problem and every fix (see Step 1).
+> - **`[[NixOS Host Upgrade Process]]`** — the version-bump runbook this skill is the everyday subset of.
+
 ## Step 1: rebuild the host
 
 ```sh
@@ -17,19 +22,29 @@ ROLLBACK_PATH="$(readlink -f /nix/var/nix/profiles/system)"
 sudo nixos-rebuild switch --flake .#ns1010301
 ```
 
-If a flake input is fetched over `git+ssh` (e.g. `picktrace-nix-configurations`), root's `~/.ssh/known_hosts` may lack the host key. Pre-build as the unprivileged user first so the fetch is cached:
+**Private `git+ssh` inputs that root can't fetch.** `sudo nixos-rebuild` re-evaluates the flake **as root**, which lacks the deploy key / `known_hosts` for private inputs (e.g. `picktrace-nix-configurations`, `cjlarose-llm-wiki`, the transitive `picktrace/cjlarose-llm-wiki`). For an **already-locked** input, pre-building as the user first is enough — root reuses the realized store path:
 
 ```sh
 nix build .#nixosConfigurations.ns1010301.config.system.build.toplevel --no-link
 sudo nixos-rebuild switch --flake .#ns1010301
 ```
 
-To build with unpushed changes in a guest flake, override its input to a local path:
+For a **brand-new** private input root has never evaluated, the pre-build does **not** help (root still re-fetches the *input* at eval time). Two routes — full detail and trade-offs in `[[Private Flake Inputs and nixos-rebuild as Root]]`:
 
-```sh
-sudo nixos-rebuild switch --flake .#ns1010301 \
-  --override-input <input-name> path:<local-path>
-```
+- **Simplest — skip root eval entirely:** build the toplevel as the user, then activate without `nixos-rebuild`:
+  ```sh
+  TOP=$(nix build .#nixosConfigurations.ns1010301.config.system.build.toplevel --no-link --print-out-paths)
+  sudo nix-env -p /nix/var/nix/profiles/system --set "$TOP"
+  sudo "$TOP/bin/switch-to-configuration" switch
+  ```
+- **Or override the private input(s)** so root never fetches them. When **several** private inputs are present, overriding one busts the eval cache and forces root to re-fetch the *others* too — so override them all. Point each at its worktree **only if that worktree is at the locked rev** (content-identical); otherwise point at the already-fetched in-store source (`nix flake archive --json` → its `…-source` path) to stay content-identical without disturbing the worktree:
+  ```sh
+  sudo nixos-rebuild switch --flake .#ns1010301 \
+    --override-input cjlarose-llm-wiki path:/nix/store/<hash>-source \
+    --override-input picktrace-nix-configurations/cjlarose-llm-wiki path:/nix/store/<hash>-source
+  ```
+
+To build with unpushed changes in a guest flake, override its input to a local path the same way (`--override-input <input-name> path:<local-path>`).
 
 ## Step 2: handle changed-but-not-restarted microvms
 
