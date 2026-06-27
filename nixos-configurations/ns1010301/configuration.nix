@@ -345,7 +345,6 @@
         hashedPassword = "$6$YLrfXTwu61JGE.v8$kR5ZdMso2lcnyy7s7GXkIb.kLDyQ2UW3aDyGerQYni96g2kPC1MIY48Y9Q3SdYe2ycuVCrKgH6DlOjUUsK02s0";
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIE/eSSGLl3ZFEAANiIJf0pXbvIKDM5ke5Ryf3ywvlZg hermes-deploy"
         ];
       };
     };
