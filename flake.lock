@@ -78,11 +78,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782529163,
-        "narHash": "sha256-mayAdmcpsTJ5mmc2jeQp4To4ez2NbETpHzYEfVTmanM=",
+        "lastModified": 1782541794,
+        "narHash": "sha256-ZB4jW39ERsw5dy6iXuX83VnZ/dL7I48CvAERzipJrJE=",
         "ref": "refs/heads/main",
-        "rev": "63f774e45e78bfd98cf4a0d15bdcb06ce023129a",
-        "revCount": 14,
+        "rev": "60deae04a7746bdce811fef7774fee9694d701ff",
+        "revCount": 26,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/cjlarose-llm-wiki"
       },
@@ -1246,11 +1246,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1782539656,
-        "narHash": "sha256-CD8LZcnMgiG5Z0I2uC2OUDpJVfETH8ocBMTomdw6NWg=",
+        "lastModified": 1782543833,
+        "narHash": "sha256-khAVSHZYcvjqEBZMe01UFr1OasOcqx2Or+00U3/rMYQ=",
         "ref": "refs/heads/main",
-        "rev": "e42c3eeabb187e4e9a9c3e4380c03ba1ba0e150f",
-        "revCount": 302,
+        "rev": "6ae74651d6e30e36d14bbcce6e33ebc7d4130f90",
+        "revCount": 303,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
