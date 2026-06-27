@@ -113,6 +113,10 @@ in
         remoteControlAtStartup = config.cjlarose.claude.remoteControlAtStartup;
         effortLevel = "medium";
         autoMemoryEnabled = false;
+        # Keep session transcripts effectively forever (default is 30 days, which
+        # silently garbage-collects ~/.claude/projects history). These transcripts
+        # are the source for llm-wiki backfill/capture, so retention matters.
+        cleanupPeriodDays = 3650;
         env = {
           CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
         };
