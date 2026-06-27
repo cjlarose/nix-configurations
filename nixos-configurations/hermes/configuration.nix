@@ -1,4 +1,4 @@
-{ pkgs, config, lib, sharedOverlays, stateVersion, system, additionalPackages, home-manager, intranetHosts, ... }:
+{ pkgs, config, lib, sharedOverlays, stateVersion, system, additionalPackages, home-manager, ... }:
 
 let
   # Hermes config rendered to config.yaml. Defined here so the same value feeds
@@ -44,10 +44,6 @@ in
   networking = {
     hostName = "hermes";
     useNetworkd = true;
-    # Resolve the fleet's *.cjlarose.dev FQDNs to their tailnet IPs locally (same
-    # pattern as edge-lax), so Hermes can SSH-deploy targets by name over Tailscale
-    # without depending on tailnet split-DNS for cjlarose.dev.
-    extraHosts = builtins.readFile "${intranetHosts}/hosts";
     firewall.enable = true;
     # Static file server (nginx) is reachable only over the tailnet — open 443
     # on tailscale0 only, never on the microvm bridge or any public path.
@@ -245,7 +241,7 @@ in
     addToSystemPackages = true;
     extraDependencyGroups = [ "messaging" "anthropic" ];
     environmentFiles = [ "/persistence/secrets/hermes.env" ];
-    extraPackages = with pkgs; [ gh git openssh nixos-rebuild ];
+    extraPackages = with pkgs; [ gh git ];
     settings = hermesSettings;
   };
 
@@ -278,16 +274,6 @@ in
       "-${ghAuthScript}"
     ];
   };
-
-  # Hermes deploys the whole fleet (host + guests) from ns1010301 itself, so it
-  # only needs SSH access to the host as cjlarose. Guests are deployed on the
-  # host via nixos-rebuild, matching how the fleet is normally operated.
-  programs.ssh.extraConfig = ''
-    Host ns1010301.cjlarose.dev
-      User cjlarose
-      IdentityFile /persistence/secrets/hermes_deploy_ed25519
-      IdentitiesOnly yes
-  '';
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
