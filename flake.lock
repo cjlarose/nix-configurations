@@ -53,6 +53,26 @@
     "cjlarose-llm-wiki": {
       "inputs": {
         "nixpkgs": [
+          "nixpkgs-26-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782542557,
+        "narHash": "sha256-/SxUQNq5dz1Q1skmJxlwAFpk646lFy9wTihXEqiYNvI=",
+        "ref": "refs/heads/main",
+        "rev": "4104f91f03d392813f9d0604f4c2641ff62ca533",
+        "revCount": 77,
+        "type": "git",
+        "url": "ssh://git@github.com/cjlarose/llm-wiki"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/cjlarose/llm-wiki"
+      }
+    },
+    "cjlarose-llm-wiki_2": {
+      "inputs": {
+        "nixpkgs": [
           "picktrace-nix-configurations",
           "nixpkgs-26-05"
         ]
@@ -1205,7 +1225,7 @@
       "inputs": {
         "cjlarose-darwin-modules": "cjlarose-darwin-modules",
         "cjlarose-home-manager-modules": "cjlarose-home-manager-modules",
-        "cjlarose-llm-wiki": "cjlarose-llm-wiki",
+        "cjlarose-llm-wiki": "cjlarose-llm-wiki_2",
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
@@ -1330,6 +1350,7 @@
     "root": {
       "inputs": {
         "bundix": "bundix",
+        "cjlarose-llm-wiki": "cjlarose-llm-wiki",
         "cs-automation": "cs-automation",
         "determinate": "determinate",
         "disko": "disko",

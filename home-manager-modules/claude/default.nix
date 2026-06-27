@@ -29,17 +29,6 @@ in
     description = "Path to the mattpocock/skills repository source.";
   };
 
-  options.cjlarose.claude.llm-wiki-path = lib.mkOption {
-    type = lib.types.nullOr lib.types.str;
-    default = null;
-    description = ''
-      Absolute path to a local llm-wiki working tree. When set, exports
-      LLM_WIKI_PATH and out-of-store-symlinks the repo's wiki-capture,
-      wiki-query, and wiki-ingest skills under ~/.claude/skills/ so edits
-      in the working tree are visible without a home-manager rebuild.
-    '';
-  };
-
   options.cjlarose.claude.enablePlaywrightMcp = lib.mkOption {
     type = lib.types.bool;
     default = false;
@@ -126,30 +115,10 @@ in
           type = "command";
           command = "${claudeCodeStatusline}/bin/claude-code-statusline";
         };
-      } // lib.optionalAttrs (config.cjlarose.claude.llm-wiki-path != null) (let
-        injector = "${config.cjlarose.claude.llm-wiki-path}/.claude/hooks/inject-wiki-index.sh";
-      in {
-        # Surface the llm-wiki index at the start of every session so the model
-        # knows what the wiki covers and can use wiki-query proactively. The
-        # script self-guards on a missing index.md; the command additionally
-        # tolerates the script file itself being absent (e.g. an older wiki
-        # checkout at this path, or a stale llm-wiki-path), staying a silent
-        # no-op instead of erroring on every session start. Gated on the same
-        # option as the LLM_WIKI_PATH export and the wiki skill symlinks.
-        hooks = {
-          SessionStart = [
-            {
-              matcher = "startup|resume|clear|compact";
-              hooks = [
-                {
-                  type = "command";
-                  command = ''if [ -x "${injector}" ]; then exec "${injector}"; fi'';
-                }
-              ];
-            }
-          ];
-        };
-      });
+        # The llm-wiki SessionStart index hook, LLM_WIKI_PATH, and the
+        # wiki-capture/query/ingest skills are now provided by the wiki flake's
+        # own home-manager module (programs.llmWiki), not this shared module.
+      };
 
       # Skills authored in this repo, deployed via the upstream
       # programs.claude-code.skills option (key = bare skill directory name,
@@ -159,10 +128,6 @@ in
         "launch-remote-session" = ./skills/launch-remote-session/SKILL.md;
       };
 
-    };
-
-    home.sessionVariables = lib.optionalAttrs (config.cjlarose.claude.llm-wiki-path != null) {
-      LLM_WIKI_PATH = config.cjlarose.claude.llm-wiki-path;
     };
 
     home.packages = [ pkgs.nixd ];
@@ -197,15 +162,6 @@ in
     in {
       ".claude/skills/handoff" = { source = "${src}/skills/productivity/handoff"; recursive = true; };
       ".claude/skills/grill-me" = { source = "${src}/skills/productivity/grill-me"; recursive = true; };
-    }) // lib.optionalAttrs (config.cjlarose.claude.llm-wiki-path != null) (let
-      src = config.cjlarose.claude.llm-wiki-path;
-    in {
-      ".claude/skills/wiki-capture".source =
-        config.lib.file.mkOutOfStoreSymlink "${src}/skills/wiki-capture";
-      ".claude/skills/wiki-query".source =
-        config.lib.file.mkOutOfStoreSymlink "${src}/skills/wiki-query";
-      ".claude/skills/wiki-ingest".source =
-        config.lib.file.mkOutOfStoreSymlink "${src}/skills/wiki-ingest";
     });
   };
 }

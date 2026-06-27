@@ -1,10 +1,15 @@
-{ system, additionalPackages, stateVersion, mattpocock-skills ? null, llm-wiki-path ? null, claudeUseNodeRuntime ? false }:
-{ pkgs, ... }: {
+{ system, additionalPackages, stateVersion, mattpocock-skills ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
+{ pkgs, lib, ... }: {
   _module.args = { inherit additionalPackages system; };
   cjlarose.claude.mattpocock-skills = mattpocock-skills;
-  cjlarose.claude.llm-wiki-path = llm-wiki-path;
   cjlarose.claude.useNodeRuntime = claudeUseNodeRuntime;
   cjlarose.claude.remoteControlAtStartup = true;
+
+  # The llm-wiki flake exports a home-manager module (programs.llmWiki) that
+  # owns the wiki's skills + index hook as store copies. Both the module and the
+  # programs.llmWiki definition it declares are added only where the wiki is
+  # threaded in (ns1010301) — defining programs.llmWiki on a host that didn't
+  # import the module would be an "option does not exist" error, mkIf or not.
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
@@ -12,6 +17,9 @@
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/claude
     ../../home-manager-modules/opencode
+  ] ++ lib.optionals (llm-wiki-module != null) [
+    llm-wiki-module
+    { programs.llmWiki = lib.mkIf (llm-wiki-path != null) { enable = true; path = llm-wiki-path; }; }
   ];
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
