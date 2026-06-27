@@ -96,7 +96,6 @@ in
 
       settings = {
         enabledPlugins = {
-          "superpowers@claude-plugins-official" = true;
           # nixd Nix language server, provided by the local marketplace below.
           "nixd@cjlarose-lsps" = true;
         };
