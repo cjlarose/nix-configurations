@@ -50,6 +50,27 @@
         "type": "github"
       }
     },
+    "cjlarose-llm-wiki": {
+      "inputs": {
+        "nixpkgs": [
+          "picktrace-nix-configurations",
+          "nixpkgs-26-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782522353,
+        "narHash": "sha256-8QrT+k8VhJJv5WGL5L1BERB6wCcirNSXKvayLK5Trs4=",
+        "ref": "refs/heads/main",
+        "rev": "ba27038f684c640100176a21670e6224df314843",
+        "revCount": 9,
+        "type": "git",
+        "url": "ssh://git@github.com/picktrace/cjlarose-llm-wiki"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/picktrace/cjlarose-llm-wiki"
+      }
+    },
     "cs-automation": {
       "inputs": {
         "nixpkgs": "nixpkgs"
@@ -1184,6 +1205,7 @@
       "inputs": {
         "cjlarose-darwin-modules": "cjlarose-darwin-modules",
         "cjlarose-home-manager-modules": "cjlarose-home-manager-modules",
+        "cjlarose-llm-wiki": "cjlarose-llm-wiki",
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
@@ -1204,11 +1226,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1782518133,
-        "narHash": "sha256-X1b8Vnbt//Yzz0wZXiuc411MHoDiWGXRQ1CNci/I/XQ=",
+        "lastModified": 1782522561,
+        "narHash": "sha256-/krvidahtwT8aIAmVRZICtiZLgmPt9CZbo63bxd2NdQ=",
         "ref": "refs/heads/main",
-        "rev": "8327a6702f6074cfaadbc7b43ecbde5a1e1bb77b",
-        "revCount": 294,
+        "rev": "3c9dff9a0b065fc35f25b22fbb50d332f493891d",
+        "revCount": 295,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
