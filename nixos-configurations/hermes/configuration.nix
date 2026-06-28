@@ -5,7 +5,10 @@ let
   # both `services.hermes-agent.settings` and the ExecStartPre that re-materializes
   # config.yaml at service start (see the systemd block below for why).
   hermesSettings = {
-    model.default = "anthropic/claude-opus-4-8";
+    model.default = "anthropic/claude-sonnet-4-6";
+    # Trim thinking-token spend; medium is the cost/quality sweet spot for a
+    # low-volume conversational bot. Levels: none|minimal|low|medium|high|xhigh.
+    agent.reasoning_effort = "medium";
     toolsets = [ "all" ];
     terminal.backend = "local";
     # One shared transcript per channel (not per-user), so the agent sees
