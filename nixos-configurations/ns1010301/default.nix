@@ -65,10 +65,19 @@
     {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.cjlarose = (import ../../home/cjlarose) {
-        inherit system stateVersion additionalPackages mattpocock-skills;
-        llm-wiki-path = "/home/cjlarose/worktrees/cjlarose/llm-wiki/default";
-        llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
+      home-manager.users.cjlarose = {
+        imports = [
+          ((import ../../home/cjlarose) {
+            inherit system stateVersion additionalPackages mattpocock-skills;
+            llm-wiki-path = "/home/cjlarose/worktrees/cjlarose/llm-wiki/default";
+            llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
+          })
+        ];
+        # Browser automation for cjlarose's sessions on this host. The shared
+        # home/cjlarose profile defaults enablePlaywrightMcp off so the chromium
+        # closure only lands where it's wanted; scope the enable to ns1010301
+        # here rather than in home/cjlarose (which fans out to every linux host).
+        cjlarose.claude.enablePlaywrightMcp = true;
       };
       home-manager.users.picktrace = picktrace-nix-configurations.homeManagerModules.picktrace-cjlarose;
       home-manager.extraSpecialArgs = {
