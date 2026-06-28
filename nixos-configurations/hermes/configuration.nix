@@ -286,7 +286,11 @@ in
   systemd.services.hermes-agent = {
     unitConfig.RequiresMountsFor = [ "/persistence/secrets" "/var/lib/hermes" ];
     serviceConfig.ExecStartPre = lib.mkAfter [
-      "+${pkgs.coreutils}/bin/install -D -o hermes -g hermes -m 0600 /persistence/secrets/hermes.env /var/lib/hermes/.hermes/.env"
+      # root-owned so the hermes user (the agent) cannot rewrite its own env.
+      # 0640 + group hermes = the gateway, gh-auth, and env-guard can READ it;
+      # only root (this ExecStartPre, run via `+`) writes it. Source stays the
+      # root-only /persistence/secrets/hermes.env that hermes can't touch.
+      "+${pkgs.coreutils}/bin/install -D -o root -g hermes -m 0640 /persistence/secrets/hermes.env /var/lib/hermes/.hermes/.env"
       "+${pkgs.coreutils}/bin/install -D -o hermes -g hermes -m 0600 ${hermesConfigYaml} /var/lib/hermes/.hermes/config.yaml"
       # Fail-closed allowlist check — runs as hermes (owns the 0600 .env),
       # after the install above, no `-` prefix so an empty allowlist is fatal.
