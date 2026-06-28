@@ -6,10 +6,11 @@
   cjlarose.claude.remoteControlAtStartup = true;
   cjlarose.claude.phxWorkflow.enable = true;
 
-  # Hardened lavish-axi CLI + its Lavish Editor Claude skill. Package threaded
-  # from the lavish-axi flake input (via additionalPackages).
-  cjlarose.lavish.enable = true;
-  cjlarose.lavish.package = additionalPackages.${system}.lavish-axi;
+  # The cjlarose.lavish module is imported below so the option exists on every
+  # cjlarose host, but it defaults off here: lavish-axi is a real Node CLI + a
+  # browser review tool, useful only on interactive hosts, so the enable is
+  # scoped to ns1010301 in nixos-configurations/ns1010301/default.nix (the same
+  # host-scoping pattern as cjlarose.claude.enablePlaywrightMcp).
 
   # The llm-wiki flake exports a home-manager module (programs.llmWiki) that
   # owns the wiki's skills + index hook as store copies. Both the module and the
