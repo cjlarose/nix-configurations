@@ -125,7 +125,8 @@ in
       # value = its SKILL.md; never append /SKILL — that double-nests post
       # home-manager #8770). Output: ~/.claude/skills/<name>/SKILL.md.
       skills = {
-        "launch-remote-session" = ./skills/launch-remote-session/SKILL.md;
+        # launch-remote-session moved into the LLM wiki (skills/), deployed via
+        # programs.llmWiki where the wiki is present (cjlarose@ns1010301).
       };
 
     };
