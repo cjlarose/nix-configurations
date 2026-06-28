@@ -10,6 +10,7 @@
       karabiner = import ./karabiner.nix;
       _1password = import ./_1password.nix;
       claude = import ./claude;
+      phx-workflow = import ./phx-workflow;
       opencode = import ./opencode;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;

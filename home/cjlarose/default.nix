@@ -4,6 +4,7 @@
   cjlarose.claude.mattpocock-skills = mattpocock-skills;
   cjlarose.claude.useNodeRuntime = claudeUseNodeRuntime;
   cjlarose.claude.remoteControlAtStartup = true;
+  cjlarose.claude.phxWorkflow.enable = true;
 
   # The llm-wiki flake exports a home-manager module (programs.llmWiki) that
   # owns the wiki's skills + index hook as store copies. Both the module and the
@@ -16,6 +17,7 @@
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/claude
+    ../../home-manager-modules/phx-workflow
     ../../home-manager-modules/opencode
   ] ++ lib.optionals (llm-wiki-module != null) [
     llm-wiki-module
