@@ -1608,16 +1608,16 @@
         "utils": "utils_2"
       },
       "locked": {
-        "lastModified": 1782590126,
-        "narHash": "sha256-S6AcAbj7aOAGH4hARgHluv094WKajVlF7C43htokOhs=",
+        "lastModified": 1782677584,
+        "narHash": "sha256-o6PuxtH3qSFusTjAfpMLUczvLhK/bs//I7STr5f72TY=",
         "owner": "cjlarose",
         "repo": "tuicr",
-        "rev": "894eafe677c7d7e8e467f02f4f9eeba95854d5fe",
+        "rev": "3bf02fd620b24db9a26669a490988089b77b0e04",
         "type": "github"
       },
       "original": {
         "owner": "cjlarose",
-        "ref": "refactor-commit-ordering",
+        "ref": "commit-order-display-option",
         "repo": "tuicr",
         "type": "github"
       }
