@@ -1246,11 +1246,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1782674523,
-        "narHash": "sha256-nK9lhbxgpMsae/D1DTfxcX0Ftf/DG17yO/dwWoHcMVw=",
+        "lastModified": 1782681714,
+        "narHash": "sha256-DfucmzXZsTLZlMSY1/l4jsYMsuzKzwpMCiIkriCCUKk=",
         "ref": "refs/heads/main",
-        "rev": "01557c79c53ffb162a4a810f1ad1651876e7916d",
-        "revCount": 313,
+        "rev": "b493c99566527d3b8148e05dede0c6a8080e1ab0",
+        "revCount": 314,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1586,15 +1586,16 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1782160727,
-        "narHash": "sha256-nQd2p+WmjzsdPVja3TnGmXrHfZEuhhJe7nEm8fOQB2s=",
+        "lastModified": 1782677584,
+        "narHash": "sha256-o6PuxtH3qSFusTjAfpMLUczvLhK/bs//I7STr5f72TY=",
         "owner": "cjlarose",
         "repo": "tuicr",
-        "rev": "838b0e2e52e82a88738deeeeb1bb7c7ffacfaf72",
+        "rev": "3bf02fd620b24db9a26669a490988089b77b0e04",
         "type": "github"
       },
       "original": {
         "owner": "cjlarose",
+        "ref": "commit-order-display-option",
         "repo": "tuicr",
         "type": "github"
       }
