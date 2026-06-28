@@ -31,7 +31,11 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     tuicr = {
-      url = "github:cjlarose/tuicr";
+      # Dogfooding the commit_order display option (parent->child branch
+      # review) from the refactor-commit-ordering branch before it's merged
+      # to the fork's main / sent upstream. Revert to plain
+      # "github:cjlarose/tuicr" once it lands.
+      url = "github:cjlarose/tuicr/refactor-commit-ordering";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     home-manager-25-05 = {

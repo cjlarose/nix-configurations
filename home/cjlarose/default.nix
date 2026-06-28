@@ -59,6 +59,13 @@
     additionalPackages.${system}.tuicr
   ];
 
+  # Dogfood the commit_order option from the refactor-commit-ordering branch
+  # of cjlarose/tuicr: render the inline commit selector parent -> child for
+  # GitHub-PR-style branch review.
+  home.file.".config/tuicr/config.toml".text = ''
+    commit_order = "base-first"
+  '';
+
   programs.git.userName = "Christopher La Rose";
   programs.git.userEmail = "cjlarose@gmail.com";
   programs.git.extraConfig = {
