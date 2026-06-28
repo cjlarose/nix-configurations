@@ -161,7 +161,8 @@ in
     } // lib.optionalAttrs (config.cjlarose.claude.mattpocock-skills != null) (let
       src = config.cjlarose.claude.mattpocock-skills;
     in {
-      ".claude/skills/handoff" = { source = "${src}/skills/productivity/handoff"; recursive = true; };
+      # handoff is now provided by the LLM wiki (skills/handoff), deployed via
+      # programs.llmWiki where a wiki is present. grill-me stays vendored here.
       ".claude/skills/grill-me" = { source = "${src}/skills/productivity/grill-me"; recursive = true; };
     });
   };
