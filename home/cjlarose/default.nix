@@ -6,6 +6,11 @@
   cjlarose.claude.remoteControlAtStartup = true;
   cjlarose.claude.phxWorkflow.enable = true;
 
+  # Hardened lavish-axi CLI + its Lavish Editor Claude skill. Package threaded
+  # from the lavish-axi flake input (via additionalPackages).
+  cjlarose.lavish.enable = true;
+  cjlarose.lavish.package = additionalPackages.${system}.lavish-axi;
+
   # The llm-wiki flake exports a home-manager module (programs.llmWiki) that
   # owns the wiki's skills + index hook as store copies. Both the module and the
   # programs.llmWiki definition it declares are added only where the wiki is
@@ -18,6 +23,7 @@
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/claude
     ../../home-manager-modules/phx-workflow
+    ../../home-manager-modules/lavish
     ../../home-manager-modules/opencode
   ] ++ lib.optionals (llm-wiki-module != null) [
     llm-wiki-module
