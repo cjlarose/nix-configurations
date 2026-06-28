@@ -994,11 +994,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1781229721,
-        "narHash": "sha256-ORvqDbb/LYxiJljGIejapjkc/kJbVote2N1WSb9W45I=",
+        "lastModified": 1782545840,
+        "narHash": "sha256-PkBPmP5ofNtunCU7/tfn6wi9OLlzFGcHAqqmY+/mwUI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "173d0ad7a974f8543a9ab01d2271b2e290341b33",
+        "rev": "3d46470bb3030020f7e1361f33514854f5bfa86d",
         "type": "github"
       },
       "original": {
@@ -1010,11 +1010,11 @@
     },
     "nixpkgs-unstable_2": {
       "locked": {
-        "lastModified": 1781229721,
-        "narHash": "sha256-ORvqDbb/LYxiJljGIejapjkc/kJbVote2N1WSb9W45I=",
+        "lastModified": 1782545840,
+        "narHash": "sha256-PkBPmP5ofNtunCU7/tfn6wi9OLlzFGcHAqqmY+/mwUI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "173d0ad7a974f8543a9ab01d2271b2e290341b33",
+        "rev": "3d46470bb3030020f7e1361f33514854f5bfa86d",
         "type": "github"
       },
       "original": {
@@ -1246,11 +1246,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1782650981,
-        "narHash": "sha256-hRW3uoRRuTo1gCTjx91uw3ggnfp40vmq0+BdZiR3mb0=",
+        "lastModified": 1782674523,
+        "narHash": "sha256-nK9lhbxgpMsae/D1DTfxcX0Ftf/DG17yO/dwWoHcMVw=",
         "ref": "refs/heads/main",
-        "rev": "92ace48f30d18af416381b6b3b2229952591ce92",
-        "revCount": 312,
+        "rev": "01557c79c53ffb162a4a810f1ad1651876e7916d",
+        "revCount": 313,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
