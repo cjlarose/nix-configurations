@@ -113,6 +113,13 @@
       url = "git+ssh://git@github.com/cjlarose/llm-wiki";
       inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
+    lavish-axi = {
+      # Hardened, built-from-source fork of lavish-axi: token-gated loopback
+      # server, DNS-rebinding defense, no telemetry. The flake exposes
+      # packages.<system>.default (CLI on bin/ + the Claude skill under share/).
+      url = "github:cjlarose/lavish-axi/hardened";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
+    };
   };
 
   outputs = {
@@ -147,6 +154,7 @@
     picktrace-nix-configurations,
     cjlarose-llm-wiki,
     tuicr,
+    lavish-axi,
   }:
     let
       supportedPlatforms = [
@@ -161,7 +169,7 @@
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           allowUnfreePredicate = import ./shared/unfree-predicate.nix { nixpkgs = nixpkgs-24-05; };
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft tuicr;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft tuicr lavish-axi;
           };
         in
           import ./packages packageArgs
