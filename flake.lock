@@ -1293,11 +1293,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1782724641,
-        "narHash": "sha256-fGJe/FjQpvEQO5yq9mT4FjVe9WRZ8O+MM8SyXHNEx08=",
+        "lastModified": 1782725334,
+        "narHash": "sha256-iDaljxKzoBUKNh6TgcDV56/QpIQZxYMjOLaIn2X1XuI=",
         "ref": "refs/heads/main",
-        "rev": "c75dad1f37b94652a0e48874085191033b989b90",
-        "revCount": 317,
+        "rev": "09869cb3b77889f2c49c803e2f8242dd134bc5bf",
+        "revCount": 318,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1651,11 +1651,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1782677584,
-        "narHash": "sha256-o6PuxtH3qSFusTjAfpMLUczvLhK/bs//I7STr5f72TY=",
+        "lastModified": 1782725166,
+        "narHash": "sha256-daZZtwLgdUXYyASSOznhZY6xc7HVNybFBYy61F72uXY=",
         "owner": "cjlarose",
         "repo": "tuicr",
-        "rev": "3bf02fd620b24db9a26669a490988089b77b0e04",
+        "rev": "6269d8921fb52f8021c772e6470fd1d14f86d823",
         "type": "github"
       },
       "original": {
@@ -1674,11 +1674,11 @@
         "utils": "utils_2"
       },
       "locked": {
-        "lastModified": 1782677584,
-        "narHash": "sha256-o6PuxtH3qSFusTjAfpMLUczvLhK/bs//I7STr5f72TY=",
+        "lastModified": 1782725166,
+        "narHash": "sha256-daZZtwLgdUXYyASSOznhZY6xc7HVNybFBYy61F72uXY=",
         "owner": "cjlarose",
         "repo": "tuicr",
-        "rev": "3bf02fd620b24db9a26669a490988089b77b0e04",
+        "rev": "6269d8921fb52f8021c772e6470fd1d14f86d823",
         "type": "github"
       },
       "original": {

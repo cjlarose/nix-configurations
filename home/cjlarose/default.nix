@@ -69,11 +69,11 @@
     additionalPackages.${system}.tuicr
   ];
 
-  # Dogfood the commit_order option from the commit-order-display-option branch
+  # Dogfood the `reverse` option from the commit-order-display-option branch
   # of cjlarose/tuicr: render the inline commit selector parent -> child for
   # GitHub-PR-style branch review.
   home.file.".config/tuicr/config.toml".text = ''
-    commit_order = "base-first"
+    reverse = true
   '';
 
   programs.git.userName = "Christopher La Rose";

@@ -31,7 +31,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     tuicr = {
-      # Dogfooding the commit_order display option (parent->child branch
+      # Dogfooding the `reverse` commit-list option (parent->child branch
       # review) from the commit-order-display-option branch before it's merged
       # to the fork's main / sent upstream. Revert to plain
       # "github:cjlarose/tuicr" once it lands.
