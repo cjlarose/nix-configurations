@@ -101,8 +101,3 @@ nmap <leader>tr :RenameTerminalBuffer<space>
 command! -nargs=0 CreateGitTerminalBuffer :call s:create_named_terminal_buffer('git')
 nmap <leader>tg :CreateGitTerminalBuffer<CR>
 
-" Interactive claude terminal buffer, still available via :CreateClaudeTerminalBuffer.
-" <leader>cc is now bound (in telescope-config.lua) to the background-claude
-" launcher: fuzzy-pick a dir, compose a prompt, then `claude --bg`.
-command! -nargs=* CreateClaudeTerminalBuffer :call s:create_named_terminal_buffer('claude', 'claude', <f-args>)
-
