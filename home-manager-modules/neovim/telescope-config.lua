@@ -123,8 +123,9 @@ local function switch_tab(opts)
   }):find()
 end
 
--- Switch project picker (scans workspace dirs for git repos)
-local function switch_project(workspaces, max_depth)
+-- Recursively scan workspace dirs for git repos (shared by the project
+-- switcher and the background-claude launcher).
+local function collect_projects(workspaces, max_depth)
   max_depth = max_depth or 3
 
   local function find_projects(dirs, depth)
@@ -158,7 +159,12 @@ local function switch_project(workspaces, max_depth)
     table.insert(expanded, vim.fn.expand(ws))
   end
 
-  local projects = find_projects(expanded, 1)
+  return find_projects(expanded, 1)
+end
+
+-- Switch project picker (scans workspace dirs for git repos)
+local function switch_project(workspaces, max_depth)
+  local projects = collect_projects(workspaces, max_depth)
 
   pickers.new({}, {
     prompt_title = 'Switch Project',
@@ -184,6 +190,98 @@ local function switch_project(workspaces, max_depth)
         vim.cmd('CreateGitTerminalBuffer')
         vim.cmd('vsp')
         vim.cmd('CreateClaudeTerminalBuffer')
+      end)
+      return true
+    end,
+  }):find()
+end
+
+-- Launch a detached background claude agent: fuzzy-pick a project directory,
+-- compose a multi-line prompt in a scratch buffer, then `claude --background <prompt>`.
+local function launch_bg_claude(workspaces, max_depth)
+  -- `claude --background` returns immediately; manage agents later via `claude agents`.
+  local function launch(dir, text)
+    vim.system({ 'claude', '--background', text }, { cwd = dir, text = true }, function(res)
+      vim.schedule(function()
+        if res.code == 0 then
+          vim.notify('claude --background launched in ' .. vim.fn.fnamemodify(dir, ':p:~'),
+            vim.log.levels.INFO)
+        else
+          vim.notify('claude --background FAILED (exit ' .. tostring(res.code) .. ')\n'
+            .. (res.stderr or '') .. (res.stdout or ''), vim.log.levels.ERROR)
+        end
+      end)
+    end)
+  end
+
+  -- Scratch buffer for composing the prompt. Uses the acwrite + BufWriteCmd
+  -- idiom (like git commit buffers / fugitive / oil) so :w / :wq triggers the
+  -- launch and :q! cancels.
+  local function compose_prompt(dir)
+    vim.cmd('botright new')
+    vim.cmd('resize 12')
+    local buf = vim.api.nvim_get_current_buf()
+    vim.bo[buf].buftype = 'acwrite'
+    vim.bo[buf].bufhidden = 'wipe'
+    vim.bo[buf].swapfile = false
+    vim.bo[buf].filetype = 'markdown'
+    vim.api.nvim_buf_set_name(buf, 'claude-bg-prompt://' .. vim.fn.fnamemodify(dir, ':t'))
+    vim.wo.winbar = '  claude --background in ' .. vim.fn.fnamemodify(dir, ':p:~')
+      .. '   [ :wq launch · :q! cancel ]'
+
+    local submitted = false
+    vim.api.nvim_create_autocmd('BufWriteCmd', {
+      buffer = buf,
+      callback = function()
+        if submitted then return end
+        local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+        local text = vim.trim(table.concat(lines, '\n'))
+        if text == '' then
+          vim.notify('cc: empty prompt — not launching (use :q! to cancel)',
+            vim.log.levels.WARN)
+          return
+        end
+        submitted = true
+        vim.bo[buf].modified = false  -- so the :q part of :wq closes cleanly
+        launch(dir, text)
+      end,
+    })
+    vim.api.nvim_create_autocmd('BufWipeout', {
+      buffer = buf,
+      callback = function()
+        if not submitted then
+          vim.notify('cc: cancelled', vim.log.levels.WARN)
+        end
+      end,
+    })
+
+    -- Defer: telescope restores mode after its action callback, which would
+    -- clobber an immediate startinsert.
+    vim.schedule(function() vim.cmd('startinsert') end)
+  end
+
+  local projects = collect_projects(workspaces, max_depth)
+
+  pickers.new({}, {
+    prompt_title = 'Launch bg claude in…',
+    finder = finders.new_table({
+      results = projects,
+      entry_maker = function(project)
+        local name = vim.fn.fnamemodify(project, ':t')
+        local path = vim.fn.fnamemodify(project, ':p:~')
+        return {
+          value = project,
+          display = name .. '  ' .. path,
+          ordinal = name .. ' ' .. path,
+        }
+      end,
+    }),
+    sorter = conf.generic_sorter({}),
+    attach_mappings = function(prompt_bufnr)
+      actions.select_default:replace(function()
+        local entry = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        compose_prompt(entry.value)
       end)
       return true
     end,
@@ -233,4 +331,6 @@ vim.keymap.set('n', '<leader>f*', builtin.grep_string, {})
 vim.keymap.set('n', '<leader>c', builtin.command_history, {})
 vim.keymap.set('n', '<leader>gt', switch_tab, {})
 vim.keymap.set('n', '<leader>gp', function() switch_project(__WORKSPACES__, __MAX_DEPTH__) end, {})
+vim.keymap.set('n', '<leader>cc', function() launch_bg_claude(__WORKSPACES__, __MAX_DEPTH__) end,
+  { desc = 'Launch background claude agent' })
 vim.keymap.set('n', '<leader>tc', '<Cmd>tabclose<CR>', { desc = 'Close tab (focus MRU)' })
