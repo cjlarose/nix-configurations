@@ -188,8 +188,6 @@ local function switch_project(workspaces, max_depth)
         vim.cmd('tabnew')
         vim.cmd('tcd ' .. vim.fn.fnameescape(entry.value))
         vim.cmd('CreateGitTerminalBuffer')
-        vim.cmd('vsp')
-        vim.cmd('CreateClaudeTerminalBuffer')
       end)
       return true
     end,
