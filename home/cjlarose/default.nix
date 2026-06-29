@@ -1,7 +1,8 @@
-{ system, additionalPackages, stateVersion, mattpocock-skills ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
+{ system, additionalPackages, stateVersion, mattpocock-skills ? null, superpowers ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
 { pkgs, lib, ... }: {
   _module.args = { inherit additionalPackages system; };
   cjlarose.claude.mattpocock-skills = mattpocock-skills;
+  cjlarose.claude.superpowers-skills = superpowers;
   cjlarose.claude.useNodeRuntime = claudeUseNodeRuntime;
   cjlarose.claude.remoteControlAtStartup = true;
   cjlarose.claude.phxWorkflow.enable = true;

@@ -94,6 +94,10 @@
       url = "github:mattpocock/skills";
       flake = false;
     };
+    superpowers = {
+      url = "github:obra/superpowers";
+      flake = false;
+    };
     nvr = {
       url = "github:cstyles/nvr";
       flake = false;
@@ -108,6 +112,7 @@
     picktrace-nix-configurations = {
       url = "git+ssh://git@github.com/picktrace/nix-configurations";
       inputs.mattpocock-skills.follows = "mattpocock-skills";
+      inputs.superpowers.follows = "superpowers";
     };
     cjlarose-llm-wiki = {
       url = "git+ssh://git@github.com/cjlarose/llm-wiki";
@@ -149,6 +154,7 @@
     nvr,
     cs-automation,
     mattpocock-skills,
+    superpowers,
     microvm,
     hermes-agent,
     picktrace-nix-configurations,
@@ -212,7 +218,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules mattpocock-skills self;
+          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules mattpocock-skills superpowers self;
         }
       );
 

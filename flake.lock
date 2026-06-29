@@ -1421,6 +1421,7 @@
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
         "picktrace-nix-configurations": "picktrace-nix-configurations",
+        "superpowers": "superpowers",
         "tfenv": "tfenv_3",
         "trueColorTest": "trueColorTest",
         "tuicr": "tuicr_2"
@@ -1490,6 +1491,22 @@
       "original": {
         "type": "git",
         "url": "https://spectrum-os.org/git/spectrum"
+      }
+    },
+    "superpowers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781822662,
+        "narHash": "sha256-+lT2a/qq0SF4k0PgnEDKiuidVlZX2p0vEso4d/5T1os=",
+        "owner": "obra",
+        "repo": "superpowers",
+        "rev": "896224c4b1879920ab573417e68fd51d2ccc9072",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "repo": "superpowers",
+        "type": "github"
       }
     },
     "systems": {

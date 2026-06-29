@@ -29,6 +29,17 @@ in
     description = "Path to the mattpocock/skills repository source.";
   };
 
+  options.cjlarose.claude.superpowers-skills = lib.mkOption {
+    type = lib.types.nullOr lib.types.path;
+    default = null;
+    description = ''
+      Path to the obra/superpowers repository source. When set, the
+      systematic-debugging skill (SKILL.md + its supporting technique files) is
+      copied into ~/.claude/skills/. Only that one skill is pulled, not the rest
+      of the superpowers plugin.
+    '';
+  };
+
   options.cjlarose.claude.enablePlaywrightMcp = lib.mkOption {
     type = lib.types.bool;
     default = false;
@@ -164,6 +175,15 @@ in
       # handoff is now provided by the LLM wiki (skills/handoff), deployed via
       # programs.llmWiki where a wiki is present. grill-me stays vendored here.
       ".claude/skills/grill-me" = { source = "${src}/skills/productivity/grill-me"; recursive = true; };
+    }) // lib.optionalAttrs (config.cjlarose.claude.superpowers-skills != null) (let
+      src = config.cjlarose.claude.superpowers-skills;
+    in {
+      # systematic-debugging pulled from obra/superpowers (flake input). Recursive
+      # so the SKILL.md plus its supporting technique files (root-cause-tracing.md,
+      # defense-in-depth.md, condition-based-waiting.md, ...) all land and the
+      # in-directory references resolve. Only this one skill is pulled, not the
+      # rest of the superpowers plugin; its superpowers:* cross-refs are inert.
+      ".claude/skills/systematic-debugging" = { source = "${src}/skills/systematic-debugging"; recursive = true; };
     });
   };
 }
