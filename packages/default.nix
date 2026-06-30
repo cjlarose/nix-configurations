@@ -15,7 +15,6 @@
   allowUnfreePredicate,
   nix-minecraft,
   tuicr,
-  lavish-axi,
   ...
 }:
 
@@ -101,7 +100,6 @@ in
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
   opencode = nixpkgs-unstable.legacyPackages.${system}.opencode;
   tuicr = tuicr.packages.${system}.default;
-  lavish-axi = lavish-axi.packages.${system}.default;
   nvr = import ./nvr { inherit pkgs nvr; };
   go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;

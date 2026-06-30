@@ -597,49 +597,6 @@
         "url": "ssh://git@github.com/cjlarose/intranet-hosts"
       }
     },
-    "lavish-axi": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs-26-05"
-        ]
-      },
-      "locked": {
-        "lastModified": 1782676246,
-        "narHash": "sha256-QJV6gU+x/9XST5d9k+Uw/BDf6klp255CoEXyT8tZQZI=",
-        "owner": "cjlarose",
-        "repo": "lavish-axi",
-        "rev": "5b955cedc4d6de7799332447bd72218c7c989561",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cjlarose",
-        "ref": "hardened",
-        "repo": "lavish-axi",
-        "type": "github"
-      }
-    },
-    "lavish-axi_2": {
-      "inputs": {
-        "nixpkgs": [
-          "picktrace-nix-configurations",
-          "nixpkgs-26-05"
-        ]
-      },
-      "locked": {
-        "lastModified": 1782676246,
-        "narHash": "sha256-QJV6gU+x/9XST5d9k+Uw/BDf6klp255CoEXyT8tZQZI=",
-        "owner": "cjlarose",
-        "repo": "lavish-axi",
-        "rev": "5b955cedc4d6de7799332447bd72218c7c989561",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cjlarose",
-        "ref": "hardened",
-        "repo": "lavish-axi",
-        "type": "github"
-      }
-    },
     "mattpocock-skills": {
       "flake": false,
       "locked": {
@@ -1273,7 +1230,6 @@
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
         "impermanence": "impermanence_2",
-        "lavish-axi": "lavish-axi_2",
         "mattpocock-skills": [
           "mattpocock-skills"
         ],
@@ -1293,11 +1249,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1782726933,
-        "narHash": "sha256-D1Dv52xI+YKi4VW3QMjH9ekJJg/h/fjYNaV8Knx6KgE=",
+        "lastModified": 1782802665,
+        "narHash": "sha256-Q5TlUz/Tn136wj606tqJ52quHPItPfnkavPPEKPxxX8=",
         "ref": "refs/heads/main",
-        "rev": "0924e42f49c833cae96ecc13612b5a49fe6e229e",
-        "revCount": 319,
+        "rev": "0d306887c69c7684008d545e4d1119fc5127f26b",
+        "revCount": 320,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1409,7 +1365,6 @@
         "home-manager-26-05": "home-manager-26-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
-        "lavish-axi": "lavish-axi",
         "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",

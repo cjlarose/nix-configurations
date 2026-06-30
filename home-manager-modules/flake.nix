@@ -11,7 +11,6 @@
       _1password = import ./_1password.nix;
       claude = import ./claude;
       phx-workflow = import ./phx-workflow;
-      lavish = import ./lavish;
       opencode = import ./opencode;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;
