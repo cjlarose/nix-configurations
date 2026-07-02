@@ -72,6 +72,8 @@ in
     # Static file server (nginx) is reachable only over the tailnet — open 443
     # on tailscale0 only, never on the microvm bridge or any public path.
     firewall.interfaces.tailscale0.allowedTCPPorts = [ 443 ];
+    # Hermes API server — LAN only (microvm bridge, 10.0.0.0/24).
+    firewall.interfaces.enp0s11.allowedTCPPorts = [ 8642 ];
   };
 
   systemd.network.enable = true;
