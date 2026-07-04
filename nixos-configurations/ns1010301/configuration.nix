@@ -309,12 +309,75 @@
         ${pkgs.zfs}/bin/zfs list -t snapshot -o name -H -S creation tank/microvms/minecraft-mellowcatfe/minecraft | ${pkgs.coreutils}/bin/tail -n +31 | ${pkgs.findutils}/bin/xargs -r -n 1 ${pkgs.zfs}/bin/zfs destroy
       '';
     };
+
+    # Off-host backup of the hermes microvm guest to Backblaze B2. Runs on the
+    # host (not the guest) because (a) only the host can ZFS-snapshot the guest's
+    # datasets, and (b) the agent is unprivileged/sandboxed and must not hold B2
+    # credentials. We back up two datasets:
+    #   - tank/microvms/hermes/hermes  → /var/lib/hermes (the agent's brain:
+    #     state.db SQLite memory/transcripts, config.yaml, SOUL.md, skills/,
+    #     cron/, workspace/)
+    #   - tank/microvms/hermes/secrets → /persistence/secrets (bot token, API
+    #     keys, Discord allowlists — encrypted at rest in the restic repo)
+    # state.db is SQLite in WAL mode with concurrent writers (Discord gateway +
+    # any `hermes chat` CLI lane), so a live file copy could tear a write. A ZFS
+    # snapshot is atomic and crash-consistent; SQLite recovers from the WAL on
+    # open. Staggered to 02:30 so it doesn't contend with minecraft's 02:00 run
+    # (same pool, same B2 upstream). Secrets layout mirrors the other jobs:
+    # /persistence/restic/hermes/{env,repo,password}. See the wiki's
+    # "Restic Secrets Layout" page for populating them from 1Password.
+    hermes = {
+      initialize = true;
+
+      timerConfig = {
+        OnCalendar = "02:30 America/Los_Angeles";
+        Persistent = true;
+      };
+
+      environmentFile = "/persistence/restic/hermes/env";
+      repositoryFile = "/persistence/restic/hermes/repo";
+      passwordFile = "/persistence/restic/hermes/password";
+
+      paths = [
+        "/mnt/hermes-backup"
+      ];
+
+      pruneOpts = [
+        "--keep-daily 7"
+        "--keep-weekly 5"
+        "--keep-monthly 12"
+      ];
+
+      backupPrepareCommand = ''
+        # Snapshot both datasets atomically-per-dataset and mount them for restic.
+        # Clean up any stale mounts/snapshots from a previous failed run first.
+        for ds in hermes secrets; do
+          ${pkgs.util-linux}/bin/umount "/mnt/hermes-backup/$ds" 2>/dev/null || true
+          ${pkgs.zfs}/bin/zfs destroy "tank/microvms/hermes/$ds@restic-backup" 2>/dev/null || true
+          ${pkgs.zfs}/bin/zfs snapshot "tank/microvms/hermes/$ds@restic-backup"
+          ${pkgs.coreutils}/bin/mkdir -p "/mnt/hermes-backup/$ds"
+          ${pkgs.util-linux}/bin/mount -t zfs "tank/microvms/hermes/$ds@restic-backup" "/mnt/hermes-backup/$ds"
+        done
+      '';
+
+      backupCleanupCommand = ''
+        DAILY_NAME="daily-$(${pkgs.coreutils}/bin/date +%Y-%m-%d)"
+        for ds in hermes secrets; do
+          ${pkgs.util-linux}/bin/umount "/mnt/hermes-backup/$ds" 2>/dev/null || true
+          # Keep the snapshot as a local rolling restore tier (rename to daily-<date>).
+          ${pkgs.zfs}/bin/zfs destroy "tank/microvms/hermes/$ds@$DAILY_NAME" 2>/dev/null || true
+          ${pkgs.zfs}/bin/zfs rename "tank/microvms/hermes/$ds@restic-backup" "tank/microvms/hermes/$ds@$DAILY_NAME" 2>/dev/null || true
+          ${pkgs.zfs}/bin/zfs list -t snapshot -o name -H -S creation "tank/microvms/hermes/$ds" | ${pkgs.coreutils}/bin/tail -n +31 | ${pkgs.findutils}/bin/xargs -r -n 1 ${pkgs.zfs}/bin/zfs destroy
+        done
+      '';
+    };
   };
 
   # PrivateTmp creates a private mount namespace, which prevents the
   # ZFS snapshot mount in backupPrepareCommand from being visible to
   # the restic backup process in ExecStart.
   systemd.services.restic-backups-minecraft-mellowcatfe.serviceConfig.PrivateTmp = lib.mkForce false;
+  systemd.services.restic-backups-hermes.serviceConfig.PrivateTmp = lib.mkForce false;
 
   services.openiscsi = {
     enable = true;
