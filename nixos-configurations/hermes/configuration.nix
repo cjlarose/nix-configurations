@@ -16,6 +16,10 @@ let
     group_sessions_per_user = false;
     # Reply inline in the channel instead of spawning a thread per message.
     discord.auto_thread = false;
+    # Respond to every message without needing an @mention. Safe because who the
+    # bot *acts for* is gated by the .env allowlist (DISCORD_ALLOWED_USERS/ROLES),
+    # not by whether it was mentioned; this only changes what triggers a reply.
+    discord.require_mention = false;
   };
   hermesConfigYaml = (pkgs.formats.yaml { }).generate "hermes-config.yaml" hermesSettings;
 
