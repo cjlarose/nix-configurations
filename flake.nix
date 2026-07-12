@@ -62,7 +62,7 @@
       url = "github:cjlarose/tfenv-nix";
     };
     pce = {
-      url = "git+ssh://git@github.com/cjlarose/pixel-cats-end-automation?ref=relist-instrumentation"; # TEMP: pinned to /relist debug instrumentation branch; revert to bare url when done
+      url = "git+ssh://git@github.com/cjlarose/pixel-cats-end-automation";
     };
     cs-automation = {
       url = "git+ssh://git@github.com/cjlarose/cs-automation";
