@@ -39,11 +39,12 @@ in {
         {
           plugin = onedark-vim;
           config = ''
-            " Enable 24-bit/true color
-            set termguicolors
+            -- Enable 24-bit/true color
+            vim.opt.termguicolors = true
 
-            colorscheme onedark
+            vim.cmd.colorscheme "onedark"
           '';
+          type = "lua";
         }
         plenary-nvim
         {
@@ -68,10 +69,11 @@ in {
         {
           plugin = vim-prettier;
           config = ''
-            let g:prettier#autoformat = 1
-            let g:prettier#autoformat_require_pragma = 0
-            let g:prettier#config#trailing_comma = 'all'
+            vim.g["prettier#autoformat"] = 1
+            vim.g["prettier#autoformat_require_pragma"] = 0
+            vim.g["prettier#config#trailing_comma"] = "all"
           '';
+          type = "lua";
         }
         vim-surround
       ];
