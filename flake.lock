@@ -597,6 +597,23 @@
         "url": "ssh://git@github.com/cjlarose/intranet-hosts"
       }
     },
+    "lavish-axi": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784695679,
+        "narHash": "sha256-CirTDJW8jgzHos3p0eJk7DCGn0OsYvBZHhZkwSyGWPA=",
+        "owner": "kunchenguid",
+        "repo": "lavish-axi",
+        "rev": "966f4d58f769b0ceab5a8baf49982dba0fde4769",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kunchenguid",
+        "ref": "lavish-axi-v0.1.43",
+        "repo": "lavish-axi",
+        "type": "github"
+      }
+    },
     "mattpocock-skills": {
       "flake": false,
       "locked": {
@@ -1365,6 +1382,7 @@
         "home-manager-26-05": "home-manager-26-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
+        "lavish-axi": "lavish-axi",
         "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",

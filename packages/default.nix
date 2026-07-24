@@ -15,6 +15,7 @@
   allowUnfreePredicate,
   nix-minecraft,
   tuicr,
+  lavish-axi,
   ...
 }:
 
@@ -100,6 +101,12 @@ in
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
   opencode = nixpkgs-unstable.legacyPackages.${system}.opencode;
   tuicr = tuicr.packages.${system}.default;
+  # Built from source (flake = false input `lavish-axi` is the upstream src).
+  # callPackage supplies lib/stdenv/nodejs_22/pnpm/makeWrapper from nixpkgs-26-05.
+  lavish-axi = nixpkgs-26-05.legacyPackages.${system}.callPackage ./lavish-axi {
+    src = lavish-axi;
+    version = "0.1.43";
+  };
   nvr = import ./nvr { inherit pkgs nvr; };
   go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
   python39 = nixpkgs-23-05.legacyPackages.${system}.python39;

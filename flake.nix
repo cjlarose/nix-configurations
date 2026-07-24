@@ -118,6 +118,14 @@
       url = "git+ssh://git@github.com/cjlarose/llm-wiki";
       inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
+    lavish-axi = {
+      # Upstream lavish-axi, pinned to a release tag and built from source in
+      # packages/lavish-axi (flake = false: upstream ships no nix packaging).
+      # v0.1.43 includes the DNS-rebinding Host-guard fix. The build disables
+      # telemetry; see packages/lavish-axi/default.nix.
+      url = "github:kunchenguid/lavish-axi/lavish-axi-v0.1.43";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -153,6 +161,7 @@
     picktrace-nix-configurations,
     cjlarose-llm-wiki,
     tuicr,
+    lavish-axi,
   }:
     let
       supportedPlatforms = [
@@ -167,7 +176,7 @@
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           allowUnfreePredicate = import ./shared/unfree-predicate.nix { nixpkgs = nixpkgs-24-05; };
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft tuicr;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft tuicr lavish-axi;
           };
         in
           import ./packages packageArgs
