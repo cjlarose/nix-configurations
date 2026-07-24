@@ -36,11 +36,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1782726798,
-        "narHash": "sha256-ej+DRTcKRJgj+y++uYHXpmff7C+Xxi452dUuffi8FYo=",
+        "lastModified": 1784854999,
+        "narHash": "sha256-Ngjdh8XVnXizyV0IvO9ftErokQuP5RHv7u9KfSz4L3U=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "689492ed98472643afa834afbed1207906e642d4",
+        "rev": "aee205b54f44ba1b0a1d63a65589892d328e823c",
         "type": "github"
       },
       "original": {
@@ -598,6 +598,23 @@
       }
     },
     "lavish-axi": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784695679,
+        "narHash": "sha256-CirTDJW8jgzHos3p0eJk7DCGn0OsYvBZHhZkwSyGWPA=",
+        "owner": "kunchenguid",
+        "repo": "lavish-axi",
+        "rev": "966f4d58f769b0ceab5a8baf49982dba0fde4769",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kunchenguid",
+        "ref": "lavish-axi-v0.1.43",
+        "repo": "lavish-axi",
+        "type": "github"
+      }
+    },
+    "lavish-axi_2": {
       "flake": false,
       "locked": {
         "lastModified": 1784695679,
@@ -1247,6 +1264,7 @@
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
         "impermanence": "impermanence_2",
+        "lavish-axi": "lavish-axi_2",
         "mattpocock-skills": [
           "mattpocock-skills"
         ],
@@ -1266,11 +1284,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1784065515,
-        "narHash": "sha256-MmENnc/pklKdQhaAoQpFvZsVsxJ7blAKu5/TWI/r2sQ=",
+        "lastModified": 1784855084,
+        "narHash": "sha256-tbyzPXEJRw1vDQa55twPRHaYitMg4kzmc80agY3oA8o=",
         "ref": "refs/heads/main",
-        "rev": "4ba3ba0c3c71b5ab7d79c416d60b45d74de58394",
-        "revCount": 321,
+        "rev": "624713834aa1f3ce8782d729b120827c139a5d00",
+        "revCount": 323,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
