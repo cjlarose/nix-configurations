@@ -1,4 +1,4 @@
-{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, cjlarose-home-manager-modules, mattpocock-skills, superpowers, self, ... }: {
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, mattpocock-skills, superpowers, self, ... }: {
   imports = [
     microvm.nixosModules.host
     ({ ... }: {
@@ -49,18 +49,6 @@
         };
       };
     })
-    ({ pkgs, ... }: {
-      users.users.picktrace = {
-        uid = 10001;
-        isNormalUser = true;
-        home = "/home/picktrace";
-        extraGroups = [ "docker" "wheel" ];
-        shell = pkgs.zsh;
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFtA/9w60OssA+Eji+Ygvd1XCJk/zw/uYLdiiaevELu cjlarose"
-        ];
-      };
-    })
     home-manager.nixosModules.home-manager
     {
       home-manager.useGlobalPkgs = true;
@@ -84,11 +72,6 @@
         # no use for a browser review tool).
         cjlarose.lavish.enable = true;
         cjlarose.lavish.package = additionalPackages.${system}.lavish-axi;
-      };
-      home-manager.users.picktrace = picktrace-nix-configurations.homeManagerModules.picktrace-cjlarose;
-      home-manager.extraSpecialArgs = {
-        stateVersion = "25.11";
-        inherit cjlarose-home-manager-modules;
       };
     }
   ];
