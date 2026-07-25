@@ -25,6 +25,12 @@
       interfaces."microvm".allowedUDPPorts = [
         67  # DHCP server for microvm bridge (bridge interface only)
       ];
+      # mosh sessions, reachable over tailscale only (never the public path).
+      # programs.mosh.openFirewall is disabled below so the range isn't opened
+      # on every interface.
+      interfaces."tailscale0".allowedUDPPortRanges = [
+        { from = 60000; to = 61000; }
+      ];
     };
     nat = {
       enable = true;
@@ -395,6 +401,14 @@
   programs.ssh.startAgent = true;
 
   programs.zsh.enable = true;
+
+  # mosh for roaming/low-latency interactive sessions over tailscale. Firewall
+  # is opened explicitly on tailscale0 above, so keep the module from opening
+  # the UDP range on every interface.
+  programs.mosh = {
+    enable = true;
+    openFirewall = false;
+  };
 
   users = {
     mutableUsers = false;
