@@ -404,10 +404,13 @@
 
   # mosh for roaming/low-latency interactive sessions over tailscale. Firewall
   # is opened explicitly on tailscale0 above, so keep the module from opening
-  # the UDP range on every interface.
+  # the UDP range on every interface. The package is patched to advertise
+  # COLORTERM=truecolor to the session (see packages/mosh) so truecolor works
+  # over mosh with no tmux-side config.
   programs.mosh = {
     enable = true;
     openFirewall = false;
+    package = additionalPackages.${system}.mosh;
   };
 
   users = {
