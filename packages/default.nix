@@ -92,6 +92,14 @@ in
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   immich = nixpkgs-25-11.legacyPackages.${system}.immich;
   intranetHosts = intranetHosts;
+  # mosh patched so mosh-server advertises COLORTERM=truecolor to the session.
+  # mosh renders 24-bit color but otherwise strips the signal, leaving nothing
+  # able to detect truecolor over mosh; see ./mosh/colorterm.patch. Built from
+  # nixpkgs-26-05 to match ns1010301, the only host wiring programs.mosh.package
+  # to this.
+  mosh = nixpkgs-26-05.legacyPackages.${system}.mosh.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [ ./mosh/colorterm.patch ];
+  });
   git-make-apply-command = import ./git-make-apply-command { inherit pkgs; };
   ghostty-terminfo = pkgs.runCommand "ghostty-terminfo" {} ''
     mkdir -p $out/share/terminfo
