@@ -1,24 +1,31 @@
 { system, additionalPackages, stateVersion, mattpocock-skills ? null, superpowers ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
 { pkgs, lib, ... }: {
-  _module.args = { inherit additionalPackages system; };
-
   # All LLM-agent tooling lives behind the single llm-agents module. Claude Code
   # itself is unconditional there; the rest is opted into here for the whole
-  # cjlarose fleet, or per-host where the closure cost warrants it.
+  # cjlarose fleet, or per-host where the closure cost warrants it. The module
+  # takes no additionalPackages arg -- every package is named explicitly here.
   cjlarose.llmAgents = {
     claude.mattpocock-skills = mattpocock-skills;
     claude.superpowers-skills = superpowers;
-    claude.useNodeRuntime = claudeUseNodeRuntime;
     claude.remoteControlAtStartup = true;
     phxWorkflow.enable = true;
+
+    # Which claude build is a property of the host, not of the module. The
+    # Goldmont-based pve guests have no AVX and segfault on the Bun standalone at
+    # launch, so they take the node-pinned build (frozen at npm 2.1.112); every
+    # AVX-capable host tracks the latest Bun build from llm-agents.nix.
+    claude.package =
+      if claudeUseNodeRuntime
+      then additionalPackages.${system}.claude-code-node
+      else additionalPackages.${system}.claude-code;
 
     # Both are small CLIs that pair with claude, so they ride the shared profile
     # rather than being host-scoped: opencode as a second agent, herdr to manage
     # claude sessions. herdr reaches the no-AVX pve guests too — its AVX2 paths
     # sit behind runtime is_x86_feature_detected! gates, unlike the Bun
-    # claude-code binary that forced claude.useNodeRuntime.
-    opencode.enable = true;
-    herdr.enable = true;
+    # claude-code binary that forces the node build above.
+    opencode = { enable = true; package = additionalPackages.${system}.opencode; };
+    herdr = { enable = true; package = additionalPackages.${system}.herdr; };
 
     # The wiki's Claude Code plugin (skills + SessionStart index hook) and
     # LLM_WIKI_PATH. Only where a wiki worktree actually exists, which is also
