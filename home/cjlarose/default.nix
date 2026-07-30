@@ -1,35 +1,53 @@
 { system, additionalPackages, stateVersion, mattpocock-skills ? null, superpowers ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
 { pkgs, lib, ... }: {
   _module.args = { inherit additionalPackages system; };
-  cjlarose.claude.mattpocock-skills = mattpocock-skills;
-  cjlarose.claude.superpowers-skills = superpowers;
-  cjlarose.claude.useNodeRuntime = claudeUseNodeRuntime;
-  cjlarose.claude.remoteControlAtStartup = true;
-  cjlarose.claude.phxWorkflow.enable = true;
 
-  # The cjlarose.lavish module is imported below so the option exists on every
-  # cjlarose host, but it defaults off here: lavish-axi is a real Node CLI + a
-  # browser review tool, useful only on interactive hosts, so the enable is
-  # scoped to ns1010301 in nixos-configurations/ns1010301/default.nix (the same
-  # host-scoping pattern as cjlarose.claude.enablePlaywrightMcp).
+  # All LLM-agent tooling lives behind the single llm-agents module. Claude Code
+  # itself is unconditional there; the rest is opted into here for the whole
+  # cjlarose fleet, or per-host where the closure cost warrants it.
+  cjlarose.llmAgents = {
+    claude.mattpocock-skills = mattpocock-skills;
+    claude.superpowers-skills = superpowers;
+    claude.useNodeRuntime = claudeUseNodeRuntime;
+    claude.remoteControlAtStartup = true;
+    phxWorkflow.enable = true;
 
-  # The llm-wiki flake exports a home-manager module (programs.llmWiki) that
-  # owns the wiki's skills + index hook as store copies. Both the module and the
-  # programs.llmWiki definition it declares are added only where the wiki is
-  # threaded in (ns1010301) — defining programs.llmWiki on a host that didn't
-  # import the module would be an "option does not exist" error, mkIf or not.
+    # Both are small CLIs that pair with claude, so they ride the shared profile
+    # rather than being host-scoped: opencode as a second agent, herdr to manage
+    # claude sessions. herdr reaches the no-AVX pve guests too — its AVX2 paths
+    # sit behind runtime is_x86_feature_detected! gates, unlike the Bun
+    # claude-code binary that forced claude.useNodeRuntime.
+    opencode.enable = true;
+    herdr.enable = true;
+
+    # The wiki's Claude Code plugin (skills + SessionStart index hook) and
+    # LLM_WIKI_PATH. Only where a wiki worktree actually exists, which is also
+    # the only place llm-wiki-module is threaded in below.
+    wiki.enable = llm-wiki-path != null;
+    wiki.path = llm-wiki-path;
+  };
+
+  # lavish and claude.enablePlaywrightMcp are left at their module defaults
+  # (off) here and enabled per-host in nixos-configurations/ns1010301: a browser
+  # review tool and a chromium closure have no business on the headless guests.
+  #
+  # llm-wiki-module is the wiki flake's own home-manager module, which is what
+  # DECLARES programs.llmWiki. It has to be imported here rather than inside
+  # llm-agents because `imports` is resolved before config exists, so it can key
+  # off neither an option nor an optional module argument (an arg with a default
+  # forces _module.args evaluation, which recurses). wiki-bridge.nix rides along
+  # with it: it turns the cjlarose.llmAgents.wiki.* options into a
+  # programs.llmWiki definition, and can only be loaded where that option is
+  # declared.
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
-    ../../home-manager-modules/claude
-    ../../home-manager-modules/phx-workflow
-    ../../home-manager-modules/lavish
-    ../../home-manager-modules/opencode
+    ../../home-manager-modules/llm-agents
   ] ++ lib.optionals (llm-wiki-module != null) [
     llm-wiki-module
-    { programs.llmWiki = lib.mkIf (llm-wiki-path != null) { enable = true; path = llm-wiki-path; }; }
+    ../../home-manager-modules/llm-agents/wiki-bridge.nix
   ];
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
@@ -46,15 +64,6 @@
     pkgs._1password-cli
     additionalPackages.${system}.bundix
     additionalPackages.${system}.git-make-apply-command
-    # herdr, a terminal workspace manager for AI coding agents (llm-agents.nix
-    # only, not nixpkgs). Deliberately in the shared profile rather than
-    # host-scoped like enablePlaywrightMcp/lavish: it manages claude sessions,
-    # so it belongs everywhere the claude module lands -- including the no-AVX
-    # pve guests. It carries AVX2 code paths, but unlike the Bun claude-code
-    # binary those sit behind runtime is_x86_feature_detected! gates (the build
-    # sets no target-cpu, so rustc's baseline x86-64 applies to everything
-    # else), which is why this needs no useNodeRuntime-style escape hatch.
-    additionalPackages.${system}.herdr
     pkgs.nodejs_22
     pkgs.oha
     pkgs.parallel
