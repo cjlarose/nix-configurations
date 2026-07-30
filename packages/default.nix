@@ -28,6 +28,14 @@ let
   # Wrap any package that exposes bin/claude with worktree-aware terminal-title
   # behavior. Shared by the Bun (claude-code) and node (claude-code-node)
   # variants so both behave identically.
+  #
+  # CLAUDE_CODE_SHELL pins the shell claude spawns for the Bash tool. Without it
+  # claude follows $SHELL, which on these hosts is zsh -- so tool invocations run
+  # under a different shell than the bash the agent's snippets assume. Sourced
+  # from nixpkgs-26-05 (not `pkgs`, which is 24-05 here) so it is the same
+  # bash-interactive the host system and the home-manager claude wrapper already
+  # pull in, rather than adding a second bash to the closure. Overridable:
+  # an explicit CLAUDE_CODE_SHELL in the environment still wins.
   mkTitleWrapper = underlying: pkgs.writeShellScriptBin "claude" ''
     # Set terminal title based on worktree layout: owner/repo [worktree]
     if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
@@ -35,6 +43,7 @@ let
     fi
     unset TMUX
     export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
+    export CLAUDE_CODE_SHELL="''${CLAUDE_CODE_SHELL:-${nixpkgs-26-05.legacyPackages.${system}.bashInteractive}/bin/bash}"
     exec ${underlying}/bin/claude "$@"
   '';
 
