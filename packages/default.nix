@@ -25,27 +25,11 @@ let
   # nixos-modules/allow-unfree.nix keeps listing it for the system-level sets).
   llm-agents-pkgs = llm-agents.packages.${system};
 
-  # Wrap any package that exposes bin/claude with worktree-aware terminal-title
-  # behavior. Shared by the Bun (claude-code) and node (claude-code-node)
-  # variants so both behave identically.
-  #
-  # CLAUDE_CODE_SHELL pins the shell claude spawns for the Bash tool. Without it
-  # claude follows $SHELL, which on these hosts is zsh -- so tool invocations run
-  # under a different shell than the bash the agent's snippets assume. Sourced
-  # from nixpkgs-26-05 (not `pkgs`, which is 24-05 here) so it is the same
-  # bash-interactive the host system and the home-manager claude wrapper already
-  # pull in, rather than adding a second bash to the closure. Overridable:
-  # an explicit CLAUDE_CODE_SHELL in the environment still wins.
-  mkTitleWrapper = underlying: pkgs.writeShellScriptBin "claude" ''
-    # Set terminal title based on worktree layout: owner/repo [worktree]
-    if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
-    fi
-    unset TMUX
-    export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
-    export CLAUDE_CODE_SHELL="''${CLAUDE_CODE_SHELL:-${nixpkgs-26-05.legacyPackages.${system}.bashInteractive}/bin/bash}"
-    exec ${underlying}/bin/claude "$@"
-  '';
+  # Both claude-code attrs below are UNWRAPPED. The worktree terminal-title /
+  # TMUX / CLAUDE_CODE_SHELL wrapper used to live here as mkTitleWrapper, but it
+  # was duplicated (and drifting) in picktrace/nix-configurations too; it now
+  # lives once in home-manager-modules/llm-agents, which wraps whichever build
+  # cjlarose.llmAgents.claude.package selects.
 
   # Latest Bun standalone claude-code, used by AVX-capable hosts. The no-AVX pve
   # guests use claude-code-node instead — the Bun binary's JIT requires AVX, so
@@ -65,7 +49,7 @@ let
   # Node-runnable claude-code, pinned to 2.1.112 (the last npm release whose
   # bin is a node-runnable cli.js; 2.1.113+ ship the Bun native binary). Runs
   # on no-AVX CPUs because V8/node has no AVX requirement. Frozen on purpose.
-  claude-code-node-unwrapped =
+  claude-code-node-pkg =
     let
       up = nixpkgs-26-05.legacyPackages.${system};
     in
@@ -105,8 +89,8 @@ let
 in
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
-  claude-code = mkTitleWrapper claude-code-bun;
-  claude-code-node = mkTitleWrapper claude-code-node-unwrapped;
+  claude-code = claude-code-bun;
+  claude-code-node = claude-code-node-pkg;
   cs-automation = cs-automation.packages.${system}.default;
   bundix = import "${bundix}/default.nix" { inherit pkgs; };
   immich = nixpkgs-25-11.legacyPackages.${system}.immich;
