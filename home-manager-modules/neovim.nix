@@ -54,7 +54,6 @@ in {
         }
         vim-fugitive
         vim-rhubarb
-        vim-fubitive
         {
           plugin = diffview-nvim;
           config = builtins.readFile ./neovim/diffview-config.lua;
