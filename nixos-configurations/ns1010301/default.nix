@@ -62,16 +62,16 @@
           })
         ];
         # Browser automation for cjlarose's sessions on this host. The shared
-        # home/cjlarose profile defaults enablePlaywrightMcp off so the chromium
+        # home/cjlarose profile leaves enablePlaywrightMcp off so the chromium
         # closure only lands where it's wanted; scope the enable to ns1010301
         # here rather than in home/cjlarose (which fans out to every linux host).
-        cjlarose.claude.enablePlaywrightMcp = true;
+        cjlarose.llmAgents.claude.enablePlaywrightMcp = true;
         # Upstream lavish-axi CLI (built from source, telemetry off) + its Lavish
         # Editor Claude skill. Scoped to this interactive/browser host (not the
         # shared profile, which fans out to the headless cjlarose hosts that have
-        # no use for a browser review tool).
-        cjlarose.lavish.enable = true;
-        cjlarose.lavish.package = additionalPackages.${system}.lavish-axi;
+        # no use for a browser review tool). Package comes from the module's
+        # default (additionalPackages.<system>.lavish-axi).
+        cjlarose.llmAgents.lavish.enable = true;
       };
     }
   ];

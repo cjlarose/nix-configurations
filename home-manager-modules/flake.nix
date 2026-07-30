@@ -9,10 +9,13 @@
       dev-tools = import ./dev-tools.nix;
       karabiner = import ./karabiner.nix;
       _1password = import ./_1password.nix;
-      claude = import ./claude;
-      phx-workflow = import ./phx-workflow;
-      lavish = import ./lavish;
-      opencode = import ./opencode;
+      # Unified LLM-agent tooling: Claude Code, the phx workflow skills,
+      # lavish-axi, the LLM wiki integration, opencode and herdr. Replaces the
+      # former separate claude / phx-workflow / lavish / opencode modules.
+      llm-agents = import ./llm-agents;
+      # Pair with llm-agents ONLY where the LLM wiki flake's own module is also
+      # imported -- it defines programs.llmWiki, which that module declares.
+      llm-agents-wiki = import ./llm-agents/wiki-bridge.nix;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;
       ghostty = import ./ghostty.nix;
