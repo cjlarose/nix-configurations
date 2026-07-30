@@ -12,14 +12,19 @@
   nvr,
   trueColorTest,
   cs-automation,
-  allowUnfreePredicate,
   nix-minecraft,
   tuicr,
+  llm-agents,
   lavish-axi,
   ...
 }:
 
 let
+  # numtide/llm-agents.nix. Its own lib marks the unfree licenses free, so
+  # claude-code needs no allowUnfreePredicate here (it is still unfree, and
+  # nixos-modules/allow-unfree.nix keeps listing it for the system-level sets).
+  llm-agents-pkgs = llm-agents.packages.${system};
+
   # Wrap any package that exposes bin/claude with worktree-aware terminal-title
   # behavior. Shared by the Bun (claude-code) and node (claude-code-node)
   # variants so both behave identically.
@@ -38,10 +43,15 @@ let
   # it segfaults at launch (and its build-time versionCheckPhase segfaults too)
   # on those CPUs. Since no no-AVX host builds this anymore, the upstream
   # versionCheckPhase is left enabled (it passes on the AVX hosts that build it).
-  claude-code-bun = (import nixpkgs-unstable {
-    inherit system;
-    config.allowUnfreePredicate = allowUnfreePredicate;
-  }).claude-code;
+  #
+  # Sourced from llm-agents.nix rather than nixpkgs-unstable so claude rolls
+  # forward on its own (that flake auto-updates daily) instead of only when
+  # nixpkgs-unstable is bumped. Its wrapper differs slightly from the nixpkgs
+  # one: same DISABLE_AUTOUPDATER / DISABLE_INSTALLATION_CHECKS and
+  # bubblewrap+socat on PATH, plus --argv0 claude (so it shows as "claude" in
+  # ps/htop) and DISABLE_NON_ESSENTIAL_MODEL_CALLS; it does not set
+  # USE_BUILTIN_RIPGREP=0, so claude uses its bundled ripgrep.
+  claude-code-bun = llm-agents-pkgs.claude-code;
 
   # Node-runnable claude-code, pinned to 2.1.112 (the last npm release whose
   # bin is a node-runnable cli.js; 2.1.113+ ship the Bun native binary). Runs
@@ -107,7 +117,12 @@ in
       $out/share/terminfo/
   '';
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
-  opencode = nixpkgs-unstable.legacyPackages.${system}.opencode;
+  # Terminal workspace manager for AI coding agents (herdr.dev). Only in
+  # llm-agents.nix, not nixpkgs.
+  herdr = llm-agents-pkgs.herdr;
+  # From llm-agents.nix rather than nixpkgs-unstable so it tracks the same
+  # daily-updated source as claude-code and herdr.
+  opencode = llm-agents-pkgs.opencode;
   tuicr = tuicr.packages.${system}.default;
   # Built from source (flake = false input `lavish-axi` is the upstream src).
   # callPackage supplies lib/stdenv/nodejs_22/pnpm/makeWrapper from nixpkgs-26-05.

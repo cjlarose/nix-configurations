@@ -38,6 +38,15 @@
       url = "github:cjlarose/tuicr/commit-order-display-option";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    llm-agents = {
+      # numtide/llm-agents.nix -- AI-coding-agent tools packaged for nix and
+      # auto-updated daily. Source of claude-code (rolls forward independently
+      # of a nixpkgs-unstable bump), opencode, and herdr. Follows
+      # nixpkgs-unstable, which is also what the flake pins upstream, so no
+      # second nixpkgs subtree lands in the lock.
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     home-manager-25-05 = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs-25-05";
@@ -161,6 +170,7 @@
     picktrace-nix-configurations,
     cjlarose-llm-wiki,
     tuicr,
+    llm-agents,
     lavish-axi,
   }:
     let
@@ -174,9 +184,8 @@
       additionalPackages = nixpkgs-24-05.lib.genAttrs supportedPlatforms (system:
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
-          allowUnfreePredicate = import ./shared/unfree-predicate.nix { nixpkgs = nixpkgs-24-05; };
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation allowUnfreePredicate nix-minecraft tuicr lavish-axi;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents lavish-axi;
           };
         in
           import ./packages packageArgs
