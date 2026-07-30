@@ -25,6 +25,40 @@
 let
   cfg = config.cjlarose.llmAgents;
 
+  # The claude wrapper, shared by both consuming flakes. It used to be duplicated
+  # as `mkTitleWrapper` in each repo's packages/default.nix, where it drifted
+  # (cjlarose had it as a reusable function over both the Bun and node builds;
+  # picktrace had the body inlined). Living here means one definition, and `pkgs`
+  # is the host's own nixpkgs -- so bashInteractive is the one the system already
+  # pulls in, with no nixpkgs-26-05 plumbing through packages/. The rationale for
+  # each line lives in the script itself, so it survives into the store copy the
+  # user actually reads.
+  wrappedClaude = pkgs.writeShellScriptBin "claude" ''
+    # Set the terminal title from the worktree layout: owner/repo [worktree].
+    # Only fires under ~/worktrees/<owner>/<repo>/<worktree>; elsewhere the
+    # title is left alone.
+    if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
+      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
+    fi
+
+    # claude (via chalk) hard-caps its color level to 256 whenever $TMUX is set,
+    # a cap even FORCE_COLOR=3 cannot defeat. Dropping the variable is the only
+    # way to get 24-bit color inside tmux; we are already past the point where
+    # anything else in this process needs it.
+    unset TMUX
+
+    # We set the title above, so stop claude from fighting us over it.
+    export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
+
+    # Pin the shell claude spawns for the Bash tool. Left unset it follows
+    # $SHELL, which is zsh on these hosts, so tool invocations would run under a
+    # different shell than the bash the agent's snippets assume. The :- default
+    # means an explicit value in the environment still wins.
+    export CLAUDE_CODE_SHELL="''${CLAUDE_CODE_SHELL:-${pkgs.bashInteractive}/bin/bash}"
+
+    exec ${cfg.claude.package}/bin/claude "$@"
+  '';
+
   claudeCodeStatusline = pkgs.writeShellApplication {
     name = "claude-code-statusline";
     runtimeInputs = [ pkgs.jq pkgs.gawk ];
@@ -110,9 +144,11 @@ in
       defaultText = lib.literalExpression
         "additionalPackages.\${system}.claude-code{,-node}, per useNodeRuntime";
       description = ''
-        The claude-code package to install. Both defaults are the consuming
-        flake's title-wrapped builds (worktree-aware terminal title), which in
-        turn wrap llm-agents.nix's claude-code / the frozen node build.
+        The UNWRAPPED claude-code package. This module applies its own wrapper
+        (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on top, so
+        the consuming flake should hand over a plain claude-code build --
+        llm-agents.nix's for the Bun default, or the frozen node build for
+        no-AVX hosts.
       '';
     };
 
@@ -199,7 +235,11 @@ in
     {
       programs.claude-code = {
         enable = true;
-        package = cfg.claude.package;
+        # The module's own wrapper, not cfg.claude.package directly -- see
+        # wrappedClaude above. home-manager wraps this again with its
+        # --plugin-dir flags, so the final chain is
+        # HM plugin wrapper -> title/env wrapper -> claude-code.
+        package = wrappedClaude;
 
         # Pinned, self-contained Playwright MCP (chromium baked in via the
         # package's PLAYWRIGHT_BROWSERS_PATH wrapper, so no runtime npx/network).
