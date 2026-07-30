@@ -9,9 +9,11 @@
 # modules. Claude Code is unconditional -- importing this module is the decision
 # to have claude; everything else is opt-in per host/user.
 #
-# Module arguments (both consumers supply these):
-#   additionalPackages, system  -- the consuming flake's package set, used for
-#                                  the package option defaults.
+# The module takes no flake-specific arguments: every package it installs comes
+# in through a `*.package` option that the consumer sets explicitly. It used to
+# reach into an `additionalPackages` module arg for defaults, which coupled it to
+# one particular shape of consuming flake and silently broke if that flake
+# renamed or dropped an attr.
 #
 # The one thing this module cannot own is the `imports` of the wiki flake's own
 # module (which declares programs.llmWiki): `imports` is resolved before config
@@ -20,7 +22,7 @@
 # The consumer therefore imports cjlarose-llm-wiki.homeManagerModules.default
 # alongside this module -- see home/cjlarose -- and this module owns everything
 # else about the wiki, including turning it on and pointing it at a worktree.
-{ additionalPackages, system, lib, pkgs, config, ... }:
+{ lib, pkgs, config, ... }:
 
 let
   cfg = config.cjlarose.llmAgents;
@@ -124,31 +126,20 @@ in
       '';
     };
 
-    claude.useNodeRuntime = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Use the node-pinned claude-code build (frozen at npm 2.1.112) instead of
-        the latest Bun standalone. Required on CPUs without AVX (the Goldmont-based
-        pve guests), where the Bun binary segfaults at launch. Leave false on
-        AVX-capable hosts so they keep receiving the latest claude-code.
-      '';
-    };
-
     claude.package = lib.mkOption {
       type = lib.types.package;
-      default =
-        if cfg.claude.useNodeRuntime
-        then additionalPackages.${system}.claude-code-node
-        else additionalPackages.${system}.claude-code;
-      defaultText = lib.literalExpression
-        "additionalPackages.\${system}.claude-code{,-node}, per useNodeRuntime";
       description = ''
-        The UNWRAPPED claude-code package. This module applies its own wrapper
+        The UNWRAPPED claude-code package. Required -- claude is the one piece of
+        this module that is unconditional. The module applies its own wrapper
         (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on top, so
-        the consuming flake should hand over a plain claude-code build --
-        llm-agents.nix's for the Bun default, or the frozen node build for
-        no-AVX hosts.
+        hand over a plain build.
+
+        Which build is a property of the HOST, not of this module: AVX-capable
+        machines take the latest Bun standalone, while the Goldmont-based pve
+        guests need the node-pinned build (frozen at npm 2.1.112) because the Bun
+        binary segfaults at launch there. The consumer picks; this used to be a
+        `useNodeRuntime` boolean here, which forced the module to know both
+        package names.
       '';
     };
 
@@ -175,12 +166,13 @@ in
     '';
 
     lavish.package = lib.mkOption {
-      type = lib.types.package;
-      default = additionalPackages.${system}.lavish-axi;
-      defaultText = lib.literalExpression "additionalPackages.\${system}.lavish-axi";
+      type = lib.types.nullOr lib.types.package;
+      default = null;
       description = ''
         The lavish-axi package to install. Carries the CLI at bin/lavish-axi and
         the generated Claude Code skill at share/lavish-axi/skill/SKILL.md.
+        Required when lavish.enable is set; asserted below rather than defaulted,
+        so hosts with lavish off need not name a package at all.
       '';
     };
 
@@ -190,10 +182,9 @@ in
       "opencode, the standalone terminal coding agent (programs.opencode)";
 
     opencode.package = lib.mkOption {
-      type = lib.types.package;
-      default = additionalPackages.${system}.opencode;
-      defaultText = lib.literalExpression "additionalPackages.\${system}.opencode";
-      description = "The opencode package to install.";
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = "The opencode package to install. Required when opencode.enable is set.";
     };
 
     herdr.enable = lib.mkEnableOption ''
@@ -202,10 +193,9 @@ in
     '';
 
     herdr.package = lib.mkOption {
-      type = lib.types.package;
-      default = additionalPackages.${system}.herdr;
-      defaultText = lib.literalExpression "additionalPackages.\${system}.herdr";
-      description = "The herdr package to install.";
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = "The herdr package to install. Required when herdr.enable is set.";
     };
 
     # --- personal LLM wiki --------------------------------------------------
@@ -357,7 +347,10 @@ in
     })
 
     # --- lavish-axi ---------------------------------------------------------
-    (lib.mkIf cfg.lavish.enable {
+    # The `package != null` half of each guard is not redundant with the
+    # assertions below: without it a null reaches home.packages and fails the
+    # `package` type check FIRST, burying the assertion's readable message.
+    (lib.mkIf (cfg.lavish.enable && cfg.lavish.package != null) {
       # CLI on PATH. Under home-manager useUserPackages this rides the system
       # profile, so the picktrace VM needs a system switch-to-configuration to pick
       # it up (an HM-only activate won't), same as tuicr / the playwright closure.
@@ -372,14 +365,14 @@ in
     })
 
     # --- standalone agent CLIs ---------------------------------------------
-    (lib.mkIf cfg.opencode.enable {
+    (lib.mkIf (cfg.opencode.enable && cfg.opencode.package != null) {
       programs.opencode = {
         enable = true;
         package = cfg.opencode.package;
       };
     })
 
-    (lib.mkIf cfg.herdr.enable {
+    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null) {
       home.packages = [ cfg.herdr.package ];
     })
 
@@ -389,11 +382,25 @@ in
     # mkIf distributes down to the attribute path, so a `programs.llmWiki`
     # definition under a false mkIf is still checked against the declarations
     # and errors with "option does not exist" on every wiki-less host.
+    # Every enable that needs a package asserts it rather than defaulting one, so
+    # a host that leaves the feature off never has to name a package at all.
     {
       assertions = [
         {
           assertion = !cfg.wiki.enable || cfg.wiki.path != null;
           message = "cjlarose.llmAgents.wiki.enable is true but cjlarose.llmAgents.wiki.path is unset.";
+        }
+        {
+          assertion = !cfg.lavish.enable || cfg.lavish.package != null;
+          message = "cjlarose.llmAgents.lavish.enable is true but cjlarose.llmAgents.lavish.package is unset.";
+        }
+        {
+          assertion = !cfg.opencode.enable || cfg.opencode.package != null;
+          message = "cjlarose.llmAgents.opencode.enable is true but cjlarose.llmAgents.opencode.package is unset.";
+        }
+        {
+          assertion = !cfg.herdr.enable || cfg.herdr.package != null;
+          message = "cjlarose.llmAgents.herdr.enable is true but cjlarose.llmAgents.herdr.package is unset.";
         }
       ];
     }

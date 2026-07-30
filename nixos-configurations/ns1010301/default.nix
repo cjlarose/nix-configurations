@@ -69,9 +69,11 @@
         # Upstream lavish-axi CLI (built from source, telemetry off) + its Lavish
         # Editor Claude skill. Scoped to this interactive/browser host (not the
         # shared profile, which fans out to the headless cjlarose hosts that have
-        # no use for a browser review tool). Package comes from the module's
-        # default (additionalPackages.<system>.lavish-axi).
-        cjlarose.llmAgents.lavish.enable = true;
+        # no use for a browser review tool).
+        cjlarose.llmAgents.lavish = {
+          enable = true;
+          package = additionalPackages.${system}.lavish-axi;
+        };
       };
     }
   ];
