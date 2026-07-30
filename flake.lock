@@ -106,11 +106,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1785449311,
-        "narHash": "sha256-tdpfvQrsmW/9heu3t4LUugwi0AAN8wgupDtuZVBI5F0=",
+        "lastModified": 1785451781,
+        "narHash": "sha256-LPcXHDsCNKPxsRZ+tqGTrQ5sRRTDGMq0PCJd5uFvYnM=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "50b9a459b20a91b39b5b5ec590d34d4b8fbb748b",
+        "rev": "62cde970e0ec205c2d41edfcaef5190fd0c0df4a",
         "type": "github"
       },
       "original": {
@@ -1447,11 +1447,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1785449385,
-        "narHash": "sha256-CUTTMdG0463wk5BxFDxyWI4ksEcnRxUDmHNq/hnQidc=",
+        "lastModified": 1785451935,
+        "narHash": "sha256-5qWqwNGEhvqIeUQxVVb13QAUymY6r9ne/jnHeOXdWfc=",
         "ref": "refs/heads/main",
-        "rev": "6e170e26792c83dc9086ea8ecd38d0b657a22b05",
-        "revCount": 337,
+        "rev": "52ce56d18cde4cce7aace8d6aa12c8ed97c2ea73",
+        "revCount": 342,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
