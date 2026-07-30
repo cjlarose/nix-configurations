@@ -41,14 +41,14 @@ let
       printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
     fi
 
+    # We set the title above, so stop claude from fighting us over it.
+    export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
+
     # claude (via chalk) hard-caps its color level to 256 whenever $TMUX is set,
     # a cap even FORCE_COLOR=3 cannot defeat. Dropping the variable is the only
     # way to get 24-bit color inside tmux; we are already past the point where
     # anything else in this process needs it.
     unset TMUX
-
-    # We set the title above, so stop claude from fighting us over it.
-    export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
 
     # Pin the shell claude spawns for the Bash tool. Left unset it follows
     # $SHELL, which is zsh on these hosts, so tool invocations would run under a
