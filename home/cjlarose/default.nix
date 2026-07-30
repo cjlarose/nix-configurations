@@ -46,6 +46,15 @@
     pkgs._1password-cli
     additionalPackages.${system}.bundix
     additionalPackages.${system}.git-make-apply-command
+    # herdr, a terminal workspace manager for AI coding agents (llm-agents.nix
+    # only, not nixpkgs). Deliberately in the shared profile rather than
+    # host-scoped like enablePlaywrightMcp/lavish: it manages claude sessions,
+    # so it belongs everywhere the claude module lands -- including the no-AVX
+    # pve guests. It carries AVX2 code paths, but unlike the Bun claude-code
+    # binary those sit behind runtime is_x86_feature_detected! gates (the build
+    # sets no target-cpu, so rustc's baseline x86-64 applies to everything
+    # else), which is why this needs no useNodeRuntime-style escape hatch.
+    additionalPackages.${system}.herdr
     pkgs.nodejs_22
     pkgs.oha
     pkgs.parallel
