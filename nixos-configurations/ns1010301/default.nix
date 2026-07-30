@@ -72,12 +72,6 @@
         # no use for a browser review tool).
         cjlarose.lavish.enable = true;
         cjlarose.lavish.package = additionalPackages.${system}.lavish-axi;
-        # herdr, a terminal workspace manager for AI coding agents. Scoped here
-        # rather than in the shared home/cjlarose profile for the same reason as
-        # the two above: it's an interactive remote-dev tool, useless on the
-        # headless cjlarose guests, and it builds from source (Rust + a vendored
-        # Zig libghostty-vt) so it isn't free to fan out.
-        home.packages = [ additionalPackages.${system}.herdr ];
       };
     }
   ];
