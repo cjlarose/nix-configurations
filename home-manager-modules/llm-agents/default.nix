@@ -1,11 +1,11 @@
 # Unified LLM-agent tooling module.
 #
 # One module owning everything agent-related for a user: Claude Code itself
-# (package choice, MCP servers, settings, the nixd LSP marketplace, vendored
-# skills), lavish-axi, the personal LLM wiki
-# integration, the standalone agent CLIs (opencode, herdr), and the gh-stack
-# agent skill. Options ending in `Skill` install documentation only -- the tool
-# they describe is installed elsewhere.
+# (package choice, MCP servers, settings, the nixd LSP marketplace), the
+# superpowers skills plugin, lavish-axi, the personal LLM wiki integration, the
+# standalone agent CLIs (opencode, herdr), and the gh-stack agent skill. Options
+# ending in `Skill` install documentation only -- the tool they describe is
+# installed elsewhere.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
 # modules. Claude Code is unconditional -- importing this module is the decision
@@ -89,17 +89,6 @@ in
 
     # --- Claude Code -------------------------------------------------------
 
-    claude.superpowers-skills = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      description = ''
-        Path to the obra/superpowers repository source. When set, the
-        systematic-debugging skill (SKILL.md + its supporting technique files) is
-        copied into ~/.claude/skills/. Only that one skill is pulled, not the rest
-        of the superpowers plugin.
-      '';
-    };
-
     claude.enablePlaywrightMcp = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -136,6 +125,31 @@ in
         binary segfaults at launch there. The consumer picks; this used to be a
         `useNodeRuntime` boolean here, which forced the module to know both
         package names.
+      '';
+    };
+
+    # --- superpowers ---------------------------------------------------------
+
+    superpowers.package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = ''
+        obra/superpowers packaged as a force-loaded Claude Code plugin: 14 skills
+        covering brainstorming, planning, TDD, code review, git worktrees and
+        debugging, invocable as superpowers:<name>, plus upstream's SessionStart
+        hook which prepends the using-superpowers skill to every session.
+
+        Replaces two things that used to live here: the vendored
+        systematic-debugging copy (now one skill of the set, with its
+        superpowers:* cross-references finally resolving) and the phx workflow
+        skills, whose brainstorm/plan/work/review spine upstream covers natively
+        with brainstorming + writing-plans + executing-plans + *-code-review.
+
+        Setting this is NOT enough on its own -- ./superpowers-plugin.nix must
+        also be imported, which is what actually defines
+        programs.claude-code.plugins. That option does not exist on
+        home-manager 25-11, so the definition has to be absent rather than
+        disabled there; see that file.
       '';
     };
 
@@ -316,19 +330,6 @@ in
         };
       };
     }
-
-    # --- vendored third-party skills ---------------------------------------
-    (lib.mkIf (cfg.claude.superpowers-skills != null) {
-      # systematic-debugging pulled from obra/superpowers (flake input). Recursive
-      # so the SKILL.md plus its supporting technique files (root-cause-tracing.md,
-      # defense-in-depth.md, condition-based-waiting.md, ...) all land and the
-      # in-directory references resolve. Only this one skill is pulled, not the
-      # rest of the superpowers plugin; its superpowers:* cross-refs are inert.
-      home.file.".claude/skills/systematic-debugging" = {
-        source = "${cfg.claude.superpowers-skills}/skills/systematic-debugging";
-        recursive = true;
-      };
-    })
 
     # --- lavish-axi ---------------------------------------------------------
     # The `package != null` half of each guard is not redundant with the

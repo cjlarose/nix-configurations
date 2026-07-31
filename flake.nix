@@ -100,7 +100,11 @@
       flake = false;
     };
     superpowers = {
-      url = "github:obra/superpowers";
+      # obra/superpowers, pinned to a release tag rather than tracking the
+      # branch: it ships a SessionStart hook that injects context into every
+      # session, so an unpinned bump would change every host's prompt silently.
+      # Repackaged in packages/superpowers (flake = false).
+      url = "github:obra/superpowers/v6.2.0";
       flake = false;
     };
     nvr = {
@@ -116,7 +120,6 @@
     };
     picktrace-nix-configurations = {
       url = "git+ssh://git@github.com/picktrace/nix-configurations";
-      inputs.superpowers.follows = "superpowers";
     };
     cjlarose-llm-wiki = {
       url = "git+ssh://git@github.com/cjlarose/llm-wiki";
@@ -190,7 +193,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack lavish-axi;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi;
           };
         in
           import ./packages packageArgs
@@ -233,7 +236,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules superpowers self;
+          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules self;
         }
       );
 

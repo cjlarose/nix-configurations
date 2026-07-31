@@ -16,6 +16,7 @@
   tuicr,
   llm-agents,
   gh-stack,
+  superpowers,
   lavish-axi,
   ...
 }:
@@ -128,6 +129,13 @@ in
   # From llm-agents.nix rather than nixpkgs-unstable so it tracks the same
   # daily-updated source as claude-code and herdr.
   opencode = llm-agents-pkgs.opencode;
+  # obra/superpowers repackaged as a force-loadable Claude Code plugin, with the
+  # SessionStart hook's CLAUDE_PLUGIN_ROOT baked to a real store path.
+  superpowers = import ./superpowers {
+    pkgs = nixpkgs-26-05.legacyPackages.${system};
+    src = superpowers;
+    version = "6.2.0";
+  };
   tuicr = tuicr.packages.${system}.default;
   # Built from source (flake = false input `lavish-axi` is the upstream src).
   # callPackage supplies lib/stdenv/nodejs_22/pnpm/makeWrapper from nixpkgs-26-05.

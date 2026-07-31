@@ -73,6 +73,10 @@
       home-manager.useUserPackages = true;
       home-manager.backupFileExtension = "hm-backup";
       home-manager.users.cjlarose = (import ../../home/cjlarose) {
+        # home-manager-25-11 here: its programs.claude-code module has no
+        # `plugins` option, so the superpowers plugin cannot be defined at all.
+        # Drop this once the host moves to 26.05.
+        enableSuperpowers = false;
         inherit system stateVersion additionalPackages;
         claudeUseNodeRuntime = true;
       };

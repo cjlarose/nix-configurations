@@ -10,7 +10,6 @@
   disko,
   determinate,
   nix-minecraft,
-  superpowers,
   microvm,
   hermes-agent,
   picktrace-nix-configurations,
@@ -113,7 +112,7 @@ let
     "ns1010301" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
-        inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules superpowers self;
+        inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules self;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "25.11";
