@@ -57,6 +57,10 @@
     ../../home-manager-modules/llm-agents/wiki-bridge.nix
   ];
 
+  # gh from nixpkgs-unstable (2.96.0) rather than the host's 26-05 (2.93.0);
+  # see packages/default.nix.
+  cjlarose.devTools.ghPackage = additionalPackages.${system}.gh;
+
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
   cjlarose.shell.kubePrompt = true;
   cjlarose.shell.dockerPrompt = true;

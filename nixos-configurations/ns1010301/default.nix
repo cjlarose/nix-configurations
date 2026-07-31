@@ -53,6 +53,12 @@
     {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
+      # dev-tools now manages ~/.config/gh/config.yml via programs.gh, and gh
+      # has already written its own default one here; without a backup
+      # extension activation hard-fails on "existing file is in the way". The
+      # displaced file is pure gh defaults, so nothing is lost. Same setting
+      # immich and the darwin host already use.
+      home-manager.backupFileExtension = "hm-backup";
       home-manager.users.cjlarose = {
         imports = [
           ((import ../../home/cjlarose) {

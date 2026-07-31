@@ -110,6 +110,10 @@ in
       $out/share/terminfo/
   '';
   nix-direnv = nixpkgs-unstable.legacyPackages.${system}.nix-direnv;
+  # From unstable rather than the host's 26-05, which lags at 2.93.0. unstable
+  # is already locked here and carries 2.96.0, the current upstream release, so
+  # this needs no channel bump.
+  gh = nixpkgs-unstable.legacyPackages.${system}.gh;
   # Terminal workspace manager for AI coding agents (herdr.dev). Only in
   # llm-agents.nix, not nixpkgs.
   herdr = llm-agents-pkgs.herdr;
