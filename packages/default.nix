@@ -120,6 +120,11 @@ in
     src = gh-stack;
     version = "0.1.0";
   };
+  # Non-interactive hunk-level git surgery (stage/unstage/discard/undo/fold/
+  # amend/squash/split/move by hunk ID). Only in llm-agents.nix, not nixpkgs.
+  # The package carries upstream's own agent skill in share/, so the SKILL.md
+  # the llm-agents module installs cannot drift from the binary.
+  git-surgeon = llm-agents-pkgs.git-surgeon;
   # Terminal workspace manager for AI coding agents (herdr.dev). Only in
   # llm-agents.nix, not nixpkgs.
   herdr = llm-agents-pkgs.herdr;
