@@ -84,6 +84,62 @@ let
     exec ${pkgs.playwright-mcp}/bin/playwright-mcp \
       --headless --isolated --executable-path "''${chrome[0]}" "$@"
   '';
+
+  # herdr's agent integrations -- the hook/plugin that report pane agent state
+  # (working/blocked/idle) back to the herdr server, so panes show live status.
+  #
+  # Upstream installs these imperatively with `herdr integration install <target>`,
+  # which cannot work here: the claude half wants to merge its hook registration
+  # into ~/.claude/settings.json, and that is a symlink into the read-only store
+  # (programs.claude-code.settings, below). The install fails with EROFS and
+  # writes nothing.
+  #
+  # So we run the same installer inside a build sandbox and take the files it
+  # produces. Both payloads are fully static -- no paths, ids, or versions baked
+  # in; everything dynamic arrives at runtime via HERDR_ENV / HERDR_SOCKET_PATH /
+  # HERDR_PANE_ID -- so extracting rather than vendoring a copy means they track
+  # cfg.herdr.package automatically and never drift from the installed binary.
+  #
+  # Lazy: only forced from the herdr branch of config, which already guards
+  # package != null.
+  herdrIntegrations = pkgs.runCommand "herdr-integrations" { } ''
+    export HOME=$PWD/home
+    export XDG_CONFIG_HOME=$HOME/.config
+    # The installer refuses a target whose config dir does not already exist.
+    mkdir -p $HOME/.claude $HOME/.config/opencode
+    ${cfg.herdr.package}/bin/herdr integration install claude   >/dev/null
+    ${cfg.herdr.package}/bin/herdr integration install opencode >/dev/null
+
+    mkdir -p $out
+
+    # The one thing we cannot extract is the settings.json hook registration --
+    # reading it back would mean readFile on a derivation output, i.e. IFD in
+    # every home-manager eval. It is hand-written below instead, so pin the
+    # payload version it was written against: a herdr bump that changes the
+    # contract fails the build here rather than silently half-wiring the hook.
+    grep -q '^# HERDR_INTEGRATION_VERSION=7$' $HOME/.claude/hooks/herdr-agent-state.sh || {
+      echo "herdr claude integration version changed; re-check the SessionStart" >&2
+      echo "registration in programs.claude-code.settings.hooks against:" >&2
+      cat $HOME/.claude/settings.json >&2
+      exit 1
+    }
+    grep -q '^// HERDR_INTEGRATION_VERSION=9$' $HOME/.config/opencode/plugins/herdr-agent-state.js || {
+      echo "herdr opencode integration version changed; re-check the plugin wiring" >&2
+      exit 1
+    }
+
+    # The hook shells out to python3 and exits 0 -- silently, reporting itself
+    # as installed and current -- when it is not on PATH. It is not on PATH in
+    # this login environment, so pin it to the store. Free in practice: python3
+    # is already in the home closure on every host in this profile, so the whole
+    # extraction adds ~11 KiB.
+    substitute $HOME/.claude/hooks/herdr-agent-state.sh $out/claude-hook.sh \
+      --replace-fail 'command -v python3' 'command -v ${pkgs.python3}/bin/python3' \
+      --replace-fail ' python3 - <<' ' ${pkgs.python3}/bin/python3 - <<'
+    chmod +x $out/claude-hook.sh
+
+    cp $HOME/.config/opencode/plugins/herdr-agent-state.js $out/opencode-plugin.js
+  '';
 in
 {
   options.cjlarose.llmAgents = {
@@ -413,6 +469,39 @@ in
 
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null) {
       home.packages = [ cfg.herdr.package ];
+
+      # Claude Code integration, in the two halves `herdr integration install
+      # claude` would have written (see herdrIntegrations above for why it
+      # cannot run against this home).
+      #
+      # The script goes to the exact path herdr probes so `herdr integration
+      # status` reports `current (v7)` instead of `not installed`. `.source`
+      # rather than programs.claude-code.hooks (which takes script *content*,
+      # so would need readFile on the derivation -> IFD).
+      home.file.".claude/hooks/herdr-agent-state.sh".source =
+        "${herdrIntegrations}/claude-hook.sh";
+
+      # The registration half. Merges into the settings attrset defined in the
+      # unconditional Claude block above. Kept in sync with the script by the
+      # VERSION=7 assertion in herdrIntegrations.
+      programs.claude-code.settings.hooks.SessionStart = [{
+        matcher = "*";
+        hooks = [{
+          type = "command";
+          timeout = 10;
+          command = "${pkgs.bash}/bin/bash '${config.home.homeDirectory}/.claude/hooks/herdr-agent-state.sh' session";
+        }];
+      }];
+    })
+
+    # opencode integration. Split from the block above because it needs both
+    # tools; the plugin is inert (and harmless) without opencode installed, but
+    # there is no reason to write it. No registration half -- opencode scans the
+    # plugins directory, and home-manager's programs.opencode does not manage
+    # it, so there is nothing to collide with.
+    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.opencode.enable) {
+      xdg.configFile."opencode/plugins/herdr-agent-state.js".source =
+        "${herdrIntegrations}/opencode-plugin.js";
     })
 
     # --- personal LLM wiki --------------------------------------------------
