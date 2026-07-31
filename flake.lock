@@ -813,11 +813,11 @@
     "mattpocock-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1779983310,
-        "narHash": "sha256-RRVV4V4h/9GkwnHU4G4PLQtwdU1Lm4istvGncwmQ9dg=",
+        "lastModified": 1785230297,
+        "narHash": "sha256-dQtG6usJWlg/FqTajrjcs8GSdymH92WsgLiUaCfvKPA=",
         "owner": "mattpocock",
         "repo": "skills",
-        "rev": "e3b90b5238f38cdea5996e16861dcae28ef52eda",
+        "rev": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
         "type": "github"
       },
       "original": {
@@ -1445,9 +1445,7 @@
         "impermanence": "impermanence_2",
         "lavish-axi": "lavish-axi_2",
         "llm-agents": "llm-agents_2",
-        "mattpocock-skills": [
-          "mattpocock-skills"
-        ],
+        "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm_2",
         "nix-darwin-26-05": "nix-darwin-26-05",
         "nixpkgs-23-05": "nixpkgs-23-05_2",
@@ -1583,7 +1581,6 @@
         "intranetHosts": "intranetHosts",
         "lavish-axi": "lavish-axi",
         "llm-agents": "llm-agents",
-        "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",
         "nixpkgs-23-05": "nixpkgs-23-05",
