@@ -30,7 +30,14 @@
     # sit behind runtime is_x86_feature_detected! gates, unlike the Bun
     # claude-code binary that forces the node build above.
     opencode = { enable = true; package = additionalPackages.${system}.opencode; };
-    herdr = { enable = true; package = additionalPackages.${system}.herdr; };
+    herdr = {
+      enable = true;
+      package = additionalPackages.${system}.herdr;
+      # Upstream's own agent skill, which the module lifts out of the source
+      # tree -- the same pin the binary above is built from, so the skill cannot
+      # describe subcommands this herdr does not have.
+      skillSrc = additionalPackages.${system}.herdr-src;
+    };
 
     # Hunk-level git surgery for agents, plus upstream's skill describing it.
     # Fleet-wide rather than host-scoped: it is a small Rust binary with no

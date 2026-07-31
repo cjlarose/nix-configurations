@@ -6,7 +6,9 @@
 # standalone agent CLIs (opencode, herdr, git-surgeon), and the gh-stack agent
 # skill. Options ending in `Skill` install documentation only -- the tool they
 # describe is installed elsewhere; an option without the suffix that happens to
-# ship a skill (lavish, gitSurgeon) installs the tool too.
+# ship a skill (lavish, gitSurgeon) installs the tool too. herdr is the third
+# case: the tool is here but upstream keeps its skill out of the package, so the
+# module lifts it out of upstream's source tree (herdr.skillSrc).
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
 # modules. Claude Code is unconditional -- importing this module is the decision
@@ -139,6 +141,31 @@ let
     chmod +x $out/claude-hook.sh
 
     cp $HOME/.config/opencode/plugins/herdr-agent-state.js $out/opencode-plugin.js
+  '';
+
+  # Upstream's official agent skill (herdr.dev/docs/agent-skill), lifted out of
+  # the herdr source tree. Upstream ships it in the repo but keeps it out of the
+  # package, distributing it through `npx skills add` -- which would write into
+  # ~/.claude/skills, a home-manager-managed tree here.
+  #
+  # Lazy, like herdrIntegrations: only forced from the block that already guards
+  # skillSrc != null.
+  herdrSkill = pkgs.runCommand "herdr-skill" { } ''
+    # v0.7.5 keeps SKILL.md at the repo root; upstream has since moved it to
+    # skills/herdr/. Take whichever the pinned revision has, so a version bump
+    # is a one-line change in the consuming flake, and fail loudly rather than
+    # installing an empty skill if it ever moves somewhere else again.
+    for candidate in ${cfg.herdr.skillSrc}/skills/herdr/SKILL.md \
+                     ${cfg.herdr.skillSrc}/SKILL.md; do
+      if [ -f "$candidate" ]; then
+        install -D "$candidate" "$out/SKILL.md"
+        break
+      fi
+    done
+    if [ ! -f "$out/SKILL.md" ]; then
+      echo "no SKILL.md in the herdr source at ${cfg.herdr.skillSrc}" >&2
+      exit 1
+    fi
   '';
 in
 {
@@ -303,6 +330,31 @@ in
       type = lib.types.nullOr lib.types.package;
       default = null;
       description = "The herdr package to install. Required when herdr.enable is set.";
+    };
+
+    herdr.skillSrc = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        Upstream's herdr source tree (the herdrdev/herdr flake input itself),
+        from which the module lifts the official agent skill and installs it as
+        the `herdr` Claude Code skill. Optional -- herdr works fine without it;
+        leave null to install the terminal multiplexer but not the instructions
+        for driving it.
+
+        A source rather than a package because upstream's derivation
+        deliberately excludes the skill from its src fileset, distributing it
+        through `npx skills add` instead -- so there is nothing to read out of
+        herdr.package, and the extraction has to happen somewhere. Here, so
+        both consuming flakes get it from one definition rather than a copy
+        each.
+
+        Set this from the SAME input that produced herdr.package, so the skill
+        cannot document subcommands the installed binary does not have.
+
+        Ignored unless herdr.enable is also set: a skill telling the agent to
+        run `herdr` is worse than useless without the binary.
+      '';
     };
 
     # --- personal LLM wiki --------------------------------------------------
@@ -492,6 +544,15 @@ in
           command = "${pkgs.bash}/bin/bash '${config.home.homeDirectory}/.claude/hooks/herdr-agent-state.sh' session";
         }];
       }];
+    })
+
+    # Upstream's agent skill for driving herdr from inside a herdr-managed pane.
+    # Split from the block above because it is optional and separately sourced
+    # (see herdr.skillSrc), but gated on herdr.enable all the same. Harmless on
+    # hosts where herdr is installed but unused: the skill's first instruction
+    # is to check HERDR_ENV=1 and stop if it is unset.
+    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null) {
+      programs.claude-code.skills."herdr" = "${herdrSkill}/SKILL.md";
     })
 
     # opencode integration. Split from the block above because it needs both
