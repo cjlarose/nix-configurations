@@ -8,7 +8,6 @@
     claude.mattpocock-skills = mattpocock-skills;
     claude.superpowers-skills = superpowers;
     claude.remoteControlAtStartup = true;
-    phxWorkflow.enable = true;
 
     # Which claude build is a property of the host, not of the module. The
     # Goldmont-based pve guests have no AVX and segfault on the Bun standalone at
