@@ -19,6 +19,22 @@ let
     fi
   '';
 in {
+  options.cjlarose.devTools.ghStack = {
+    enable = lib.mkEnableOption ''
+      github/gh-stack, GitHub's official stacked-PR gh CLI extension. Registers
+      it with gh so `gh stack ...` works; the binary is reached through that
+      extension mechanism and is deliberately not put on PATH separately. This
+      is a human CLI tool -- the agent SKILL.md that upstream ships in the same
+      package is installed separately by the llm-agents module
+    '';
+
+    package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = "The gh-stack package. Required when ghStack.enable is set.";
+    };
+  };
+
   options.cjlarose.devTools.ghPackage = lib.mkOption {
     type = lib.types.package;
     default = pkgs.gh;
@@ -31,10 +47,24 @@ in {
     '';
   };
 
+  config.assertions = [
+    {
+      assertion = !cfg.ghStack.enable || cfg.ghStack.package != null;
+      message = "cjlarose.devTools.ghStack.enable is true but cjlarose.devTools.ghStack.package is unset.";
+    }
+  ];
+
   config.programs.gh = {
     enable = true;
     package = cfg.ghPackage;
 
+    # gh discovers extensions by directory layout, not PATH -- it looks for
+    # ~/.local/share/gh/extensions/gh-<name>/. This option does exactly that
+    # (a linkFarm keyed on pname into xdg.dataFile "gh/extensions"), which is
+    # the reason gh is managed through programs.gh at all rather than just
+    # dropped into home.packages.
+    extensions = lib.optional (cfg.ghStack.enable && cfg.ghStack.package != null)
+      cfg.ghStack.package;
     # home-manager generates ~/.config/gh/config.yml from this. Note that gh
     # CANNOT fill in defaults it is missing: the generated file is a read-only
     # store symlink, so anything omitted here is simply absent. aliases.co is
@@ -53,6 +83,9 @@ in {
     };
   };
 
+  # gh-stack is deliberately NOT here. It is invoked as `gh stack ...` through
+  # the extension mechanism above; a bare gh-stack on PATH would just be a
+  # second spelling of the same command.
   config.home.packages = [
     pkgs.csvtool
     pkgs.dig
