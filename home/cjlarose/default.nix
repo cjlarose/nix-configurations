@@ -61,6 +61,14 @@
   # see packages/default.nix.
   cjlarose.devTools.ghPackage = additionalPackages.${system}.gh;
 
+  # GitHub's official stacked-PR extension: `gh stack ...` and a gh-stack on
+  # PATH. Useful at the keyboard, independent of any agent -- the SKILL.md that
+  # ships in the same package is installed by llm-agents above.
+  cjlarose.devTools.ghStack = {
+    enable = true;
+    package = additionalPackages.${system}.gh-stack;
+  };
+
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
   cjlarose.shell.kubePrompt = true;
   cjlarose.shell.dockerPrompt = true;

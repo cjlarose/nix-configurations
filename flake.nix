@@ -127,6 +127,16 @@
       url = "git+ssh://git@github.com/cjlarose/llm-wiki";
       inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
+    gh-stack = {
+      # github/gh-stack -- GitHub's official stacked-PR gh CLI extension
+      # (https://github.github.com/gh-stack/). flake = false: upstream ships no
+      # nix packaging. One input serves two purposes -- it is the src for the
+      # buildGoModule package in packages/gh-stack AND the source of the agent
+      # skill at skills/gh-stack/SKILL.md, so the binary and the skill that
+      # documents it can never drift apart.
+      url = "github:github/gh-stack/v0.1.0";
+      flake = false;
+    };
     lavish-axi = {
       # Upstream lavish-axi, pinned to a release tag and built from source in
       # packages/lavish-axi (flake = false: upstream ships no nix packaging).
@@ -171,6 +181,7 @@
     cjlarose-llm-wiki,
     tuicr,
     llm-agents,
+    gh-stack,
     lavish-axi,
   }:
     let
@@ -185,7 +196,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents lavish-axi;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack lavish-axi;
           };
         in
           import ./packages packageArgs

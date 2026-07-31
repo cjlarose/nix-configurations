@@ -15,6 +15,7 @@
   nix-minecraft,
   tuicr,
   llm-agents,
+  gh-stack,
   lavish-axi,
   ...
 }:
@@ -114,6 +115,13 @@ in
   # is already locked here and carries 2.96.0, the current upstream release, so
   # this needs no channel bump.
   gh = nixpkgs-unstable.legacyPackages.${system}.gh;
+  # Built from the flake input (flake = false), which is also where the
+  # llm-agents module reads skills/gh-stack/SKILL.md -- one pin for both.
+  gh-stack = import ./gh-stack {
+    pkgs = nixpkgs-26-05.legacyPackages.${system};
+    src = gh-stack;
+    version = "0.1.0";
+  };
   # Terminal workspace manager for AI coding agents (herdr.dev). Only in
   # llm-agents.nix, not nixpkgs.
   herdr = llm-agents-pkgs.herdr;
