@@ -27,6 +27,11 @@
     opencode = { enable = true; package = additionalPackages.${system}.opencode; };
     herdr = { enable = true; package = additionalPackages.${system}.herdr; };
 
+    # Skill only, as the name says; the gh extension itself is a human CLI tool
+    # enabled via cjlarose.devTools.ghStack below. Same package for both, so the
+    # skill always documents the extension that is actually installed.
+    ghStackSkill = { enable = true; package = additionalPackages.${system}.gh-stack; };
+
     # The wiki's Claude Code plugin (skills + SessionStart index hook) and
     # LLM_WIKI_PATH. Only where a wiki worktree actually exists, which is also
     # the only place llm-wiki-module is threaded in below.
