@@ -2,7 +2,7 @@
 #
 # One module owning everything agent-related for a user: Claude Code itself
 # (package choice, MCP servers, settings, the nixd LSP marketplace, vendored
-# skills), the phx workflow skills, lavish-axi, the personal LLM wiki
+# skills), lavish-axi, the personal LLM wiki
 # integration, the standalone agent CLIs (opencode, herdr), and the gh-stack
 # agent skill. Options ending in `Skill` install documentation only -- the tool
 # they describe is installed elsewhere.
@@ -144,18 +144,6 @@ in
         package names.
       '';
     };
-
-    # --- phx workflow skills ------------------------------------------------
-
-    phxWorkflow.enable = lib.mkEnableOption ''
-      the language-agnostic phx workflow skills (/phx-brainstorm, /phx-plan,
-      /phx-work, /phx-review, /phx-full). These are de-Elixir'd ports of the
-      core workflow spine from oliver-kriska/claude-elixir-phoenix: same
-      .claude/plans/{slug}/ artifact contract and decision-gate discipline,
-      but with build/test/lint discovery left to the model (prose, not
-      hardcoded mix commands) and research fan-out using the built-in
-      general-purpose/Explore subagents instead of named Elixir agents
-    '';
 
     # --- lavish-axi ---------------------------------------------------------
 
@@ -354,21 +342,6 @@ in
       home.file.".claude/skills/systematic-debugging" = {
         source = "${cfg.claude.superpowers-skills}/skills/systematic-debugging";
         recursive = true;
-      };
-    })
-
-    # --- phx workflow skills ------------------------------------------------
-    (lib.mkIf cfg.phxWorkflow.enable {
-      # Deployed via the upstream programs.claude-code.skills option (key = bare
-      # skill directory name, value = its SKILL.md; never append /SKILL — that
-      # double-nests post home-manager #8770). skills is attrsOf, so these keys
-      # merge with any set elsewhere. Output: ~/.claude/skills/phx-<name>/SKILL.md.
-      programs.claude-code.skills = {
-        "phx-brainstorm" = ./skills/phx/brainstorm/SKILL.md;
-        "phx-plan" = ./skills/phx/plan/SKILL.md;
-        "phx-work" = ./skills/phx/work/SKILL.md;
-        "phx-review" = ./skills/phx/review/SKILL.md;
-        "phx-full" = ./skills/phx/full/SKILL.md;
       };
     })
 
