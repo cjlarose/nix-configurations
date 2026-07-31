@@ -89,12 +89,6 @@ in
 
     # --- Claude Code -------------------------------------------------------
 
-    claude.mattpocock-skills = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      description = "Path to the mattpocock/skills repository source.";
-    };
-
     claude.superpowers-skills = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
       default = null;
@@ -324,15 +318,6 @@ in
     }
 
     # --- vendored third-party skills ---------------------------------------
-    (lib.mkIf (cfg.claude.mattpocock-skills != null) {
-      # handoff is provided by the LLM wiki (skills/handoff), deployed via the
-      # wiki plugin where a wiki is present. grill-me stays vendored here.
-      home.file.".claude/skills/grill-me" = {
-        source = "${cfg.claude.mattpocock-skills}/skills/productivity/grill-me";
-        recursive = true;
-      };
-    })
-
     (lib.mkIf (cfg.claude.superpowers-skills != null) {
       # systematic-debugging pulled from obra/superpowers (flake input). Recursive
       # so the SKILL.md plus its supporting technique files (root-cause-tracing.md,

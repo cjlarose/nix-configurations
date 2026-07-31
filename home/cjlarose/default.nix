@@ -1,11 +1,10 @@
-{ system, additionalPackages, stateVersion, mattpocock-skills ? null, superpowers ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
+{ system, additionalPackages, stateVersion, superpowers ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
 { pkgs, lib, ... }: {
   # All LLM-agent tooling lives behind the single llm-agents module. Claude Code
   # itself is unconditional there; the rest is opted into here for the whole
   # cjlarose fleet, or per-host where the closure cost warrants it. The module
   # takes no additionalPackages arg -- every package is named explicitly here.
   cjlarose.llmAgents = {
-    claude.mattpocock-skills = mattpocock-skills;
     claude.superpowers-skills = superpowers;
     claude.remoteControlAtStartup = true;
 

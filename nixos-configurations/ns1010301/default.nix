@@ -1,4 +1,4 @@
-{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, mattpocock-skills, superpowers, self, ... }: {
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, superpowers, self, ... }: {
   imports = [
     microvm.nixosModules.host
     ({ ... }: {
@@ -62,7 +62,7 @@
       home-manager.users.cjlarose = {
         imports = [
           ((import ../../home/cjlarose) {
-            inherit system stateVersion additionalPackages mattpocock-skills superpowers;
+            inherit system stateVersion additionalPackages superpowers;
             llm-wiki-path = "/home/cjlarose/worktrees/cjlarose/llm-wiki/default";
             llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
           })
