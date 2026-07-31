@@ -91,29 +91,16 @@
     THOR_MERGE = "${pkgs.neovim-remote}/bin/nvr -s -d";
   };
 
+  # Deliberately small. This profile fans out to every cjlarose host, so it
+  # carries only things wanted everywhere; per-project toolchains belong in
+  # devshells, and picktrace's toolchain lives in that repo's
+  # home/modules/picktrace-dev-packages.nix.
   home.packages = [
     pkgs._1password-cli
-    additionalPackages.${system}.bundix
     additionalPackages.${system}.git-make-apply-command
-    pkgs.nodejs_22
     pkgs.oha
     pkgs.parallel
-    pkgs.postgresql
-    (additionalPackages.${system}.python39.withPackages (python-pkgs: with python-pkgs; [
-      faker
-      google-cloud-firestore
-      google-cloud-pubsub
-      ipython
-      psycopg2
-      pytz
-      requests
-      setuptools
-      shortuuid
-    ]))
-    pkgs.ruby
     pkgs.socat
-    pkgs.speedtest-cli
-    pkgs.stack
     additionalPackages.${system}.trueColorTest
     additionalPackages.${system}.tuicr
   ];
@@ -127,8 +114,9 @@
 
   programs.git.userName = "Christopher La Rose";
   programs.git.userEmail = "cjlarose@gmail.com";
+  # gh is configured with git_protocol = ssh (see dev-tools), but anything else
+  # handing out an https github URL still gets rewritten here.
   programs.git.extraConfig = {
-    "url \"git@bitbucket.org:\"".insteadOf = "https://bitbucket.org";
     "url \"ssh://git@github.com/\"".insteadOf = "https://github.com/";
   };
 
@@ -138,14 +126,5 @@
         forwardAgent = true;
       };
     };
-  };
-
-  programs.go = {
-    enable = true;
-    package = additionalPackages.${system}.go_1_22;
-    goPrivate = [
-      "bitbucket.org/picktrace"
-      "github.com/picktrace"
-    ];
   };
 }

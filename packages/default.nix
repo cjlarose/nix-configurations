@@ -1,13 +1,11 @@
 {
   pkgs,
   nixpkgs-24-11,
-  nixpkgs-23-05,
   nixpkgs-25-05,
   nixpkgs-25-11,
   nixpkgs-26-05,
   nixpkgs-unstable,
   system,
-  bundix,
   intranetHosts,
   nvr,
   trueColorTest,
@@ -94,7 +92,6 @@ in
   claude-code = claude-code-bun;
   claude-code-node = claude-code-node-pkg;
   cs-automation = cs-automation.packages.${system}.default;
-  bundix = import "${bundix}/default.nix" { inherit pkgs; };
   immich = nixpkgs-25-11.legacyPackages.${system}.immich;
   intranetHosts = intranetHosts;
   # mosh patched so mosh-server advertises COLORTERM=truecolor to the session.
@@ -144,8 +141,6 @@ in
     version = "0.1.43";
   };
   nvr = import ./nvr { inherit pkgs nvr; };
-  go_1_22 = nixpkgs-24-11.legacyPackages.${system}.go_1_22;
-  python39 = nixpkgs-23-05.legacyPackages.${system}.python39;
   trueColorTest = pkgs.stdenv.mkDerivation {
     name = "true-color-test";
     src = trueColorTest;
