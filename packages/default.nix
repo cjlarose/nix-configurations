@@ -16,6 +16,7 @@
   gh-stack,
   superpowers,
   lavish-axi,
+  herdr,
   ...
 }:
 
@@ -125,11 +126,20 @@ in
   # The package carries upstream's own agent skill in share/, so the SKILL.md
   # the llm-agents module installs cannot drift from the binary.
   git-surgeon = llm-agents-pkgs.git-surgeon;
-  # Terminal workspace manager for AI coding agents (herdr.dev). Only in
-  # llm-agents.nix, not nixpkgs.
-  herdr = llm-agents-pkgs.herdr;
+  # Terminal workspace manager for AI coding agents (herdr.dev). Not in nixpkgs.
+  # From upstream's own flake rather than llm-agents.nix, so this pin serves the
+  # binary and the agent skill below at once and the two cannot drift.
+  herdr = herdr.packages.${system}.default;
+  # The same input as a bare source tree, for cjlarose.llmAgents.herdr.skillSrc:
+  # upstream's official agent skill (herdr.dev/docs/agent-skill) is in the repo
+  # but deliberately NOT in the package -- its src fileset is code only, and the
+  # skill is distributed through `npx skills add`. The llm-agents module lifts
+  # the SKILL.md out; passing the source rather than a package built here keeps
+  # that extraction in the one place both repos share. Same passthrough shape as
+  # intranetHosts above.
+  herdr-src = herdr;
   # From llm-agents.nix rather than nixpkgs-unstable so it tracks the same
-  # daily-updated source as claude-code and herdr.
+  # daily-updated source as claude-code.
   opencode = llm-agents-pkgs.opencode;
   # obra/superpowers repackaged as a force-loadable Claude Code plugin, with the
   # SessionStart hook's CLAUDE_PLUGIN_ROOT baked to a real store path.

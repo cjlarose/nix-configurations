@@ -38,7 +38,8 @@
     llm-agents = {
       # numtide/llm-agents.nix -- AI-coding-agent tools packaged for nix and
       # auto-updated daily. Source of claude-code (rolls forward independently
-      # of a nixpkgs-unstable bump), opencode, and herdr. Follows
+      # of a nixpkgs-unstable bump), opencode, and git-surgeon; herdr used to
+      # come from here too and now comes from its own upstream flake. Follows
       # nixpkgs-unstable, which is also what the flake pins upstream, so no
       # second nixpkgs subtree lands in the lock.
       url = "github:numtide/llm-agents.nix";
@@ -128,6 +129,25 @@
       url = "github:github/gh-stack/v0.1.0";
       flake = false;
     };
+    herdr = {
+      # herdrdev/herdr -- upstream's own flake, and the definitive source for
+      # BOTH the herdr binary and the official agent SKILL.md
+      # (herdr.dev/docs/agent-skill). One pin for both, like the gh-stack input
+      # above, so a skill documenting subcommands the installed binary does not
+      # have is structurally impossible.
+      #
+      # This replaces llm-agents.nix as the source of herdr specifically (that
+      # input still provides claude-code, opencode and git-surgeon). The trade
+      # is llm-agents.nix's daily auto-bump for one deliberate tag: herdr now
+      # moves when this line moves. Upstream's package covers all four supported
+      # platforms and its build.rs passes an explicit -Dtarget, so the vendored
+      # zig builds for the arch baseline -- no AVX on the Goldmont pve guests.
+      #
+      # NOTE when bumping the tag: upstream moved SKILL.md from the repo root to
+      # skills/herdr/ after v0.7.5; packages/default.nix accepts either.
+      url = "github:herdrdev/herdr/v0.7.5";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     lavish-axi = {
       # Upstream lavish-axi, pinned to a release tag and built from source in
       # packages/lavish-axi (flake = false: upstream ships no nix packaging).
@@ -171,6 +191,7 @@
     llm-agents,
     gh-stack,
     lavish-axi,
+    herdr,
   }:
     let
       supportedPlatforms = [
@@ -184,7 +205,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi herdr;
           };
         in
           import ./packages packageArgs
