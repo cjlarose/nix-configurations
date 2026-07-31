@@ -90,11 +90,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1785475980,
-        "narHash": "sha256-p5l0yBUwzGMhZ9s1lXVAvULvyWqrqnIg8tAVye9QOI0=",
+        "lastModified": 1785478955,
+        "narHash": "sha256-VFSQkLATEuvVCBmb6C8t4hjrn4pF5IuBJHU8EKTSVfA=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "9a6583429ea3260e2dec557f7888adc14ee9c2aa",
+        "rev": "74ab9dc56126099a9581448f68ef04f62985df71",
         "type": "github"
       },
       "original": {
@@ -511,6 +511,29 @@
           "nixpkgs-unstable"
         ],
         "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1784657072,
+        "narHash": "sha256-3BA8eredGku+vsL2Af7sUf43QiArR5XTHNrI+X11vFM=",
+        "owner": "herdrdev",
+        "repo": "herdr",
+        "rev": "ef4c23f5775bb8cfec05f05d0844226ff959a07a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "herdrdev",
+        "ref": "v0.7.5",
+        "repo": "herdr",
+        "type": "github"
+      }
+    },
+    "herdr_2": {
+      "inputs": {
+        "nixpkgs": [
+          "picktrace-nix-configurations",
+          "nixpkgs-unstable"
+        ],
+        "rust-overlay": "rust-overlay_2"
       },
       "locked": {
         "lastModified": 1784657072,
@@ -1431,6 +1454,7 @@
         "cjlarose-home-manager-modules": "cjlarose-home-manager-modules",
         "cjlarose-llm-wiki": "cjlarose-llm-wiki_2",
         "gh-stack": "gh-stack_2",
+        "herdr": "herdr_2",
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
@@ -1451,11 +1475,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1785476691,
-        "narHash": "sha256-/I2DyAYBzeegSS6DxDKnMThfRHSLMB9GNvCJw49+7mU=",
+        "lastModified": 1785479094,
+        "narHash": "sha256-743hvDL5hb1CmpgiWtNyJQQyG+mU3dEenkRS68svXW8=",
         "ref": "refs/heads/main",
-        "rev": "4e97623b0b71ef14a47bf3579d3c3815fef73911",
-        "revCount": 358,
+        "rev": "9e1395087521d973996377ce2c2fe85e74b4ae39",
+        "revCount": 360,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1625,6 +1649,28 @@
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
+          "herdr",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783577481,
+        "narHash": "sha256-EWMxOWrJ031f8f/lrcEmhTRs4npw1/5N3Hcjin846c8=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "4cdea398dc491b082dccdce0fad1ed0b75fa3394",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_2": {
+      "inputs": {
+        "nixpkgs": [
+          "picktrace-nix-configurations",
           "herdr",
           "nixpkgs"
         ]
