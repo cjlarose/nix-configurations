@@ -32,6 +32,14 @@
     opencode = { enable = true; package = additionalPackages.${system}.opencode; };
     herdr = { enable = true; package = additionalPackages.${system}.herdr; };
 
+    # Hunk-level git surgery for agents, plus upstream's skill describing it.
+    # Fleet-wide rather than host-scoped: it is a small Rust binary with no
+    # closure to speak of, and the branch-and-PR workflow it serves is the same
+    # everywhere. Not split across dev-tools like gh-stack -- `git-surgeon` is
+    # agent tooling, and the interactive equivalents (git add -p, rebase -i) are
+    # what a human at the keyboard reaches for.
+    gitSurgeon = { enable = true; package = additionalPackages.${system}.git-surgeon; };
+
     # Skill only, as the name says; the gh extension itself is a human CLI tool
     # enabled via cjlarose.devTools.ghStack below. Same package for both, so the
     # skill always documents the extension that is actually installed.

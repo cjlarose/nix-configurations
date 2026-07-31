@@ -3,9 +3,10 @@
 # One module owning everything agent-related for a user: Claude Code itself
 # (package choice, MCP servers, settings, the nixd LSP marketplace), the
 # superpowers skills plugin, lavish-axi, the personal LLM wiki integration, the
-# standalone agent CLIs (opencode, herdr), and the gh-stack agent skill. Options
-# ending in `Skill` install documentation only -- the tool they describe is
-# installed elsewhere.
+# standalone agent CLIs (opencode, herdr, git-surgeon), and the gh-stack agent
+# skill. Options ending in `Skill` install documentation only -- the tool they
+# describe is installed elsewhere; an option without the suffix that happens to
+# ship a skill (lavish, gitSurgeon) installs the tool too.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
 # modules. Claude Code is unconditional -- importing this module is the decision
@@ -198,6 +199,34 @@ in
       '';
     };
 
+    # --- git-surgeon --------------------------------------------------------
+
+    gitSurgeon.enable = lib.mkEnableOption ''
+      git-surgeon: hunk-level git staging, unstaging, discarding, undoing,
+      folding, amending, squashing, commit splitting and commit reordering, all
+      non-interactive and addressed by content-derived hunk ID. Installs BOTH the
+      CLI and upstream's own agent skill, which is why this is not named
+      `gitSurgeonSkill` -- the skill drives the bare `git-surgeon` command, so
+      shipping the two apart would give the agent instructions for a binary that
+      is not there. Contrast ghStackSkill above, whose tool is a human CLI owned
+      by cjlarose.devTools.
+
+      The CLI is agent tooling first (upstream's stated audience is agents that
+      need precise control over which hunks to stage), so unlike gh-stack it
+      lives entirely here rather than being split across dev-tools
+    '';
+
+    gitSurgeon.package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = ''
+        The git-surgeon package to install. Carries the CLI at bin/git-surgeon
+        and upstream's skill at share/git-surgeon/skills/git-surgeon/SKILL.md
+        (note the plural `skills/` -- gh-stack and lavish-axi both use a singular
+        `skill/`). Required when gitSurgeon.enable is set.
+      '';
+    };
+
     # --- standalone agent CLIs ---------------------------------------------
 
     opencode.enable = lib.mkEnableOption
@@ -357,6 +386,23 @@ in
         "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
     })
 
+    # --- git-surgeon --------------------------------------------------------
+    (lib.mkIf (cfg.gitSurgeon.enable && cfg.gitSurgeon.package != null) {
+      # Binary and skill together, out of one package, so the documented
+      # subcommands and flags always match the build that is installed.
+      home.packages = [ cfg.gitSurgeon.package ];
+
+      # Upstream nests its skill one level deeper than the other two tools we
+      # read a SKILL.md out of: share/git-surgeon/skills/<name>/SKILL.md, not
+      # share/<tool>/skill/SKILL.md.
+      #
+      # Key is the bare skill directory name -- home-manager appends
+      # /SKILL.md itself (PR #8770); a trailing /SKILL here would double-nest to
+      # ~/.claude/skills/git-surgeon/SKILL/SKILL.md and be discovered by nothing.
+      programs.claude-code.skills."git-surgeon" =
+        "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+    })
+
     # --- standalone agent CLIs ---------------------------------------------
     (lib.mkIf (cfg.opencode.enable && cfg.opencode.package != null) {
       programs.opencode = {
@@ -398,6 +444,10 @@ in
         {
           assertion = !cfg.ghStackSkill.enable || cfg.ghStackSkill.package != null;
           message = "cjlarose.llmAgents.ghStackSkill.enable is true but cjlarose.llmAgents.ghStackSkill.package is unset.";
+        }
+        {
+          assertion = !cfg.gitSurgeon.enable || cfg.gitSurgeon.package != null;
+          message = "cjlarose.llmAgents.gitSurgeon.enable is true but cjlarose.llmAgents.gitSurgeon.package is unset.";
         }
       ];
     }
