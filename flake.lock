@@ -90,11 +90,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1785451781,
-        "narHash": "sha256-LPcXHDsCNKPxsRZ+tqGTrQ5sRRTDGMq0PCJd5uFvYnM=",
+        "lastModified": 1785469943,
+        "narHash": "sha256-i+8xzwTiFtNiF75u2lKnyoc53wCX1/4/LwI5pzPH/cc=",
         "owner": "cjlarose",
         "repo": "nix-configurations",
-        "rev": "62cde970e0ec205c2d41edfcaef5190fd0c0df4a",
+        "rev": "fe2dfb372d1adff31cce44c4f082f76d6ec9857a",
         "type": "github"
       },
       "original": {
@@ -462,6 +462,23 @@
         "type": "github"
       }
     },
+    "gh-stack_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785346327,
+        "narHash": "sha256-48JkOeqbvHlCZ2u3LnwJymw55xMQWLTPJLDbV44clGI=",
+        "owner": "github",
+        "repo": "gh-stack",
+        "rev": "a1b4a3d4d0bcde9ec3a78ab99b2d63af121857a9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "github",
+        "ref": "v0.1.0",
+        "repo": "gh-stack",
+        "type": "github"
+      }
+    },
     "git-hooks-nix": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -791,22 +808,6 @@
       "original": {
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "type": "github"
-      }
-    },
-    "mattpocock-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1785230297,
-        "narHash": "sha256-dQtG6usJWlg/FqTajrjcs8GSdymH92WsgLiUaCfvKPA=",
-        "owner": "mattpocock",
-        "repo": "skills",
-        "rev": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mattpocock",
-        "repo": "skills",
         "type": "github"
       }
     },
@@ -1407,13 +1408,13 @@
         "cjlarose-darwin-modules": "cjlarose-darwin-modules",
         "cjlarose-home-manager-modules": "cjlarose-home-manager-modules",
         "cjlarose-llm-wiki": "cjlarose-llm-wiki_2",
+        "gh-stack": "gh-stack_2",
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
         "impermanence": "impermanence_2",
         "lavish-axi": "lavish-axi_2",
         "llm-agents": "llm-agents_2",
-        "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm_2",
         "nix-darwin-26-05": "nix-darwin-26-05",
         "nixpkgs-23-05": "nixpkgs-23-05",
@@ -1428,11 +1429,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1785451935,
-        "narHash": "sha256-5qWqwNGEhvqIeUQxVVb13QAUymY6r9ne/jnHeOXdWfc=",
+        "lastModified": 1785470040,
+        "narHash": "sha256-nYJgDrbT895LdciOj48WvU5kS3v0lV4XeHip56XWew8=",
         "ref": "refs/heads/main",
-        "rev": "52ce56d18cde4cce7aace8d6aa12c8ed97c2ea73",
-        "revCount": 342,
+        "rev": "3652ada2fcc3eb5d4a884207d7f70e2e26eeef19",
+        "revCount": 354,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1633,15 +1634,16 @@
     "superpowers": {
       "flake": false,
       "locked": {
-        "lastModified": 1785266736,
-        "narHash": "sha256-fnl+HbPL2qD5Zgz8a1NctjFJSqu6UsyHJAhQMLQNXXc=",
+        "lastModified": 1784852836,
+        "narHash": "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=",
         "owner": "obra",
         "repo": "superpowers",
-        "rev": "44c9b2d6e889982ac18c27d05a19fefe335194e1",
+        "rev": "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9",
         "type": "github"
       },
       "original": {
         "owner": "obra",
+        "ref": "v6.2.0",
         "repo": "superpowers",
         "type": "github"
       }
