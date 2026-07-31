@@ -70,22 +70,6 @@
         "type": "github"
       }
     },
-    "bundix": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1707369252,
-        "narHash": "sha256-X9SRXC+KMRnZL026uIHCNl1n2glo+cqs6bgNdtTVpFs=",
-        "owner": "cjlarose",
-        "repo": "bundix",
-        "rev": "48cb83464cb6da3d6fd26426d671b062afc7efcc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cjlarose",
-        "repo": "bundix",
-        "type": "github"
-      }
-    },
     "cjlarose-darwin-modules": {
       "locked": {
         "dir": "darwin-modules",
@@ -1013,22 +997,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-23-05_2": {
-      "locked": {
-        "lastModified": 1704290814,
-        "narHash": "sha256-LWvKHp7kGxk/GEtlrGYV68qIvPHkU9iToomNFGagixU=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "70bdadeb94ffc8806c0570eb5c2695ad29f0e421",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-23.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs-23-11": {
       "locked": {
         "lastModified": 1717159533,
@@ -1448,7 +1416,7 @@
         "mattpocock-skills": "mattpocock-skills",
         "microvm": "microvm_2",
         "nix-darwin-26-05": "nix-darwin-26-05",
-        "nixpkgs-23-05": "nixpkgs-23-05_2",
+        "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-24-05": "nixpkgs-24-05_2",
         "nixpkgs-24-11": "nixpkgs-24-11_2",
         "nixpkgs-25-11": "nixpkgs-25-11_2",
@@ -1563,7 +1531,6 @@
     },
     "root": {
       "inputs": {
-        "bundix": "bundix",
         "cjlarose-llm-wiki": "cjlarose-llm-wiki",
         "cs-automation": "cs-automation",
         "determinate": "determinate",
@@ -1581,7 +1548,6 @@
         "llm-agents": "llm-agents",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",
-        "nixpkgs-23-05": "nixpkgs-23-05",
         "nixpkgs-24-05": "nixpkgs-24-05",
         "nixpkgs-24-11": "nixpkgs-24-11",
         "nixpkgs-25-05": "nixpkgs-25-05",

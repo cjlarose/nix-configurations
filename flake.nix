@@ -2,9 +2,6 @@
   description = "NixOS-based development environment";
 
   inputs = {
-    nixpkgs-23-05 = {
-      url = "github:nixos/nixpkgs/nixos-23.05";
-    };
     nixpkgs-24-05 = {
       url = "github:nixos/nixpkgs/nixos-24.05";
     };
@@ -83,10 +80,6 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs-24-05";
     };
-    bundix = {
-      url = "github:cjlarose/bundix";
-      flake = false;
-    };
     intranetHosts = {
       url = "git+ssh://git@github.com/cjlarose/intranet-hosts";
       flake = false;
@@ -146,7 +139,6 @@
   };
 
   outputs = {
-    bundix,
     determinate,
     disko,
     fzfProject,
@@ -158,7 +150,6 @@
     intranetHosts,
     nix-minecraft,
     nixpkgs-24-05,
-    nixpkgs-23-05,
     nixpkgs-24-11,
     nixpkgs-25-05,
     nixpkgs-25-11,
@@ -193,7 +184,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-23-05 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 bundix intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi;
           };
         in
           import ./packages packageArgs
