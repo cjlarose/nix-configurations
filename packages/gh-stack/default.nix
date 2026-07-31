@@ -1,11 +1,20 @@
 # github/gh-stack -- GitHub's official stacked-PR gh CLI extension.
 #
-# nixpkgs does carry gh-stack, but it lags -- 0.0.4 at the time of writing,
-# against v0.1.0 here -- so build from the pinned tag instead.
+# Built from the same pinned source as the agent skill the llm-agents module
+# installs, so the binary and the SKILL.md documenting it can never drift.
+# nixpkgs does carry gh-stack, but it lags (0.0.4 at the time of writing, versus
+# v0.1.0 here and a skill that documents 0.0.9 behaviour) -- a mismatch between
+# the skill's instructions and the binary's actual flags is worse than a build.
 #
-# gh discovers extensions by directory layout, not PATH, so the dev-tools module
-# links bin/ into ~/.local/share/gh/extensions/gh-stack rather than putting the
-# package into home.packages.
+# The output carries bin/gh-stack plus upstream's agent skill at
+# share/gh-stack/skill/SKILL.md -- the same shape lavish-axi uses. Shipping the
+# skill in the package rather than reading it from the flake input means the
+# consuming home config only has to thread ONE thing (the package), and the
+# binary and its documentation are guaranteed to come from the same tag.
+#
+# gh discovers extensions by directory layout, not PATH, so the llm-agents
+# module links bin/ into ~/.local/share/gh/extensions/gh-stack rather than
+# putting the package into home.packages.
 { pkgs, src, version }:
 
 pkgs.buildGoModule {
@@ -23,6 +32,11 @@ pkgs.buildGoModule {
   # The test suite shells out to git and expects a configured identity; the
   # build sandbox has neither.
   doCheck = false;
+
+  postInstall = ''
+    install -Dm644 skills/gh-stack/SKILL.md \
+      $out/share/gh-stack/skill/SKILL.md
+  '';
 
   meta = {
     description = "GitHub CLI extension for managing stacked pull requests";

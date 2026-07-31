@@ -3,7 +3,9 @@
 # One module owning everything agent-related for a user: Claude Code itself
 # (package choice, MCP servers, settings, the nixd LSP marketplace, vendored
 # skills), the phx workflow skills, lavish-axi, the personal LLM wiki
-# integration, and the standalone agent CLIs (opencode, herdr).
+# integration, the standalone agent CLIs (opencode, herdr), and the gh-stack
+# agent skill. Options ending in `Skill` install documentation only -- the tool
+# they describe is installed elsewhere.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
 # modules. Claude Code is unconditional -- importing this module is the decision
@@ -173,6 +175,30 @@ in
         the generated Claude Code skill at share/lavish-axi/skill/SKILL.md.
         Required when lavish.enable is set; asserted below rather than defaulted,
         so hosts with lavish off need not name a package at all.
+      '';
+    };
+
+    # --- gh stacked PRs (skill only) ----------------------------------------
+
+    ghStackSkill.enable = lib.mkEnableOption ''
+      the agent skill that github/gh-stack ships at share/gh-stack/skill/.
+
+      The name is literal: this installs the SKILL.md and nothing else. `gh
+      stack` is a human CLI tool and is not this module's business -- registering
+      the extension with gh and putting the binary on PATH is
+      cjlarose.devTools.ghStack, in the dev-tools module. Enable both, from the
+      same package, or the skill documents a command that is not installed
+    '';
+
+    ghStackSkill.package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = ''
+        The gh-stack package to read share/gh-stack/skill/SKILL.md from. Should
+        be the same package given to cjlarose.devTools.ghStack.package -- the
+        skill documents specific subcommands and flags, so a skill from a
+        different build than the installed extension is actively misleading.
+        Required when ghStackSkill.enable is set.
       '';
     };
 
@@ -364,6 +390,14 @@ in
         "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
     })
 
+    # --- gh stacked PRs (skill only) ----------------------------------------
+    (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null) {
+      # Upstream's own skill, read out of the package so it always matches the
+      # extension binary built from the same source.
+      programs.claude-code.skills."gh-stack" =
+        "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+    })
+
     # --- standalone agent CLIs ---------------------------------------------
     (lib.mkIf (cfg.opencode.enable && cfg.opencode.package != null) {
       programs.opencode = {
@@ -401,6 +435,10 @@ in
         {
           assertion = !cfg.herdr.enable || cfg.herdr.package != null;
           message = "cjlarose.llmAgents.herdr.enable is true but cjlarose.llmAgents.herdr.package is unset.";
+        }
+        {
+          assertion = !cfg.ghStackSkill.enable || cfg.ghStackSkill.package != null;
+          message = "cjlarose.llmAgents.ghStackSkill.enable is true but cjlarose.llmAgents.ghStackSkill.package is unset.";
         }
       ];
     }
