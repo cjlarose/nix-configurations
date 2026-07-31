@@ -1,12 +1,19 @@
-{ system, additionalPackages, stateVersion, superpowers ? null, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false }:
+{ system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
 { pkgs, lib, ... }: {
   # All LLM-agent tooling lives behind the single llm-agents module. Claude Code
   # itself is unconditional there; the rest is opted into here for the whole
   # cjlarose fleet, or per-host where the closure cost warrants it. The module
   # takes no additionalPackages arg -- every package is named explicitly here.
   cjlarose.llmAgents = {
-    claude.superpowers-skills = superpowers;
     claude.remoteControlAtStartup = true;
+
+    # obra/superpowers as a namespaced plugin: brainstorming, planning, TDD,
+    # code review, worktrees, systematic debugging. Replaces both the vendored
+    # single-skill systematic-debugging copy and the phx workflow skills, whose
+    # spine upstream covers natively. The package is named on every host; what
+    # actually turns it on is importing superpowers-plugin.nix below, because
+    # home-manager 25-11 has no programs.claude-code.plugins option at all.
+    superpowers.package = additionalPackages.${system}.superpowers;
 
     # Which claude build is a property of the host, not of the module. The
     # Goldmont-based pve guests have no AVX and segfault on the Bun standalone at
@@ -55,7 +62,9 @@
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/llm-agents
-  ] ++ lib.optionals (llm-wiki-module != null) [
+  ] ++ lib.optional enableSuperpowers
+    ../../home-manager-modules/llm-agents/superpowers-plugin.nix
+  ++ lib.optionals (llm-wiki-module != null) [
     llm-wiki-module
     ../../home-manager-modules/llm-agents/wiki-bridge.nix
   ];

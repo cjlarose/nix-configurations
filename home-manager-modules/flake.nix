@@ -16,6 +16,10 @@
       # Pair with llm-agents ONLY where the LLM wiki flake's own module is also
       # imported -- it defines programs.llmWiki, which that module declares.
       llm-agents-wiki = import ./llm-agents/wiki-bridge.nix;
+      # Pair with llm-agents ONLY where home-manager's claude-code module has a
+      # `plugins` option -- 26.05 and later. It does not exist on 25-11, where
+      # defining it is a hard error rather than a no-op.
+      llm-agents-superpowers = import ./llm-agents/superpowers-plugin.nix;
       coder = import ./coder.nix;
       direnv = import ./direnv.nix;
       ghostty = import ./ghostty.nix;

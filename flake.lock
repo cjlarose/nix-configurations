@@ -1455,9 +1455,7 @@
         "nixpkgs-26-05": "nixpkgs-26-05_2",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
         "nvr": "nvr_2",
-        "superpowers": [
-          "superpowers"
-        ],
+        "superpowers": "superpowers",
         "tfenv": "tfenv",
         "tuicr": "tuicr"
       },
@@ -1594,7 +1592,7 @@
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
         "picktrace-nix-configurations": "picktrace-nix-configurations",
-        "superpowers": "superpowers",
+        "superpowers": "superpowers_2",
         "tfenv": "tfenv_3",
         "trueColorTest": "trueColorTest",
         "tuicr": "tuicr_2"
@@ -1669,15 +1667,32 @@
     "superpowers": {
       "flake": false,
       "locked": {
-        "lastModified": 1781822662,
-        "narHash": "sha256-+lT2a/qq0SF4k0PgnEDKiuidVlZX2p0vEso4d/5T1os=",
+        "lastModified": 1785266736,
+        "narHash": "sha256-fnl+HbPL2qD5Zgz8a1NctjFJSqu6UsyHJAhQMLQNXXc=",
         "owner": "obra",
         "repo": "superpowers",
-        "rev": "896224c4b1879920ab573417e68fd51d2ccc9072",
+        "rev": "44c9b2d6e889982ac18c27d05a19fefe335194e1",
         "type": "github"
       },
       "original": {
         "owner": "obra",
+        "repo": "superpowers",
+        "type": "github"
+      }
+    },
+    "superpowers_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784852836,
+        "narHash": "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=",
+        "owner": "obra",
+        "repo": "superpowers",
+        "rev": "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "ref": "v6.2.0",
         "repo": "superpowers",
         "type": "github"
       }
