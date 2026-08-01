@@ -177,6 +177,8 @@ let
   '';
 in
 {
+  imports = [ ./workspace-layout.nix ];
+
   options.cjlarose.llmAgents = {
 
     # --- Claude Code -------------------------------------------------------
