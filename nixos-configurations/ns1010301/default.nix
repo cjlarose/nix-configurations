@@ -63,10 +63,21 @@
         imports = [
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
-            llm-wiki-path = "/home/cjlarose/worktrees/cjlarose/llm-wiki/default";
+            llm-wiki-path = "/home/cjlarose/repos/cjlarose/llm-wiki";
             llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
           })
         ];
+        # ns1010301 is the trial host for the ~/repos + ~/workspaces layout:
+        # ~/repos/<owner>/<repo> holds a read-only checkout of each repo's
+        # default branch, named for the canonical owner, and all writing
+        # happens in per-task ~/workspaces/<task>/ directories holding one
+        # linked worktree per repo. Both roots are two levels deep, unlike
+        # ~/worktrees/<owner>/<repo>/<worktree>. Scoped here rather than in
+        # home/cjlarose (which fans out to every linux host) so the other
+        # cjlarose hosts keep the old layout while this is a trial.
+        cjlarose.neovim.projectWorkspaces = [ "~/repos" "~/workspaces" ];
+        cjlarose.neovim.projectMaxDepth = 2;
+        cjlarose.llmAgents.claude.workspaceLayout.enable = true;
         # Browser automation for cjlarose's sessions on this host. The shared
         # home/cjlarose profile leaves enablePlaywrightMcp off so the chromium
         # closure only lands where it's wanted; scope the enable to ns1010301
