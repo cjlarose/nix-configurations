@@ -41,11 +41,19 @@ let
   # each line lives in the script itself, so it survives into the store copy the
   # user actually reads.
   wrappedClaude = pkgs.writeShellScriptBin "claude" ''
-    # Set the terminal title from the worktree layout: owner/repo [worktree].
-    # Only fires under ~/worktrees/<owner>/<repo>/<worktree>; elsewhere the
-    # title is left alone.
+    # Set the terminal title from the checkout layout. Three schemes are
+    # recognized so a host may use either the old or the new one:
+    #   ~/worktrees/<owner>/<repo>/<worktree> -> owner/repo [worktree]
+    #   ~/workspaces/<task>/<owner>-<repo>    -> owner-repo [task]
+    #   ~/repos/<owner>/<repo>                -> owner/repo
+    # Elsewhere the title is left alone. The ~/repos form has no bracket
+    # because nothing should ever be edited there.
     if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
       printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
+    elif [[ "$PWD" =~ ^''${HOME}/workspaces/([^/]+)/([^/]+) ]]; then
+      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[2]} [''${BASH_REMATCH[1]}]"
+    elif [[ "$PWD" =~ ^''${HOME}/repos/([^/]+)/([^/]+) ]]; then
+      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]}"
     fi
 
     # We set the title above, so stop claude from fighting us over it.
