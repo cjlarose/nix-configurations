@@ -39,6 +39,18 @@
       skillSrc = additionalPackages.${system}.herdr-src;
     };
 
+    # Code review at the keyboard, fleet-wide for the same reason as
+    # git-surgeon: a small Rust binary, and reviewing a branch before pushing it
+    # is the same job on every host. `reverse` comes from the
+    # commit-order-display-option branch of cjlarose/tuicr, which is what the
+    # package below is built from -- render the inline commit selector
+    # parent -> child for GitHub-PR-style branch review.
+    tuicr = {
+      enable = true;
+      package = additionalPackages.${system}.tuicr;
+      settings.reverse = true;
+    };
+
     # Hunk-level git surgery for agents, plus upstream's skill describing it.
     # Fleet-wide rather than host-scoped: it is a small Rust binary with no
     # closure to speak of, and the branch-and-PR workflow it serves is the same
@@ -117,15 +129,7 @@
     pkgs.parallel
     pkgs.socat
     additionalPackages.${system}.trueColorTest
-    additionalPackages.${system}.tuicr
   ];
-
-  # Dogfood the `reverse` option from the commit-order-display-option branch
-  # of cjlarose/tuicr: render the inline commit selector parent -> child for
-  # GitHub-PR-style branch review.
-  home.file.".config/tuicr/config.toml".text = ''
-    reverse = true
-  '';
 
   programs.git.userName = "Christopher La Rose";
   programs.git.userEmail = "cjlarose@gmail.com";
