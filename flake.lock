@@ -73,11 +73,11 @@
     "cjlarose-darwin-modules": {
       "locked": {
         "dir": "darwin-modules",
-        "lastModified": 1785734257,
-        "narHash": "sha256-dlcinvdc4ml2iGW4XJWwNaIX4EWxBGb7S6Phq+M7zww=",
+        "lastModified": 1785736681,
+        "narHash": "sha256-qzsjbofssjbp/l/cO2MWyh7/od4L5PokN8CO7TjgWTc=",
         "ref": "refs/heads/main",
-        "rev": "0e3b5b17bdfa1b30258b56a6131f5fcb0567301c",
-        "revCount": 1118,
+        "rev": "de45bddd14d9bb4c93c502e72c809db0511c34c8",
+        "revCount": 1120,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/nix-configurations"
       },
@@ -90,11 +90,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1785734257,
-        "narHash": "sha256-dlcinvdc4ml2iGW4XJWwNaIX4EWxBGb7S6Phq+M7zww=",
+        "lastModified": 1785736681,
+        "narHash": "sha256-qzsjbofssjbp/l/cO2MWyh7/od4L5PokN8CO7TjgWTc=",
         "ref": "refs/heads/main",
-        "rev": "0e3b5b17bdfa1b30258b56a6131f5fcb0567301c",
-        "revCount": 1118,
+        "rev": "de45bddd14d9bb4c93c502e72c809db0511c34c8",
+        "revCount": 1120,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/nix-configurations"
       },
@@ -1681,11 +1681,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1785734551,
-        "narHash": "sha256-S99aFPLmurjqAW7W2avTzQ4Q4gNOJB4M78M5N9oJJL8=",
+        "lastModified": 1785737070,
+        "narHash": "sha256-vu7nWf2+Y4WYEeVrVcGomnL6+c6/9n6dSwMezjby38c=",
         "ref": "refs/heads/main",
-        "rev": "5ea03880d8a435b4a0fd7a63e0c5bddc29040b34",
-        "revCount": 390,
+        "rev": "d19088cbbcfdf93e0326f0814b817f9742a1a224",
+        "revCount": 393,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
