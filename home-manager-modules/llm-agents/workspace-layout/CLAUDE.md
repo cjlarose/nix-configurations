@@ -24,11 +24,35 @@ a workspace is impossible rather than merely discouraged.
 
 A task gets one directory holding one linked worktree per repo it touches:
 
-    ~/workspaces/<task>/<owner>-<repo>
+    ~/workspaces/<task>/<repo>
 
 A task spanning several repos is one directory, one herdr space, one cwd — that
 is the point of the layout. Adding a second repo mid-task needs no
 restructuring.
+
+### Naming: prefix with the owner only when the workspace is mixed
+
+Name each worktree directory for the **repo alone**. Nearly every task stays
+within one owner, and `picktrace-web-api` next to `picktrace-web-client` next to
+`picktrace-internal-operations` is just noise repeated in every path you type.
+
+When a workspace holds repos from **more than one owner**, prefix with the owner
+— `<owner>-<repo>` — and prefix **every** worktree in that workspace, not only
+the colliding one, so the listing stays uniform:
+
+    ~/workspaces/device-sync-batching/web-api          # single-owner task
+    ~/workspaces/device-sync-batching/internal-operations
+
+    ~/workspaces/coder-envbox/picktrace-nix-configurations   # mixed: prefix all
+    ~/workspaces/coder-envbox/cjlarose-nix-configurations
+
+The mixed case is usually exactly that one: `picktrace/nix-configurations` and
+`cjlarose/nix-configurations` in the same workspace, which collide on the bare
+repo name and are the reason the prefix exists at all.
+
+If a task grows a second owner mid-flight, rename the existing worktrees to
+match — `git worktree move` from the `~/repos` checkout, so git rewrites its own
+bookkeeping instead of leaving a stale `.git` pointer behind.
 
 **Use the `herdr` skill for the mechanics** — creating the space, splitting
 panes, starting agents. Do not improvise the commands from memory; the
@@ -42,7 +66,7 @@ worktree add` from the `~/repos` checkout; herdr is only the multiplexer here.
 
 Tear down when the branches have merged:
 
-    git -C ~/repos/<owner>/<repo> worktree remove ~/workspaces/<task>/<owner>-<repo>
+    git -C ~/repos/<owner>/<repo> worktree remove ~/workspaces/<task>/<repo>
     rmdir ~/workspaces/<task>
 
 Use `git worktree remove`, not `rm -rf`: it refuses when the tree is dirty, so
