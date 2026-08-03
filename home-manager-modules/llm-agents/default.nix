@@ -3,12 +3,14 @@
 # One module owning everything agent-related for a user: Claude Code itself
 # (package choice, MCP servers, settings, the nixd LSP marketplace), the
 # superpowers skills plugin, lavish-axi, the personal LLM wiki integration, the
-# standalone agent CLIs (opencode, herdr, git-surgeon), and the gh-stack agent
-# skill. Options ending in `Skill` install documentation only -- the tool they
-# describe is installed elsewhere; an option without the suffix that happens to
-# ship a skill (lavish, gitSurgeon) installs the tool too. herdr is the third
-# case: the tool is here but upstream keeps its skill out of the package, so the
-# module lifts it out of upstream's source tree (herdr.skillSrc).
+# standalone agent CLIs (opencode, herdr, git-surgeon), tuicr, and the gh-stack
+# agent skill. Options ending in `Skill` install documentation only -- the tool
+# they describe is installed elsewhere; an option without the suffix that
+# happens to ship a skill (lavish, gitSurgeon) installs the tool too. herdr is
+# the third case: the tool is here but upstream keeps its skill out of the
+# package, so the module lifts it out of upstream's source tree
+# (herdr.skillSrc). tuicr is the fourth: no skill at all, and the only option
+# here that carries configuration rather than just a package.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
 # modules. Claude Code is unconditional -- importing this module is the decision
@@ -31,6 +33,12 @@
 
 let
   cfg = config.cjlarose.llmAgents;
+
+  # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
+  # format rather than a typed option per key: tuicr's config surface is its
+  # own, and every key it grows would otherwise need a change here before a
+  # consumer could set it.
+  tomlFormat = pkgs.formats.toml { };
 
   # The claude wrapper, shared by both consuming flakes. It used to be duplicated
   # as `mkTitleWrapper` in each repo's packages/default.nix, where it drifted
@@ -320,6 +328,39 @@ in
       '';
     };
 
+    # --- tuicr ---------------------------------------------------------------
+
+    tuicr.enable = lib.mkEnableOption ''
+      tuicr, a code-review TUI with vim keybindings that reviews a commit range
+      or working tree and exports the annotations to a GitHub PR or the
+      clipboard. Ships no agent skill -- it is a tool for a human at the
+      keyboard, and lives here rather than in dev-tools because reviewing what
+      an agent just wrote is what it gets used for
+    '';
+
+    tuicr.package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = "The tuicr package to install. Required when tuicr.enable is set.";
+    };
+
+    tuicr.settings = lib.mkOption {
+      type = tomlFormat.type;
+      default = { };
+      example = { reverse = true; };
+      description = ''
+        Freeform tuicr configuration, rendered to ~/.config/tuicr/config.toml.
+        Left empty, no file is written at all, so tuicr keeps its own built-in
+        defaults rather than being handed an empty config.
+
+        The only key this fleet sets is `reverse` (tuicr's own default is off),
+        which renders the inline commit selector parent -> child for
+        GitHub-PR-style branch review. It comes from the
+        commit-order-display-option branch of cjlarose/tuicr, so it is only
+        meaningful when tuicr.package is built from that fork.
+      '';
+    };
+
     # --- standalone agent CLIs ---------------------------------------------
 
     opencode.enable = lib.mkEnableOption
@@ -521,6 +562,21 @@ in
         "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
     })
 
+    # --- tuicr ---------------------------------------------------------------
+    (lib.mkIf (cfg.tuicr.enable && cfg.tuicr.package != null) {
+      home.packages = [ cfg.tuicr.package ];
+
+      # Only written when the consumer actually sets something: an empty
+      # settings attrset means no config.toml, not a config.toml saying nothing.
+      # mkIf wraps the whole attrset rather than the entry's value -- under
+      # attrsOf, a filtered-out value can still leave the key behind with an
+      # all-defaults submodule, which would write an empty file.
+      xdg.configFile = lib.mkIf (cfg.tuicr.settings != { }) {
+        "tuicr/config.toml".source =
+          tomlFormat.generate "tuicr-config.toml" cfg.tuicr.settings;
+      };
+    })
+
     # --- standalone agent CLIs ---------------------------------------------
     (lib.mkIf (cfg.opencode.enable && cfg.opencode.package != null) {
       programs.opencode = {
@@ -608,6 +664,10 @@ in
         {
           assertion = !cfg.gitSurgeon.enable || cfg.gitSurgeon.package != null;
           message = "cjlarose.llmAgents.gitSurgeon.enable is true but cjlarose.llmAgents.gitSurgeon.package is unset.";
+        }
+        {
+          assertion = !cfg.tuicr.enable || cfg.tuicr.package != null;
+          message = "cjlarose.llmAgents.tuicr.enable is true but cjlarose.llmAgents.tuicr.package is unset.";
         }
       ];
     }
