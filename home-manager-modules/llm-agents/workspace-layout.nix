@@ -39,36 +39,6 @@ let
     the worktree rule holds here too: do not create worktrees in the wiki either.
   '';
 
-  # Naming policy for hosts whose work is tracked in an issue tracker. Off by
-  # default because it is false on a personal host -- ns1010301's repos have no
-  # Jira project and no incident tracker, so requiring a key there would leave
-  # every workspace unnameable.
-  trackerNaming = ''
-
-    ## Workspace names must carry the issue key
-
-    Name a workspace `<KEY>-<short-kebab-description>`, where `<KEY>` is whichever
-    of these the work has:
-
-    - a **Jira issue key** — `PLAT-1518`, `LMG-1702`, `LMD-1138`
-    - an **incident.io incident number** — `INC-128`
-
-    So: `~/workspaces/PLAT-1518-coder-envbox`, `~/workspaces/INC-128-payroll-export-timeouts`.
-
-    Keep the description short and kebab-cased. It is there to make the directory
-    readable at a glance, not to restate the ticket title — the key is the durable
-    identifier and the place to look up detail.
-
-    ### When there is no key
-
-    **Do not create the workspace directory.** Ask the user for the Jira issue or
-    incident number first.
-
-    Only create an unprefixed workspace if the user, having been asked, explicitly
-    confirms they want to work without either. Their silence is not confirmation,
-    and neither is the absence of a key in how they described the task — most work
-    that arrives without a mentioned ticket still has one.
-  '';
 in
 {
   options.cjlarose.llmAgents.claude.workspaceLayout = {
@@ -78,13 +48,30 @@ in
       layout should turn it on
     '';
 
-    requireTrackerKey = lib.mkEnableOption ''
-      the rule that a workspace directory is named <KEY>-<short-kebab-description>
-      for a Jira issue key or incident.io incident number, and that an agent must
-      ask rather than invent a name when the work has neither. Off by default:
-      it is only true for hosts whose work is actually tracked that way, and a
-      personal host has no such key to require
-    '';
+    extraInstructions = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      example = lib.literalExpression ''
+        '''
+          ## Workspace names must carry the issue key
+
+          Name a workspace `<KEY>-<short-kebab-description>` ...
+        '''
+      '';
+      description = ''
+        Markdown appended to the layout CLAUDE.md, for conventions that are
+        real on one consumer but meaningless on another.
+
+        This is text rather than a set of booleans on purpose. A flag here
+        would mean this module carries prose about someone else's issue
+        tracker, and every new convention would need a new option plus a
+        release of this repo before the consumer could adopt it. Passing the
+        text lets the consumer that actually holds the convention own the
+        wording and change it on its own schedule.
+
+        Appended after the layout body and before the wiki carve-out.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -95,7 +82,7 @@ in
     # it -- the same trade this module already makes for settings.json.
     home.file.".claude/CLAUDE.md".text =
       builtins.readFile ./workspace-layout/CLAUDE.md
-      + lib.optionalString cfg.requireTrackerKey trackerNaming
+      + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
       + lib.optionalString wikiUnderRepos wikiCarveOut;
   };
 }
