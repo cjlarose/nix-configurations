@@ -79,6 +79,19 @@ let
     # means an explicit value in the environment still wins.
     export CLAUDE_CODE_SHELL="''${CLAUDE_CODE_SHELL:-${pkgs.bashInteractive}/bin/bash}"
 
+    # Always use the fullscreen (alt-screen, flicker-free) TUI renderer rather
+    # than leaving it to a rollout gate. There is no CLI flag for this; the two
+    # real mechanisms are the settings.json "tui": "fullscreen" key (what the
+    # /tui slash command writes) and this variable, which the setting's own
+    # description calls equivalent. The variable is the stronger of the two:
+    # claude consults it *before* the settings key and before the automatic
+    # opt-outs, so it also survives the tmux -CC and Windows-over-SSH
+    # auto-disables, which the setting does not. It is parsed as a tri-state,
+    # so the :- default leaves CLAUDE_CODE_NO_FLICKER=0 as a working escape
+    # hatch for a session that needs the classic renderer. Screen-reader mode
+    # still wins over both, by design.
+    export CLAUDE_CODE_NO_FLICKER="''${CLAUDE_CODE_NO_FLICKER:-1}"
+
     exec ${cfg.claude.package}/bin/claude "$@"
   '';
 
