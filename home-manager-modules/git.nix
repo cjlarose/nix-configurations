@@ -44,6 +44,13 @@ in {
         "[._]*.s[a-w][a-z]"
         "[._]s[a-w][a-z]"
         ".claude"
+        # Where the superpowers brainstorming/writing-plans skills park their
+        # design specs and implementation plans. They are working notes for a
+        # single task, not repo history -- packages/superpowers strips the
+        # skill's instruction to commit the spec, and this keeps the leftover
+        # files out of `git status` instead of tracked in every repo they
+        # touch.
+        "docs/superpowers"
       ];
       delta = {
         enable = true;
