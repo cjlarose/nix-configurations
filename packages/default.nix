@@ -141,13 +141,12 @@ in
   # From llm-agents.nix rather than nixpkgs-unstable so it tracks the same
   # daily-updated source as claude-code.
   opencode = llm-agents-pkgs.opencode;
-  # obra/superpowers repackaged as a force-loadable Claude Code plugin, with the
-  # SessionStart hook's CLAUDE_PLUGIN_ROOT baked to a real store path.
-  superpowers = import ./superpowers {
-    pkgs = nixpkgs-26-05.legacyPackages.${system};
-    src = superpowers;
-    version = "6.2.0";
-  };
+  # Upstream obra/superpowers source, re-exported unbuilt for
+  # cjlarose.llmAgents.superpowers.src -- the llm-agents module builds the
+  # plugin itself, since the customizations it applies (disabling the
+  # SessionStart hook, stripping the spec-commit instructions) are driven by
+  # module options that packages/ cannot see. Same shape as herdr-src above.
+  superpowers-src = superpowers;
   tuicr = tuicr.packages.${system}.default;
   # Built from source (flake = false input `lavish-axi` is the upstream src).
   # callPackage supplies lib/stdenv/nodejs_22/pnpm/makeWrapper from nixpkgs-26-05.
