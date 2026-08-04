@@ -10,10 +10,28 @@
     # obra/superpowers as a namespaced plugin: brainstorming, planning, TDD,
     # code review, worktrees, systematic debugging. Replaces both the vendored
     # single-skill systematic-debugging copy and the phx workflow skills, whose
-    # spine upstream covers natively. The package is named on every host; what
-    # actually turns it on is importing superpowers-plugin.nix below, because
-    # home-manager 25-11 has no programs.claude-code.plugins option at all.
-    superpowers.package = additionalPackages.${system}.superpowers;
+    # spine upstream covers natively.
+    #
+    # `enable` and the superpowers-plugin.nix import below are driven off the
+    # same enableSuperpowers flag: home-manager 25-11 has no
+    # programs.claude-code.plugins option at all, so on those hosts the
+    # definition has to be ABSENT rather than merely disabled. One flag, both
+    # effects, so they cannot drift apart.
+    #
+    # The module builds the plugin from this source rather than taking a
+    # prebuilt one, because the two customizations below are module options.
+    superpowers = {
+      enable = enableSuperpowers;
+      src = additionalPackages.${system}.superpowers-src;
+      # Upstream's SessionStart hook force-feeds the using-superpowers skill
+      # into every session, which makes the agent open with a brainstorm on
+      # questions that only wanted an answer. Skills stay invocable by name.
+      disableHooks = true;
+      # Specs are working notes here, not repo history; docs/superpowers is
+      # gitignored globally (home-manager-modules/git.nix). Implementation
+      # commits are untouched.
+      disableSpecCommits = true;
+    };
 
     # Which claude build is a property of the host, not of the module. The
     # Goldmont-based pve guests have no AVX and segfault on the Bun standalone at

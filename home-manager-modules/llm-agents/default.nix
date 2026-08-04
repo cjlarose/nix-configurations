@@ -10,7 +10,11 @@
 # the third case: the tool is here but upstream keeps its skill out of the
 # package, so the module lifts it out of upstream's source tree
 # (herdr.skillSrc). tuicr is the fourth: no skill at all, and the only option
-# here that carries configuration rather than just a package.
+# here that carries configuration rather than just a package. superpowers is the
+# fifth, and the same shape as herdr: a source comes in (superpowers.src) and
+# the module builds the plugin from it, because its customizations
+# (disableHooks, disableSpecCommits) are module options and a package built out
+# in a consuming flake's packages/ cannot see them.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
 # modules. Claude Code is unconditional -- importing this module is the decision
@@ -196,6 +200,121 @@ let
       exit 1
     fi
   '';
+
+  # The literal text "${CLAUDE_PLUGIN_ROOT}" to search for. Built in a normal
+  # double-quoted string where \${ is an unambiguous escape; writing it inline
+  # in the '' block below collides with Nix's own '' and ''${ escapes.
+  pluginRootVar = "\${CLAUDE_PLUGIN_ROOT}";
+
+  # obra/superpowers as a force-loadable Claude Code plugin, built from
+  # upstream's source with this fleet's customizations applied on top.
+  #
+  # Upstream already ships the plugin layout (.claude-plugin/plugin.json,
+  # skills/, hooks/), so this is a copy with edits rather than a build. It used
+  # to be packages/superpowers in each consuming flake -- hand-duplicated, and
+  # therefore drifting -- but the customizations below are driven by module
+  # options, which packages/ cannot see. Same reasoning as herdrSkill above:
+  # a source comes in, the transformation happens once, here.
+  #
+  # Every edit is --replace-fail or an explicit guard, so an upstream rewording
+  # breaks the BUILD rather than silently shipping unmodified text. The
+  # line-count tripwires cover the opposite failure -- an upstream release that
+  # ADDS commit language, which no search-and-replace can detect on its own.
+  # When one fires, read the upstream diff and re-derive the strings; do not
+  # just bump the expected count.
+  #
+  # Lazy, like the two herdr derivations: only forced from the block that
+  # already guards src != null.
+  superpowersPlugin = pkgs.runCommand "superpowers-plugin"
+    {
+      src = cfg.superpowers.src;
+      meta = {
+        description = "obra/superpowers skills library, packaged as a Claude Code plugin";
+        homepage = "https://github.com/obra/superpowers";
+        license = lib.licenses.mit;
+      };
+    }
+    ''
+      cp -r "$src" "$out"
+      chmod -R u+w "$out"
+
+      # Guard before either branch: both of them assume hook registration lives
+      # in this file, so if upstream moves it, the disable branch would write a
+      # stray no-op while the real hook keeps firing, and the substitute branch
+      # would leave an unresolved path behind.
+      [ -f "$out/hooks/hooks.json" ] \
+        || { echo "hooks/hooks.json is gone; upstream moved hook registration -- re-check this module" >&2; exit 1; }
+
+      ${
+        if cfg.superpowers.disableHooks then ''
+          grep -q '"SessionStart"' "$out/hooks/hooks.json" \
+            || { echo "hooks.json no longer registers SessionStart; re-check superpowers.disableHooks" >&2; exit 1; }
+
+          # Overwrite rather than delete: an empty hook set is unambiguous to
+          # the plugin loader and keeps the file present so the guard above
+          # stays meaningful. The hook scripts are left in place (unreferenced,
+          # harmless) so flipping the option back needs no other change.
+          echo '{"hooks":{}}' > "$out/hooks/hooks.json"
+        '' else ''
+          # hooks.json invokes its own hook runner via
+          # "''${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd", and CLAUDE_PLUGIN_ROOT
+          # is NOT set for SessionStart events -- the hook fails silently, which
+          # is the failure mode hardest to notice, since a missing session
+          # preamble looks like a model that just didn't reach for a skill.
+          # Baking the real store path is the same fix the llm-wiki plugin uses.
+          #
+          # The hook script itself needs no patching: it derives the plugin root
+          # from its own $0, so once hooks.json points at the right
+          # run-hook.cmd everything below resolves relative to it.
+          grep -q 'CLAUDE_PLUGIN_ROOT' "$out/hooks/hooks.json" \
+            || { echo "hooks.json no longer references CLAUDE_PLUGIN_ROOT; re-check this module" >&2; exit 1; }
+
+          substituteInPlace "$out/hooks/hooks.json" \
+            --replace-fail '${pluginRootVar}' '${builtins.placeholder "out"}'
+
+          # `if`, not `grep && exit` -- a correct run leaves no match, so grep
+          # exits 1 and the && form would fail precisely when it succeeded.
+          if grep -q 'CLAUDE_PLUGIN_ROOT' "$out/hooks/hooks.json"; then
+            echo "substitution left a CLAUDE_PLUGIN_ROOT reference behind" >&2
+            exit 1
+          fi
+        ''
+      }
+
+      # The hook runner and its scripts must stay executable through the copy,
+      # whether or not anything currently invokes them.
+      chmod +x "$out/hooks/run-hook.cmd" "$out/hooks/session-start"
+
+      ${lib.optionalString cfg.superpowers.disableSpecCommits ''
+        # The replacement wording deliberately says "add it to git" rather than
+        # "do not commit it": the tripwire below counts lines matching 'commit',
+        # so prose containing the word would inflate the count and blunt it.
+        substituteInPlace "$out/skills/brainstorming/SKILL.md" \
+          --replace-fail \
+            '6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit' \
+            '6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`. Do NOT add it to git.' \
+          --replace-fail \
+            '- Commit the design document to git' \
+            '- Do NOT add the design document to git. `docs/superpowers/` is gitignored globally; the spec is a working note, not repo history.' \
+          --replace-fail \
+            '> "Spec written and committed to `<path>`.' \
+            '> "Spec written to `<path>`.'
+
+        # The two survivors in brainstorming are both "check ... recent commits"
+        # (reading history, not writing it); all four in writing-plans are about
+        # committing the implementation, which this option deliberately keeps.
+        for check in brainstorming:2 writing-plans:4; do
+          skill="''${check%:*}"
+          want="''${check#*:}"
+          got=$(grep -ci 'commit' "$out/skills/$skill/SKILL.md" || true)
+          [ "$got" = "$want" ] || {
+            echo "$skill/SKILL.md: expected $want lines mentioning 'commit', found $got." >&2
+            echo "Upstream changed its commit guidance -- re-read the diff before bumping this count." >&2
+            exit 1
+          }
+        done
+      ''}
+    '';
 in
 {
   imports = [ ./workspace-layout.nix ];
@@ -245,26 +364,104 @@ in
 
     # --- superpowers ---------------------------------------------------------
 
-    superpowers.package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
+    superpowers.enable = lib.mkEnableOption ''
+      obra/superpowers as a Claude Code plugin: 14 skills covering
+      brainstorming, planning, TDD, code review, git worktrees and debugging,
+      invocable as superpowers:<name>.
+
+      Replaces two things that used to live here: the vendored
+      systematic-debugging copy (now one skill of the set, with its
+      superpowers:* cross-references finally resolving) and the phx workflow
+      skills, whose brainstorm/plan/work/review spine upstream covers natively
+      with brainstorming + writing-plans + executing-plans + *-code-review.
+
+      Enabling this is NOT enough on its own -- ./superpowers-plugin.nix must
+      also be imported, which is what actually defines
+      programs.claude-code.plugins. That option does not exist on
+      home-manager 25-11, so the definition has to be absent rather than
+      disabled there; see that file. Gate the import and this option off the
+      same flag in the consumer so the two cannot drift
+    '';
+
+    superpowers.src = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
       default = null;
       description = ''
-        obra/superpowers packaged as a force-loaded Claude Code plugin: 14 skills
-        covering brainstorming, planning, TDD, code review, git worktrees and
-        debugging, invocable as superpowers:<name>, plus upstream's SessionStart
-        hook which prepends the using-superpowers skill to every session.
+        Upstream's obra/superpowers source tree (the flake input itself, pinned
+        to a release tag). The module builds the plugin from it.
 
-        Replaces two things that used to live here: the vendored
-        systematic-debugging copy (now one skill of the set, with its
-        superpowers:* cross-references finally resolving) and the phx workflow
-        skills, whose brainstorm/plan/work/review spine upstream covers natively
-        with brainstorming + writing-plans + executing-plans + *-code-review.
+        A source rather than a package because the customizations below are
+        driven by the options in this module, and a package built out in
+        packages/ cannot see them. This used to be packages/superpowers in each
+        consuming flake -- a file hand-copied between two repos, with the
+        customizations frozen into it. Same shape as herdr.skillSrc: the source
+        comes in, the transformation happens once, here.
 
-        Setting this is NOT enough on its own -- ./superpowers-plugin.nix must
-        also be imported, which is what actually defines
-        programs.claude-code.plugins. That option does not exist on
-        home-manager 25-11, so the definition has to be absent rather than
-        disabled there; see that file.
+        Pin to a tag rather than a branch. Upstream ships a SessionStart hook
+        that injects context into every session, so an unpinned bump would
+        change every host's prompt with no lock diff to show for it.
+
+        Required when superpowers.enable is set.
+      '';
+    };
+
+    superpowers.disableHooks = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Ship the plugin with an empty hook set, replacing upstream's
+        hooks/hooks.json.
+
+        Upstream registers a SessionStart hook that cats
+        skills/using-superpowers/SKILL.md into every session wrapped in
+        <EXTREMELY_IMPORTANT>, whose text orders the agent to invoke a skill
+        "BEFORE any response or action" and to brainstorm before entering plan
+        mode. That is too eager -- it front-loads a brainstorm onto questions
+        that only wanted an answer.
+
+        Turning this on leaves every skill invocable through the Skill tool,
+        including superpowers:using-superpowers; it just stops one being
+        force-fed. Note it is a reduction, not an elimination: the skill
+        descriptions still nudge (brainstorming's own description says "You MUST
+        use this before any creative work"). The hook is what made it
+        unconditional.
+
+        Left off (the default), the module instead bakes the plugin's real store
+        path into hooks.json, because CLAUDE_PLUGIN_ROOT is not set for
+        SessionStart events and the hook would otherwise fail silently.
+      '';
+    };
+
+    superpowers.disableSpecCommits = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Remove the brainstorming skill's instructions to COMMIT its design
+        document. Upstream writes the spec to docs/superpowers/specs/ and
+        commits it; where specs are working notes rather than repo history, that
+        dirties every repo the agent touches.
+
+        Only the doc-committing language is touched. The implementation-commit
+        guidance in writing-plans and subagent-driven-development is left alone
+        deliberately -- the implementation step is expected to commit.
+        writing-plans needs no edit at all: it never says to commit the plan
+        document, only the code.
+
+        Pairs with gitignoring docs/superpowers (see home-manager-modules/git.nix),
+        so the specs land untracked rather than as a dirty worktree.
+      '';
+    };
+
+    superpowers.finalPackage = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      internal = true;
+      description = ''
+        The built plugin, or null when superpowers is off. Read by
+        ./superpowers-plugin.nix, which is the file that actually defines
+        programs.claude-code.plugins -- it cannot be defined from here, and that
+        sibling module has no way to reach a `let` binding in this one. Internal:
+        set by this module, never by a consumer.
       '';
     };
 
@@ -532,6 +729,14 @@ in
       };
     }
 
+    # --- superpowers ---------------------------------------------------------
+    # Only builds the plugin; the programs.claude-code.plugins definition that
+    # consumes it lives in ./superpowers-plugin.nix, for the same reason the
+    # wiki's does not live here (see the llmWiki note below).
+    (lib.mkIf (cfg.superpowers.enable && cfg.superpowers.src != null) {
+      cjlarose.llmAgents.superpowers.finalPackage = superpowersPlugin;
+    })
+
     # --- lavish-axi ---------------------------------------------------------
     # The `package != null` half of each guard is not redundant with the
     # assertions below: without it a null reaches home.packages and fails the
@@ -657,6 +862,10 @@ in
         {
           assertion = !cfg.wiki.enable || cfg.wiki.path != null;
           message = "cjlarose.llmAgents.wiki.enable is true but cjlarose.llmAgents.wiki.path is unset.";
+        }
+        {
+          assertion = !cfg.superpowers.enable || cfg.superpowers.src != null;
+          message = "cjlarose.llmAgents.superpowers.enable is true but cjlarose.llmAgents.superpowers.src is unset.";
         }
         {
           assertion = !cfg.lavish.enable || cfg.lavish.package != null;

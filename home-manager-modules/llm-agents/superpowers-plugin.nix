@@ -1,4 +1,4 @@
-# Bridge between cjlarose.llmAgents.superpowers.package and
+# Bridge between cjlarose.llmAgents.superpowers.finalPackage and
 # programs.claude-code.plugins.
 #
 # Separate from ./default.nix for the same reason ./wiki-bridge.nix is: the
@@ -12,7 +12,13 @@
 { config, lib, ... }:
 
 {
+  # finalPackage, not a package the consumer named: ./default.nix builds the
+  # plugin from superpowers.src with the disableHooks / disableSpecCommits
+  # options applied, and surfaces the result through that internal option
+  # because a sibling module cannot reach its `let` bindings. It is null exactly
+  # when superpowers is off, so this stays correct on a host that imports this
+  # file but leaves the feature disabled.
   programs.claude-code.plugins =
-    lib.optional (config.cjlarose.llmAgents.superpowers.package != null)
-      config.cjlarose.llmAgents.superpowers.package;
+    lib.optional (config.cjlarose.llmAgents.superpowers.finalPackage != null)
+      config.cjlarose.llmAgents.superpowers.finalPackage;
 }
