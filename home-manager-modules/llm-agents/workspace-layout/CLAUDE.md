@@ -20,6 +20,21 @@ Git does enforce one half by itself: because the default branch is checked out
 here, no workspace worktree can check it out too, so committing to `main` from
 a workspace is impossible rather than merely discouraged.
 
+### Confirm the checkout is trustworthy before you read it
+
+"Read and grep freely" assumes what is on disk is what is on the remote. Before
+exploring a repo here, check that it is: working tree clean, on the repo's
+default branch, and `git pull`ed so it matches the remote. Do this once per repo
+per session, before the first read — not after you have already formed an
+opinion from it.
+
+This matters more here than anywhere else because nothing about a stale checkout
+looks wrong. A branch left over from a hurried debugging session, or a `main`
+last pulled three weeks ago, greps exactly as convincingly as a current one — so
+the answer you give is confidently wrong about the current state of the code,
+and neither you nor the person reading your answer has any signal that it was.
+The failure is silent, so the check has to be unconditional.
+
 ## ~/workspaces — where work happens
 
 A task gets one directory holding one linked worktree per repo it touches:
@@ -63,6 +78,13 @@ a sibling pane in the *current* tab and cwd. So state the topology explicitly �
 **one space per task, rooted at `~/workspaces/<task>`, one linked worktree per
 repo, agents as panes in that space.** The worktrees themselves are plain `git
 worktree add` from the `~/repos` checkout; herdr is only the multiplexer here.
+
+`git pull` the source checkout first, if you have not already done so this
+session. `git worktree add` branches from whatever that checkout currently has,
+so a stale `main` silently gives you a branch that starts behind — work you then
+have to rebase, review against the wrong base, or resolve conflicts in that
+would never have existed. Pulling before the branch exists costs nothing;
+pulling after it has commits on it costs a rebase.
 
 Tear down when the branches have merged:
 
