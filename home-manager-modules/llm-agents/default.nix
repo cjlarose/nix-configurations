@@ -20,6 +20,11 @@
 # modules. Claude Code is unconditional -- importing this module is the decision
 # to have claude; everything else is opt-in per host/user.
 #
+# Every skill an option here installs goes through cjlarose.llmAgents.skills
+# (./skills.nix) rather than programs.claude-code.skills, because that module
+# owns ~/.claude/skills as a single directory symlink so the same store path can
+# also serve ~/.agents/skills. Nothing here may write a file underneath it.
+#
 # The module takes no flake-specific arguments: every package it installs comes
 # in through a `*.package` option that the consumer sets explicitly. It used to
 # reach into an `additionalPackages` module arg for defaults, which coupled it to
@@ -317,7 +322,7 @@ let
     '';
 in
 {
-  imports = [ ./workspace-layout.nix ];
+  imports = [ ./skills.nix ./workspace-layout.nix ];
 
   options.cjlarose.llmAgents = {
 
@@ -748,10 +753,9 @@ in
       home.packages = [ cfg.lavish.package ];
 
       # The skill drives the on-PATH lavish-axi binary directly (never npx), so
-      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in the
-      # package's share/ output; raw home.file (like the upstream lavish-axi HM
-      # module) rather than programs.claude-code.skills.
-      home.file.".claude/skills/lavish/SKILL.md".source =
+      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in
+      # the package's share/ output.
+      cjlarose.llmAgents.skills.lavish =
         "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
     })
 
@@ -759,7 +763,7 @@ in
     (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null) {
       # Upstream's own skill, read out of the package so it always matches the
       # extension binary built from the same source.
-      programs.claude-code.skills."gh-stack" =
+      cjlarose.llmAgents.skills."gh-stack" =
         "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
     })
 
@@ -771,12 +775,9 @@ in
 
       # Upstream nests its skill one level deeper than the other two tools we
       # read a SKILL.md out of: share/git-surgeon/skills/<name>/SKILL.md, not
-      # share/<tool>/skill/SKILL.md.
-      #
-      # Key is the bare skill directory name -- home-manager appends
-      # /SKILL.md itself (PR #8770); a trailing /SKILL here would double-nest to
-      # ~/.claude/skills/git-surgeon/SKILL/SKILL.md and be discovered by nothing.
-      programs.claude-code.skills."git-surgeon" =
+      # share/<tool>/skill/SKILL.md. Irrelevant to the installed name, which
+      # comes from the attribute key -- see cjlarose.llmAgents.skills.
+      cjlarose.llmAgents.skills."git-surgeon" =
         "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
     })
 
@@ -836,7 +837,7 @@ in
     # hosts where herdr is installed but unused: the skill's first instruction
     # is to check HERDR_ENV=1 and stop if it is unset.
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null) {
-      programs.claude-code.skills."herdr" = "${herdrSkill}/SKILL.md";
+      cjlarose.llmAgents.skills."herdr" = "${herdrSkill}/SKILL.md";
     })
 
     # opencode integration. Split from the block above because it needs both

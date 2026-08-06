@@ -40,6 +40,16 @@ let
     assert c "git rebase.autosquash" (hm.programs.git.extraConfig.rebase.autosquash or false);
     assert c "git rebase.autostash" (hm.programs.git.extraConfig.rebase.autostash or false);
 
+    # Agent skills are installed once and shared: ~/.claude/skills and
+    # ~/.agents/skills must be the SAME store path, not two copies that happen
+    # to agree today. Nothing about a second copy looks wrong until the two
+    # drift, which is precisely when it stops being checkable by eye.
+    # Conditional because a host may install no skills at all.
+    assert c "agent skills shared between ~/.claude and ~/.agents"
+      (!(hm.home.file ? ".claude/skills")
+       || (hm.home.file ? ".agents/skills"
+           && hm.home.file.".claude/skills".source == hm.home.file.".agents/skills".source));
+
     true;
 
 in {
