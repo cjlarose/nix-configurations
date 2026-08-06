@@ -78,6 +78,11 @@
         cjlarose.neovim.projectWorkspaces = [ "~/repos" "~/workspaces" ];
         cjlarose.neovim.projectMaxDepth = 2;
         cjlarose.llmAgents.claude.workspaceLayout.enable = true;
+        # Commit-message and PR-description conventions as skills. No
+        # extraInstructions: this host has no issue tracker to link, and the
+        # harness already supplies the model-attribution footer that picktrace's
+        # config will have to ban on its side.
+        cjlarose.llmAgents.gitConventions.enable = true;
         # Browser automation for cjlarose's sessions on this host. The shared
         # home/cjlarose profile leaves enablePlaywrightMcp off so the chromium
         # closure only lands where it's wanted; scope the enable to ns1010301
