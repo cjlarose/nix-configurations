@@ -21,6 +21,14 @@
 # claude.enable gates the package, its settings, and everything installed under
 # ~/.claude. The cjlarose fleet turns it on once, in home/cjlarose.
 #
+# Every skill an option here installs writes its own entries, one per harness --
+# ~/.claude/skills gated on claude.enable, opencode/skills gated on
+# opencode.enable -- rather than going through programs.claude-code.skills,
+# which only ever feeds one of them. Written out at each site on purpose: there
+# is no registry of skills to consult and nothing owns a skills directory as a
+# whole, so a skill that should reach only one harness is a matter of deleting
+# one of its two blocks.
+#
 # The module takes no flake-specific arguments: every package it installs comes
 # in through a `*.package` option that the consumer sets explicitly. It used to
 # reach into an `additionalPackages` module arg for defaults, which coupled it to
@@ -480,7 +488,7 @@ in
 
     lavish.enable = lib.mkEnableOption ''
       the lavish-axi CLI (upstream kunchenguid/lavish-axi, built from source with
-      telemetry disabled) and its Lavish Editor Claude Code skill. lavish-axi opens
+      telemetry disabled) and its Lavish Editor agent skill. lavish-axi opens
       an agent-generated HTML artifact in a sandboxed browser for human annotation
       and ships the feedback back to the driving agent over a loopback server with
       a Host-header DNS-rebinding guard. Disabled by default; opt in per host/user
@@ -491,7 +499,8 @@ in
       default = null;
       description = ''
         The lavish-axi package to install. Carries the CLI at bin/lavish-axi and
-        the generated Claude Code skill at share/lavish-axi/skill/SKILL.md.
+        the generated agent skill at share/lavish-axi/skill/SKILL.md, which this
+        module installs into every enabled harness.
         Required when lavish.enable is set; asserted below rather than defaulted,
         so hosts with lavish off need not name a package at all.
       '';
@@ -610,7 +619,7 @@ in
       description = ''
         Upstream's herdr source tree (the herdrdev/herdr flake input itself),
         from which the module lifts the official agent skill and installs it as
-        the `herdr` Claude Code skill. Optional -- herdr works fine without it;
+        the `herdr` agent skill, into every enabled harness. Optional -- herdr works fine without it;
         leave null to install the terminal multiplexer but not the instructions
         for driving it.
 
@@ -761,19 +770,30 @@ in
       home.packages = [ cfg.lavish.package ];
 
       # The skill drives the on-PATH lavish-axi binary directly (never npx), so
-      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in the
-      # package's share/ output; raw home.file (like the upstream lavish-axi HM
-      # module) rather than programs.claude-code.skills.
-      home.file.".claude/skills/lavish/SKILL.md".source =
-        "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
+      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in
+      # the package's share/ output, installed into each enabled harness.
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/lavish/SKILL.md".source =
+          "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/lavish/SKILL.md".source =
+          "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
+      };
     })
 
     # --- gh stacked PRs (skill only) ----------------------------------------
     (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null) {
       # Upstream's own skill, read out of the package so it always matches the
       # extension binary built from the same source.
-      programs.claude-code.skills."gh-stack" =
-        "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/gh-stack/SKILL.md".source =
+          "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/gh-stack/SKILL.md".source =
+          "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+      };
     })
 
     # --- git-surgeon --------------------------------------------------------
@@ -784,13 +804,16 @@ in
 
       # Upstream nests its skill one level deeper than the other two tools we
       # read a SKILL.md out of: share/git-surgeon/skills/<name>/SKILL.md, not
-      # share/<tool>/skill/SKILL.md.
-      #
-      # Key is the bare skill directory name -- home-manager appends
-      # /SKILL.md itself (PR #8770); a trailing /SKILL here would double-nest to
-      # ~/.claude/skills/git-surgeon/SKILL/SKILL.md and be discovered by nothing.
-      programs.claude-code.skills."git-surgeon" =
-        "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+      # share/<tool>/skill/SKILL.md. Irrelevant to where it lands, which is
+      # spelled out on the left of each assignment below.
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/git-surgeon/SKILL.md".source =
+          "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/git-surgeon/SKILL.md".source =
+          "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+      };
     })
 
     # --- tuicr ---------------------------------------------------------------
@@ -851,7 +874,12 @@ in
     # hosts where herdr is installed but unused: the skill's first instruction
     # is to check HERDR_ENV=1 and stop if it is unset.
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null) {
-      programs.claude-code.skills."herdr" = "${herdrSkill}/SKILL.md";
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
+      };
     })
 
     # opencode integration. Split from the block above because it needs both
