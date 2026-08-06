@@ -776,6 +776,32 @@ in
       cjlarose.llmAgents.superpowers.finalPackage = superpowersPlugin;
     })
 
+    # The same skills for opencode, through `skills.paths` -- a native opencode
+    # config key, not a plugin invention: it reads
+    # `[...skills.paths, ...skills.urls]` straight out of opencode.json. One
+    # store path registers the whole tree, so nothing here has to enumerate the
+    # skills or track upstream adding and removing them.
+    #
+    # NOT upstream's opencode plugin, which is what their INSTALL.md documents.
+    # Two reasons. It installs from `git+https` through opencode's package
+    # manager at runtime, which is unpinned by this flake and whose caching
+    # upstream itself documents as unreliable -- the same trade this module
+    # already declines for `herdr integration install` and `npx skills add`.
+    # And its second hook injects the using-superpowers skill into the first
+    # user message of every session, which is precisely what disableHooks
+    # switches off on the claude side; taking the plugin would reintroduce on
+    # one harness the behaviour this fleet turned off on the other.
+    #
+    # Nothing is lost in namespacing by declining it: that plugin's other hook
+    # only pushes this same directory onto skills.paths. Skills take their flat
+    # frontmatter names either way, so the `superpowers:test-driven-development`
+    # cross-references in their bodies fail to resolve under opencode however it
+    # is installed. That is upstream's, and unfixable short of rewriting the
+    # bodies for a second time.
+    (lib.mkIf (cfg.superpowers.enable && cfg.superpowers.src != null && cfg.opencode.enable) {
+      programs.opencode.settings.skills.paths = [ "${superpowersPlugin}/skills" ];
+    })
+
     # --- lavish-axi ---------------------------------------------------------
     # The `package != null` half of each guard is not redundant with the
     # assertions below: without it a null reaches home.packages and fails the
