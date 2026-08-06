@@ -17,8 +17,9 @@
 # in a consuming flake's packages/ cannot see them.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
-# modules. Claude Code is unconditional -- importing this module is the decision
-# to have claude; everything else is opt-in per host/user.
+# modules. EVERYTHING here is opt-in per host/user, claude included:
+# claude.enable gates the package, its settings, and everything installed under
+# ~/.claude. The cjlarose fleet turns it on once, in home/cjlarose.
 #
 # The module takes no flake-specific arguments: every package it installs comes
 # in through a `*.package` option that the consumer sets explicitly. It used to
@@ -323,6 +324,15 @@ in
 
     # --- Claude Code -------------------------------------------------------
 
+    claude.enable = lib.mkEnableOption ''
+      Claude Code: the wrapped package, its settings and MCP servers, the nixd
+      LSP marketplace, and every skill this module installs into ~/.claude/skills.
+
+      Off by default like everything else here, so a consumer of this module has
+      to ask for claude explicitly. The cjlarose fleet does it once, in
+      home/cjlarose
+    '';
+
     claude.enablePlaywrightMcp = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -348,10 +358,11 @@ in
     claude.package = lib.mkOption {
       type = lib.types.package;
       description = ''
-        The UNWRAPPED claude-code package. Required -- claude is the one piece of
-        this module that is unconditional. The module applies its own wrapper
-        (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on top, so
-        hand over a plain build.
+        The UNWRAPPED claude-code package. Required when claude.enable is set,
+        and only then: it is read from inside the block that option gates, so a
+        host with claude off never has to name one. The module applies its own
+        wrapper (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on
+        top, so hand over a plain build.
 
         Which build is a property of the HOST, not of this module: AVX-capable
         machines take the latest Bun standalone, while the Goldmont-based pve
@@ -641,8 +652,10 @@ in
 
   config = lib.mkMerge [
 
-    # --- Claude Code (unconditional) ---------------------------------------
-    {
+    # --- Claude Code -------------------------------------------------------
+    # Off unless claude.enable says otherwise, like every other feature here.
+    # The cjlarose fleet turns it on once, in home/cjlarose.
+    (lib.mkIf cfg.claude.enable {
       programs.claude-code = {
         enable = true;
         # The module's own wrapper, not cfg.claude.package directly -- see
@@ -727,7 +740,7 @@ in
           };
         };
       };
-    }
+    })
 
     # --- superpowers ---------------------------------------------------------
     # Only builds the plugin; the programs.claude-code.plugins definition that
@@ -818,8 +831,10 @@ in
         "${herdrIntegrations}/claude-hook.sh";
 
       # The registration half. Merges into the settings attrset defined in the
-      # unconditional Claude block above. Kept in sync with the script by the
-      # VERSION=7 assertion in herdrIntegrations.
+      # claude.enable block above -- so on a host with herdr but no claude this
+      # defines settings for a claude that is not installed, which home-manager
+      # simply does not write. Kept in sync with the script by the VERSION=7
+      # assertion in herdrIntegrations.
       programs.claude-code.settings.hooks.SessionStart = [{
         matcher = "*";
         hooks = [{
