@@ -1,7 +1,15 @@
 # The ~/repos + ~/workspaces checkout layout, as it affects Claude Code.
 #
 # Split out of default.nix rather than added to it: this is a self-contained,
-# opt-in concern (one option, one CLAUDE.md) and default.nix is already long.
+# opt-in concern (one option, one CLAUDE.md, four skills) and default.nix is
+# already long.
+#
+# The division between the two halves: the CLAUDE.md carries the rules and the
+# reasons, because it is loaded into every session whether or not it is wanted,
+# and it names the skill to reach for at each gate. The skills carry the
+# commands, the decision trees and the scripts, because those cost nothing until
+# something actually invokes them. Anything stated in both places will drift, so
+# it is stated once.
 # Off by default: home-manager-modules/ is shared across the fleet and only
 # hosts actually migrated to this layout should carry the CLAUDE.md.
 { lib, config, ... }:
@@ -84,5 +92,22 @@ in
       builtins.readFile ./workspace-layout/CLAUDE.md
       + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
       + lib.optionalString wikiUnderRepos wikiCarveOut;
+
+    # The mechanics the CLAUDE.md above deliberately does not carry. It states
+    # the rules and names the skill at each gate; the commands, the decision
+    # trees and the scripts live here, where they cost nothing until invoked.
+    #
+    # Installed through cjlarose.llmAgents.skills rather than
+    # programs.claude-code.skills so they also land in ~/.agents/skills for the
+    # other agents -- see ./skills.nix.
+    cjlarose.llmAgents.skills = {
+      # Deliberately not gated on anything: the read-side gate applies on every
+      # host that has ~/repos at all, which is exactly the hosts that enable
+      # this module.
+      refreshing-a-repo = ./workspace-layout/skills/refreshing-a-repo;
+      starting-a-workspace = ./workspace-layout/skills/starting-a-workspace;
+      adding-a-repo-to-a-workspace = ./workspace-layout/skills/adding-a-repo-to-a-workspace;
+      tearing-down-a-workspace = ./workspace-layout/skills/tearing-down-a-workspace;
+    };
   };
 }
