@@ -96,8 +96,16 @@ binary is the authority and the skill knows its current syntax.
 
 It will not invent topology on its own: by default it starts an agent in a
 sibling pane in the *current* tab and cwd. So state the topology explicitly —
-**one space per task, rooted at `~/workspaces/<task>`, one linked worktree per
-repo, agents as panes in that space.**
+**one space per task, one linked worktree per repo, agents as panes in that
+space.**
+
+**The space's cwd is `~/workspaces/<task>` itself, never a worktree inside it —
+including when the task has only one repo.** A space is bound to its cwd at
+creation time rather than continuously, so a space rooted one level too deep is
+not something you can cd your way out of; it has to be recreated. The
+single-worktree case is where the temptation lives, and it is exactly the case
+that changes: a task that grows a second owner has every worktree renamed
+underneath it, moving the directory such a space was pointed at.
 
 ### Tearing down
 

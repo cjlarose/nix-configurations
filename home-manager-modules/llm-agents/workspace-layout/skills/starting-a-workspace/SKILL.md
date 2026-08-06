@@ -37,11 +37,20 @@ decision about someone's work, not a retry.
 
 ## Then the herdr space
 
-One space per task, rooted at `~/workspaces/<task>`, agents as panes in it.
-herdr will not invent this topology — state it explicitly.
+One space per task, agents as panes in it. **The space's cwd is
+`~/workspaces/<task>` itself — not a worktree inside it, even when the task has
+exactly one repo.**
 
-Use the **herdr** skill for the commands. Do not improvise them from memory; the
-installed binary is the authority.
+A space is bound to its cwd at creation time, not continuously, so rooting it one
+level too deep cannot be fixed by cd'ing later; the space has to be recreated.
+The single-repo case is the tempting one and the fragile one: adding a second
+owner renames every worktree underneath, moving the directory such a space
+pointed at. herdr also labels the space from its cwd's basename, so rooting at
+the workspace puts the task in the sidebar rather than a repo name shared with
+every other task touching that repo.
+
+herdr will not invent this topology — state it explicitly. Use the **herdr**
+skill for the commands; the installed binary is the authority.
 
 ## Why pull before `git worktree add`
 
