@@ -78,10 +78,10 @@
         cjlarose.neovim.projectWorkspaces = [ "~/repos" "~/workspaces" ];
         cjlarose.neovim.projectMaxDepth = 2;
         cjlarose.llmAgents.claude.workspaceLayout.enable = true;
-        # Commit-message and PR-description conventions as skills. No
-        # extraInstructions: this host has no issue tracker to link, and the
-        # harness already supplies the model-attribution footer that picktrace's
-        # config will have to ban on its side.
+        # Commit-message, PR-description and PR-comment conventions as skills.
+        # No extraInstructions: this host has no issue tracker to link, and it
+        # wants the model disclosure all three skills already default to. It is
+        # picktrace that has to ban it, and only on PR descriptions.
         cjlarose.llmAgents.gitConventions.enable = true;
         # Browser automation for cjlarose's sessions on this host. The shared
         # home/cjlarose profile leaves enablePlaywrightMcp off so the chromium

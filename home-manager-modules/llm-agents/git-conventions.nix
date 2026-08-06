@@ -15,10 +15,16 @@
 #
 # The divergence is not hypothetical, and it is sharpest on PR descriptions:
 # one consumer requires a tracker link on the first line and bans model
-# attribution outright, while the other has no tracker and follows the harness
-# default of a generated-with footer. A skill asserting either rule would be
-# actively wrong on one of the two hosts, so it asserts neither -- it says the
-# per-repo rules appended below are the authority.
+# attribution outright, while the other has no tracker.
+#
+# On attribution the skills take a position rather than staying neutral:
+# disclosure is the DEFAULT, stated explicitly, in all three artifacts. A skill
+# that merely stayed silent and deferred would be read as permission to omit,
+# and the failure mode -- machine-written prose appearing under a human's name
+# with nothing marking it -- is the one worth defaulting against. A consumer
+# that wants it gone says so in its own text, which is what picktrace does for
+# PR descriptions and only for PR descriptions: it requires the trailer on
+# commits and a Generated-By signature on comments.
 { lib, pkgs, config, ... }:
 
 let
@@ -44,9 +50,12 @@ in
 {
   options.cjlarose.llmAgents.gitConventions = {
     enable = lib.mkEnableOption ''
-      the writing-commit-messages and writing-pull-request-descriptions skills.
-      Off by default: home-manager-modules/ is shared, and a host that does not
-      want these particular house rules should not carry them
+      the writing-commit-messages, writing-pull-request-descriptions and
+      writing-pull-request-comments skills -- one per artifact, because the
+      three take deliberately different attribution rules and collapsing them is
+      the mistake they exist to prevent. Off by default: home-manager-modules/
+      is shared, and a host that does not want these particular house rules
+      should not carry them
     '';
 
     commitExtraInstructions = lib.mkOption {
@@ -80,12 +89,26 @@ in
       description = ''
         Markdown appended to the writing-pull-request-descriptions skill.
 
-        This is the option that matters most of the two: the shared skill
-        deliberately takes no position on tracker links, prose mood, headings or
-        model attribution, because the two consumers of this module require
-        opposite things on the last of those. Whichever rules apply on this host
-        have to be stated here, or the skill leaves the agent to the harness
-        default.
+        This is the option that matters most of the three: the shared skill
+        takes no position on tracker links, prose mood or headings, because the
+        two consumers of this module want different things. It DOES take a
+        position on model attribution -- the disclosure footer is the documented
+        default -- so a consumer that bans it has to say so here. Silence leaves
+        the footer in place, deliberately.
+      '';
+    };
+
+    commentExtraInstructions = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      description = ''
+        Markdown appended to the writing-pull-request-comments skill.
+
+        Least likely of the three to be needed: the comment convention (a
+        visible Generated-By signature, no email) is documented in one place and
+        neither consumer contradicts it. The option exists for symmetry, and so
+        that a house wanting a different signature form does not need a release
+        of this repo to get one.
       '';
     };
   };
@@ -96,6 +119,8 @@ in
         mkSkill "writing-commit-messages" cfg.commitExtraInstructions;
       writing-pull-request-descriptions =
         mkSkill "writing-pull-request-descriptions" cfg.pullRequestExtraInstructions;
+      writing-pull-request-comments =
+        mkSkill "writing-pull-request-comments" cfg.commentExtraInstructions;
     };
   };
 }

@@ -21,20 +21,33 @@ Same instinct, same fix, in three other places:
   that". The diff is the record of what changed.
 - **No testing-plan section** unless the consumer rules below ask for one.
 
+## Model disclosure: included by default
+
+**End the description with the generated-with footer**, unless the rules for
+this repo below say otherwise:
+
+```
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+Machine-written prose says so. The default is to disclose, and silence is not a
+licence to omit — a repo that wants the footer gone says so explicitly, and one
+of the two consumers of this skill does exactly that.
+
+The `Co-Authored-By` trailer and that footer are **the same disclosure in
+different clothing**. Wherever one is banned or required, so is the other;
+swapping one for the other is not a fix in either direction.
+
 ## The rules invert between artifacts — do not generalize
 
 A commit message and a PR description are deliberately asymmetric, and each may
 *require* what the other *forbids* — issue keys and model attribution are the two
-that bite. A third artifact, a review comment posted on the user's behalf, takes
-its own rule again, often the opposite of the PR's.
+that bite. A **comment** posted on the user's behalf is a third artifact with a
+third rule, and it is the *opposite* of the description's: see
+**writing-pull-request-comments**.
 
-So: never carry a rule across artifacts by analogy. The per-repo rules appended
-below are the authority; where they say nothing, follow the harness.
-
-One trap worth naming: the `Co-Authored-By` trailer and the "🤖 Generated with
-Claude Code" footer are **the same disclosure in different clothing**. Wherever
-one is banned or required, so is the other — substituting one for the other is
-not a fix.
+Never carry a rule across artifacts by analogy. Where the rules for this repo
+below speak, they are the authority.
 
 ## Accuracy is a separate pass
 
