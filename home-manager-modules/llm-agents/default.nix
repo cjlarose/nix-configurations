@@ -21,13 +21,23 @@
 # claude.enable gates the package, its settings, and everything installed under
 # ~/.claude. The cjlarose fleet turns it on once, in home/cjlarose.
 #
-# Every skill an option here installs writes its own entries, one per harness --
-# ~/.claude/skills gated on claude.enable, opencode/skills gated on
-# opencode.enable -- rather than going through programs.claude-code.skills,
-# which only ever feeds one of them. Written out at each site on purpose: there
-# is no registry of skills to consult and nothing owns a skills directory as a
-# whole, so a skill that should reach only one harness is a matter of deleting
-# one of its two blocks.
+# Every skill an option here installs lands in ~/.claude/skills and nowhere
+# else, because that one location reaches BOTH harnesses: opencode scans
+# ~/.claude/skills (and ~/.agents/skills) natively, alongside anything named in
+# its own skills.paths. Installing a second copy under opencode/skills is not
+# belt-and-braces, it is a collision -- opencode logs `duplicate skill name` and
+# silently picks one by scan order.
+#
+# The reach of each location, which is what any change here has to respect:
+#
+#   ~/.claude/skills          claude + opencode
+#   ~/.agents/skills          opencode only
+#   opencode skills.paths     opencode only  (used for superpowers, below)
+#   a Claude Code plugin      claude only
+#
+# So an opencode-only skill goes through skills.paths, and a CLAUDE-only skill
+# is not expressible except as a plugin: opencode's scan of ~/.claude is
+# unconditional and has no exclude setting.
 #
 # The module takes no flake-specific arguments: every package it installs comes
 # in through a `*.package` option that the consumer sets explicitly. It used to
@@ -46,6 +56,13 @@
 
 let
   cfg = config.cjlarose.llmAgents;
+
+  # Whether to install skills at all. ~/.claude/skills is written whenever
+  # EITHER harness is enabled, not just claude: it is the location both of them
+  # read, so on a host running opencode alone it is still where opencode looks.
+  # Writing under ~/.claude with claude off reads oddly for a moment, and is
+  # cheaper than a second copy that opencode would only warn about.
+  skillsWanted = cfg.claude.enable || cfg.opencode.enable;
 
   # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
   # format rather than a typed option per key: tuicr's config surface is its
@@ -772,12 +789,8 @@ in
       # The skill drives the on-PATH lavish-axi binary directly (never npx), so
       # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in
       # the package's share/ output, installed into each enabled harness.
-      home.file = lib.mkIf cfg.claude.enable {
+      home.file = lib.mkIf skillsWanted {
         ".claude/skills/lavish/SKILL.md".source =
-          "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
-      };
-      xdg.configFile = lib.mkIf cfg.opencode.enable {
-        "opencode/skills/lavish/SKILL.md".source =
           "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
       };
     })
@@ -786,12 +799,8 @@ in
     (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null) {
       # Upstream's own skill, read out of the package so it always matches the
       # extension binary built from the same source.
-      home.file = lib.mkIf cfg.claude.enable {
+      home.file = lib.mkIf skillsWanted {
         ".claude/skills/gh-stack/SKILL.md".source =
-          "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
-      };
-      xdg.configFile = lib.mkIf cfg.opencode.enable {
-        "opencode/skills/gh-stack/SKILL.md".source =
           "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
       };
     })
@@ -806,12 +815,8 @@ in
       # read a SKILL.md out of: share/git-surgeon/skills/<name>/SKILL.md, not
       # share/<tool>/skill/SKILL.md. Irrelevant to where it lands, which is
       # spelled out on the left of each assignment below.
-      home.file = lib.mkIf cfg.claude.enable {
+      home.file = lib.mkIf skillsWanted {
         ".claude/skills/git-surgeon/SKILL.md".source =
-          "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
-      };
-      xdg.configFile = lib.mkIf cfg.opencode.enable {
-        "opencode/skills/git-surgeon/SKILL.md".source =
           "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
       };
     })
@@ -874,11 +879,8 @@ in
     # hosts where herdr is installed but unused: the skill's first instruction
     # is to check HERDR_ENV=1 and stop if it is unset.
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null) {
-      home.file = lib.mkIf cfg.claude.enable {
+      home.file = lib.mkIf skillsWanted {
         ".claude/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
-      };
-      xdg.configFile = lib.mkIf cfg.opencode.enable {
-        "opencode/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
       };
     })
 
