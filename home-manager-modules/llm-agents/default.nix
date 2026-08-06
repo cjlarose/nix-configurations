@@ -17,8 +17,17 @@
 # in a consuming flake's packages/ cannot see them.
 #
 # It replaces the former separate claude / phx-workflow / lavish / opencode
-# modules. Claude Code is unconditional -- importing this module is the decision
-# to have claude; everything else is opt-in per host/user.
+# modules. EVERYTHING here is opt-in per host/user, claude included:
+# claude.enable gates the package, its settings, and everything installed under
+# ~/.claude. The cjlarose fleet turns it on once, in home/cjlarose.
+#
+# Every skill an option here installs writes its own entries, one per harness --
+# ~/.claude/skills gated on claude.enable, opencode/skills gated on
+# opencode.enable -- rather than going through programs.claude-code.skills,
+# which only ever feeds one of them. Written out at each site on purpose: there
+# is no registry of skills to consult and nothing owns a skills directory as a
+# whole, so a skill that should reach only one harness is a matter of deleting
+# one of its two blocks.
 #
 # The module takes no flake-specific arguments: every package it installs comes
 # in through a `*.package` option that the consumer sets explicitly. It used to
@@ -323,6 +332,15 @@ in
 
     # --- Claude Code -------------------------------------------------------
 
+    claude.enable = lib.mkEnableOption ''
+      Claude Code: the wrapped package, its settings and MCP servers, the nixd
+      LSP marketplace, and every skill this module installs into ~/.claude/skills.
+
+      Off by default like everything else here, so a consumer of this module has
+      to ask for claude explicitly. The cjlarose fleet does it once, in
+      home/cjlarose
+    '';
+
     claude.enablePlaywrightMcp = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -348,10 +366,11 @@ in
     claude.package = lib.mkOption {
       type = lib.types.package;
       description = ''
-        The UNWRAPPED claude-code package. Required -- claude is the one piece of
-        this module that is unconditional. The module applies its own wrapper
-        (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on top, so
-        hand over a plain build.
+        The UNWRAPPED claude-code package. Required when claude.enable is set,
+        and only then: it is read from inside the block that option gates, so a
+        host with claude off never has to name one. The module applies its own
+        wrapper (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on
+        top, so hand over a plain build.
 
         Which build is a property of the HOST, not of this module: AVX-capable
         machines take the latest Bun standalone, while the Goldmont-based pve
@@ -469,7 +488,7 @@ in
 
     lavish.enable = lib.mkEnableOption ''
       the lavish-axi CLI (upstream kunchenguid/lavish-axi, built from source with
-      telemetry disabled) and its Lavish Editor Claude Code skill. lavish-axi opens
+      telemetry disabled) and its Lavish Editor agent skill. lavish-axi opens
       an agent-generated HTML artifact in a sandboxed browser for human annotation
       and ships the feedback back to the driving agent over a loopback server with
       a Host-header DNS-rebinding guard. Disabled by default; opt in per host/user
@@ -480,7 +499,8 @@ in
       default = null;
       description = ''
         The lavish-axi package to install. Carries the CLI at bin/lavish-axi and
-        the generated Claude Code skill at share/lavish-axi/skill/SKILL.md.
+        the generated agent skill at share/lavish-axi/skill/SKILL.md, which this
+        module installs into every enabled harness.
         Required when lavish.enable is set; asserted below rather than defaulted,
         so hosts with lavish off need not name a package at all.
       '';
@@ -599,7 +619,7 @@ in
       description = ''
         Upstream's herdr source tree (the herdrdev/herdr flake input itself),
         from which the module lifts the official agent skill and installs it as
-        the `herdr` Claude Code skill. Optional -- herdr works fine without it;
+        the `herdr` agent skill, into every enabled harness. Optional -- herdr works fine without it;
         leave null to install the terminal multiplexer but not the instructions
         for driving it.
 
@@ -641,8 +661,10 @@ in
 
   config = lib.mkMerge [
 
-    # --- Claude Code (unconditional) ---------------------------------------
-    {
+    # --- Claude Code -------------------------------------------------------
+    # Off unless claude.enable says otherwise, like every other feature here.
+    # The cjlarose fleet turns it on once, in home/cjlarose.
+    (lib.mkIf cfg.claude.enable {
       programs.claude-code = {
         enable = true;
         # The module's own wrapper, not cfg.claude.package directly -- see
@@ -727,7 +749,7 @@ in
           };
         };
       };
-    }
+    })
 
     # --- superpowers ---------------------------------------------------------
     # Only builds the plugin; the programs.claude-code.plugins definition that
@@ -748,19 +770,30 @@ in
       home.packages = [ cfg.lavish.package ];
 
       # The skill drives the on-PATH lavish-axi binary directly (never npx), so
-      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in the
-      # package's share/ output; raw home.file (like the upstream lavish-axi HM
-      # module) rather than programs.claude-code.skills.
-      home.file.".claude/skills/lavish/SKILL.md".source =
-        "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
+      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in
+      # the package's share/ output, installed into each enabled harness.
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/lavish/SKILL.md".source =
+          "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/lavish/SKILL.md".source =
+          "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
+      };
     })
 
     # --- gh stacked PRs (skill only) ----------------------------------------
     (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null) {
       # Upstream's own skill, read out of the package so it always matches the
       # extension binary built from the same source.
-      programs.claude-code.skills."gh-stack" =
-        "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/gh-stack/SKILL.md".source =
+          "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/gh-stack/SKILL.md".source =
+          "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
+      };
     })
 
     # --- git-surgeon --------------------------------------------------------
@@ -771,13 +804,16 @@ in
 
       # Upstream nests its skill one level deeper than the other two tools we
       # read a SKILL.md out of: share/git-surgeon/skills/<name>/SKILL.md, not
-      # share/<tool>/skill/SKILL.md.
-      #
-      # Key is the bare skill directory name -- home-manager appends
-      # /SKILL.md itself (PR #8770); a trailing /SKILL here would double-nest to
-      # ~/.claude/skills/git-surgeon/SKILL/SKILL.md and be discovered by nothing.
-      programs.claude-code.skills."git-surgeon" =
-        "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+      # share/<tool>/skill/SKILL.md. Irrelevant to where it lands, which is
+      # spelled out on the left of each assignment below.
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/git-surgeon/SKILL.md".source =
+          "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/git-surgeon/SKILL.md".source =
+          "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
+      };
     })
 
     # --- tuicr ---------------------------------------------------------------
@@ -818,8 +854,10 @@ in
         "${herdrIntegrations}/claude-hook.sh";
 
       # The registration half. Merges into the settings attrset defined in the
-      # unconditional Claude block above. Kept in sync with the script by the
-      # VERSION=7 assertion in herdrIntegrations.
+      # claude.enable block above -- so on a host with herdr but no claude this
+      # defines settings for a claude that is not installed, which home-manager
+      # simply does not write. Kept in sync with the script by the VERSION=7
+      # assertion in herdrIntegrations.
       programs.claude-code.settings.hooks.SessionStart = [{
         matcher = "*";
         hooks = [{
@@ -836,7 +874,12 @@ in
     # hosts where herdr is installed but unused: the skill's first instruction
     # is to check HERDR_ENV=1 and stop if it is unset.
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null) {
-      programs.claude-code.skills."herdr" = "${herdrSkill}/SKILL.md";
+      home.file = lib.mkIf cfg.claude.enable {
+        ".claude/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
+      };
+      xdg.configFile = lib.mkIf cfg.opencode.enable {
+        "opencode/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
+      };
     })
 
     # opencode integration. Split from the block above because it needs both

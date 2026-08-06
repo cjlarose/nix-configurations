@@ -1,10 +1,15 @@
 { system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
 { pkgs, lib, ... }: {
-  # All LLM-agent tooling lives behind the single llm-agents module. Claude Code
-  # itself is unconditional there; the rest is opted into here for the whole
-  # cjlarose fleet, or per-host where the closure cost warrants it. The module
-  # takes no additionalPackages arg -- every package is named explicitly here.
+  # All LLM-agent tooling lives behind the single llm-agents module, which
+  # defaults every feature off -- claude included. Everything wanted fleet-wide
+  # is opted into here, and the rest per-host where the closure cost warrants
+  # it. The module takes no additionalPackages arg -- every package is named
+  # explicitly here.
   cjlarose.llmAgents = {
+    # Claude Code for the whole cjlarose fleet. Stated here rather than assumed:
+    # the module defaults it off like everything else, so this one line is what
+    # keeps all seven hosts that import this profile on claude.
+    claude.enable = true;
     claude.remoteControlAtStartup = true;
 
     # obra/superpowers as a namespaced plugin: brainstorming, planning, TDD,
