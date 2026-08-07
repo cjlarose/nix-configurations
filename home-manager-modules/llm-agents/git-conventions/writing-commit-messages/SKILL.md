@@ -38,9 +38,7 @@ Imperative test: the subject completes "If applied, this commit will ___".
 
 ## Disclosing the models
 
-One trailer per model, repeated — the same shape git's own trailer block uses
-for `Signed-off-by:`, and for the same reason: one line per contributor is
-greppable and `git interpret-trailers` parses it, where a packed list is neither.
+One trailer per model, repeated:
 
 ```
 Assisted-by: Claude Opus 5
@@ -53,16 +51,10 @@ Assisted-by: Claude Haiku 4.5
   nothing used does not.
 - One line each, deduplicated. A single model is a list of one — that is the
   normal case, not a reason to drop the trailer.
-- Use the display name (`Claude Opus 5`), and **no email address**. The trailer
-  discloses a tool, not a person who could be written to.
-- `Assisted-by:` rather than `Co-developed-by:` deliberately. The kernel pairs
-  `Co-developed-by:` with a matching `Signed-off-by:` from that same developer,
-  certifying provenance — a certification a model cannot make. Borrowing the key
-  would claim something untrue.
+- Use the display name (`Claude Opus 5`), and **no email address**.
 
-This is a **commit-message** convention. Trailers are defined as the block at the
-end of a commit message, and nothing parses them anywhere else, so do not carry
-this form into a PR description — see **writing-pull-request-descriptions**.
+This is a **commit-message** convention. Do not carry the trailer form into a PR
+description — see **writing-pull-request-descriptions**.
 
 ## Check the convention before the first commit, not after
 
