@@ -1,207 +1,139 @@
 ---
 name: ingesting-sources
-description: Use when the user wants to ingest a source from raw/ into the LLM wiki — phrases like "ingest raw/articles/foo.md", "process this new article", "file this", "add this to the wiki". Also runs as a subagent spawned by the handing-off skill. Synthesizes the source into a summary page, updates 5-15 related entity/concept pages, refreshes index.md, and appends log.md.
+description: Use when the user wants to file queued captures or a specific raw source into an LLM wiki — phrases like "ingest the queue", "drain the backlog", "file this", "process raw/articles/foo.md", "ingest the uningested captures". Synthesizes each source into a summary page, updates related pages, refreshes index.md, appends log.md, and fast-forwards the canonical checkout. Runs only in the wiki's designated ingest worktree.
 ---
 
 # ingesting-sources
 
-Ingest one source from `raw/` into the wiki. End state: a summary page exists in `pages/`, related entity/concept pages have been created or updated, `index.md` reflects every new page, and `log.md` has a new entry describing what changed.
+File sources into an LLM wiki: one summary page, related pages created or updated, `index.md` refreshed, `log.md` appended, all committed and pushed.
 
-This skill is **location-independent**: it operates on the wiki at `$LLM_WIKI_PATH` regardless of the current working directory. It works the same whether invoked directly from a session inside the wiki repo or spawned as a subagent from an unrelated project (e.g., by the `handing-off` skill).
+Usually invoked with no argument to **drain the capture queue** — the captures other sessions have pushed since the last run.
+
+## Where this runs, and why it matters
+
+This skill runs **only in the wiki's designated ingest worktree** (`ingestPath` in the registry). That is the serialization mechanism, not a preference.
+
+Ingest rewrites `index.md`, `log.md` and task pages in place. Two ingests at once corrupt all three. Confining it to one worktree makes "one agent per worktree" the lock — no lockfile to leak, no coordination protocol. The canonical checkout under `~/repos` is read-only like every other repo there, and a linked worktree cannot check out `main` anyway, since the main worktree holds it.
+
+```bash
+REG="${XDG_CONFIG_HOME:-$HOME/.config}/llm-wiki/wikis.json"
+INGEST=$(jq -r --arg i "$ID" '.wikis[$i].ingestPath' "$REG")
+[ "$INGEST" != "null" ] || { echo "wiki '$ID' has no ingestPath; no standing agent on this host"; exit 1; }
+[ "$(cd "$INGEST" && pwd -P)" = "$(pwd -P)" ] || { echo "run this in $INGEST"; exit 1; }
+```
+
+If you are not there, **stop and say so.** Do not `cd` into it and continue: another agent may already be working there, and that is precisely what the guard exists to prevent.
 
 ## Setup contract
 
-This skill requires the `LLM_WIKI_PATH` environment variable to point at the user's LLM wiki repository. The user wires this up via home-manager.
+Resolve everything from the registry — `repoPath`, `ingestPath`, `queueDir`. `LLM_WIKI_PATH` is a compatibility export that only exists when a single wiki is installed; do not depend on it.
 
-Verify before doing anything else:
-
-```bash
-test -n "$LLM_WIKI_PATH" \
-  && test -d "$LLM_WIKI_PATH/.git" \
-  && test -d "$LLM_WIKI_PATH/pages"
-```
-
-If any check fails, tell the user `LLM_WIKI_PATH` must be set to their LLM wiki git repository and that they should add the export to their home-manager config. Then abort — do not write anything.
-
-**All paths below are resolved against `$LLM_WIKI_PATH`.** Never assume the current working directory is the wiki root. Use `git -C "$LLM_WIKI_PATH"` for every git operation and `$LLM_WIKI_PATH/<...>` for every Read/Write/Edit.
-
-## Inputs
-
-One of:
-- A path to a file in `raw/` — either absolute, or relative to the wiki root (e.g., `raw/articles/2026-05-30-foo.md`, `raw/sessions/2026-06-25-bar.md`).
-- A URL. Fetch its content, save to `$LLM_WIKI_PATH/raw/articles/YYYY-MM-DD-<kebab-slug>.md`, then proceed with that path.
-
-Resolve the source to both an absolute path (for reading/writing) and a wiki-relative path (for frontmatter `sources:` and `git add`):
-
-```bash
-case "$SRC" in
-  /*) ABS="$SRC" ;;
-  *)  ABS="$LLM_WIKI_PATH/$SRC" ;;
-esac
-REL="${ABS#"$LLM_WIKI_PATH"/}"   # wiki-relative, e.g. raw/sessions/2026-06-25-bar.md
-```
-
-Frontmatter `sources:` and `log.md` entries always use the **wiki-relative** path (`$REL`), never the absolute one.
+**The wiki's own `CLAUDE.md` is the schema authority.** Read it before writing anything. The two wikis genuinely differ — different domain tags, different page types, `repo/*` and `service/*` on one, `slug:` versus `jira:` and `airtable-*` for work-item identity — and this skill deliberately does not hardcode either. Whatever `CLAUDE.md` says about frontmatter, taxonomy and required sections wins over any example here.
 
 ## Hard constraints
 
-- **Run autonomously — do not pause for confirmation.** Rely on your own assessment of what the source says and which pages to create or update. Make the changes, commit them, and report what you did afterward. Never stop mid-workflow to ask "anything to add/correct/emphasize before I proceed?" The only things that stop the workflow before it completes are genuine blockers: a missing/invalid wiki repo (`LLM_WIKI_PATH` unset or not a wiki), a locked git index, or an unredactable secret. Surface judgment calls, assumptions, and contradictions in the final report (step 10), not before.
-- **Flag review items with a literal `⚠️ REVIEW:` marker.** A *review item* is anything the user may need to act on or override: a contradiction with an existing page (surface it — never silently resolve, per hard rule 5 in `CLAUDE.md`), an unresolved open question, a material judgment call that shaped what you wrote (e.g. touching far fewer pages than the usual 5-15, or picking one reading of an ambiguous source), or a change to an existing page's framing or claims. Routine created/updated/cross-linked work is **not** a review item. Review items appear in exactly two places and must match (parity): one `- ⚠️ REVIEW: …` bullet per item in `log.md` (step 8), and the same items in the end-of-report banner (step 10). If nothing qualifies, emit no markers — and say so via the calm no-items line in step 10. The whole point: the user runs this flow unattended, so a flag must survive in the durable log *and* be the last jarring thing they see in the session output.
-- **One source per invocation.** If asked to ingest a batch, do them one at a time — run the full workflow (including the commit) end to end for each source before moving to the next. Do not pause for user review between sources.
-- **Evolve the wiki's skills when warranted (self-improvement).** You may — and when the source clearly calls for it, should — **add, modify, or remove** the wiki's user-scoped skills under `$LLM_WIKI_PATH/skills/<name>/SKILL.md`:
-  - **Add** a skill when the source describes a repeatable *executable* procedure worth running on demand. Author it thin: frontmatter (`name`, `description`) + a body that keeps the operational steps/commands and references the wiki pages you wrote for the criteria/reference (the pattern the wiki-coupled skills `transcoding-media` / `rebuilding-nixos` use).
-  - **Modify** an existing skill — e.g. slim it to cite a page you just created, or correct it against the source.
-  - **Remove** a skill the source renders obsolete or superseded.
-  Operate on `skills/` **only** — the user-scoped skills the home-manager module deploys — never `.claude/skills/` (project-scoped, e.g. `linting-the-wiki`). The module auto-discovers `skills/*/SKILL.md`, so writing or deleting a `skills/<name>/SKILL.md` is sufficient: **never edit nix.**
-  **Skill changes are not live.** Deployed skills are store copies from the pinned flake rev (unlike pages, which are live via the worktree), so a skill change is committed but inert until the user bumps the flake input and runs HM activation. Therefore emit one `🛠️ SKILL-CHANGE:` bullet in `log.md` per change (step 8) — format `🛠️ SKILL-CHANGE: <add|modify|remove> <name> — needs redeploy (flake bump + HM activation)` — and surface the set in the step-10 report so the user knows a redeploy is pending and can review the diff first.
-  **Guardrail — your own tooling.** Managing a *domain* skill (`transcoding-media`, `rebuilding-nixos`, or a new one) is routine. Modifying or removing the wiki's own maintenance skills (`capturing-sessions`, `querying-notes`, `ingesting-sources`) is high-stakes — a bad edit breaks this very pipeline — so additionally emit a `⚠️ REVIEW:` flag when you touch one.
-  When you spot a candidate but aren't confident enough to author it, fall back to flagging only: add a `🔧 SKILL-CANDIDATE:` bullet to `log.md` (parallel to `⚠️ REVIEW:`) so the shortlist stays greppable. Candidates are non-blocking — log only, not the report banner.
-- **Track work items with `type/task` and `type/epic` pages.** Create a `type/task` page for each substantial piece of work the source represents — whether **completed** this session (`status/done`), **in flight** (`status/in-progress`/`status/blocked`), or **named as future work** (`status/not-started`) — with exactly one `status/*` tag, an optional stable `slug:`, and an `epic:` link if it belongs to a larger effort. The task page is the work item; a separate summary page still captures the *knowledge*. Don't manufacture tasks for trivial one-off edits. When a task already has a page, **match it by `slug:` first, then by title**, and update its `status/*` (→ `status/in-progress`, `status/blocked`, `status/done`, or `status/cancelled`) and bump `updated:` in place rather than duplicating it. Cluster related tasks under a `type/epic` page when the work is large — the epic lists its tasks via `[[wikilinks]]`, and tasks link back via `epic:`. Assign a `slug:` (kebab-case, `^[a-z0-9]+(-[a-z0-9]+)*$`, unique across pages) when you create a work item so later sessions have a stable matcher; omit it only for throwaway tasks.
-- **Handoff captures carry continuation onto `type/task` pages.** When the source's frontmatter has `handoff: true`, it is a handoff capture (written for a handoff — the `handing-off` skill directs `capturing-sessions` to include this) with a `## Handoff guidance` section holding one subsection per in-flight piece of work. The `type/task` page **is** the handoff doc — there is no separate handoff page type. For **each** item: **match** an existing task by its `slug:`, else by title, else **create** one (assigning a fresh unique `slug:` on creation). Set/refresh a **`## Next steps`** section from the item's next steps (ordered, concrete), refresh the current-state summary, set `status/in-progress` (or `status/blocked`), and bump `updated:`. A `type/task` carries `## Next steps` **only while open** — if an item reports the work finished, set `status/done` and drop the `## Next steps` section instead of leaving a stale one. The durable knowledge in the same capture still fans out to its own concept/entity/decision/etc. pages as usual — the task page is the work item + handoff, not the knowledge store. List every task page you touched in the step-10 report so the `handing-off` skill can point the next agent at them.
-- **Never modify, rename, or delete files in `raw/`.**
-- **Every page in `pages/` must have valid frontmatter** — exactly one `domain/*` tag, exactly one `type/*` tag, and (for `type/task`/`type/epic` pages) exactly one `status/*` tag. Include the `epic:` field on task pages that belong to a parent epic.
-- **End the workflow with a `log.md` append.** No exceptions.
-- **Dates are America/Los_Angeles.** Derive today with `TZ='America/Los_Angeles' date +%Y-%m-%d`. Use that date in any filename prefix (URL fetches into `raw/articles/`), frontmatter `created`/`updated`/`clipped` fields, and log entry prefix.
+- **Run autonomously.** Make the changes, commit, report afterwards. Never stop mid-workflow to ask "anything to add before I proceed?" Only genuine blockers stop you: wrong worktree, unreadable registry, locked git index, a secret you cannot redact.
+- **One source per commit, sources one at a time.** Draining a queue of six means six full cycles, each ending in its own commit. Never batch them: a failure halfway through a batch leaves the wiki in a state no one can reason about.
+- **Never modify, rename or delete anything under `raw/` other than moving a queued capture out of the queue directory** (below).
+- **Flag review items with a literal `⚠️ REVIEW:` marker.** A review item is something the user may need to act on or override: a contradiction with an existing page (surface it, never resolve it silently), an unresolved open question, a material judgment call, a change to an existing page's framing. Routine created/updated work is not one. They appear in exactly two places and must match: one bullet each in `log.md`, and the same list in the closing banner.
+- **Dates are America/Los_Angeles**, `TZ='America/Los_Angeles' date +%Y-%m-%d`.
+- **Do not author, modify or delete skills.** Skills live in the `llm-agents` home-manager module now, not in the wiki, and they are deployed as read-only store copies. If a source suggests a skill is wrong or missing, record it as a `🔧 SKILL-CANDIDATE:` bullet in `log.md` and say so in the report. That is the whole of your involvement.
 
 ## Workflow
 
-### 1. Read the source
+### 1. Build the work list
 
-Read the full source file at `$ABS`. If it has frontmatter (e.g., from Obsidian Web Clipper with title/URL/date, or a `capturing-sessions` extract with `captured`/`topic`), treat that as ground truth.
-
-### 2. Check for prior ingestion
+With no argument, drain the queue — and the spool, which holds captures written by sessions that had no workspace to make a worktree in:
 
 ```bash
-grep -l "$(basename "$ABS")" "$LLM_WIKI_PATH"/pages/*.md 2>/dev/null
+git -C . pull --rebase                       # other sessions have been pushing captures
+ls "$QUEUE"/*.md 2>/dev/null                 # the queue, in the worktree
+ls "${XDG_STATE_HOME:-$HOME/.local/state}/llm-wiki/$ID/spool"/*.md 2>/dev/null
 ```
 
-If any page already lists this source in its `sources:` frontmatter, this is a re-ingestion. Don't ask — proceed by **integrating in place**: update the existing pages rather than duplicating them, and never delete prior content wholesale. Note in the final report (step 10) that this source had already been ingested and which pages you re-touched.
+Process oldest first. With an explicit path or URL argument, that is the whole list; fetch a URL into `raw/articles/YYYY-MM-DD-<slug>.md` first.
 
-### 3. Assess the source
+Then, for each source, run steps 2-7 to completion before starting the next.
 
-Form your own 3-5 key takeaways of what this source says and what's worth preserving. This is your working assessment — do not present it for approval or wait for a response. Carry it straight into the summary page and the related-pages plan below.
+### 2. Read the source and check for prior ingestion
 
-### 4. Draft the summary page
+Read it in full; treat its frontmatter as ground truth. Then:
 
-Create `$LLM_WIKI_PATH/pages/<Title>.md` where `<Title>` is `Title Case With Spaces` derived from the source. Frontmatter:
-
-```yaml
----
-tags: [domain/<software|finance>, type/summary, <topic-tags>]
-created: <today's date, YYYY-MM-DD>
-updated: <today's date, YYYY-MM-DD>
-sources:
-  - <$REL — the wiki-relative source path>
----
+```bash
+grep -l "$(basename "$SRC")" pages/*.md 2>/dev/null
 ```
 
-Body: condensed takeaways + key facts worth preserving + any directly-quoted material with citations.
+A hit means re-ingestion: integrate in place, updating existing pages rather than duplicating them, and never delete prior content wholesale. Note it in the report.
 
-### 5. Identify related pages
+### 3. Decide what it touches
 
-Read `$LLM_WIKI_PATH/index.md`. Identify 5-15 pages this source touches:
+Form your own three to five takeaways. Read `index.md` and identify the pages this affects — typically 5-15: existing entities and concepts to enrich, new ones worth a page, comparisons or syntheses the material warrants, and work items.
 
-- **Existing entities/concepts** to enrich with new information.
-- **New entities/concepts** worth a dedicated page.
-- **New comparisons or syntheses** worth drafting if material warrants.
-- **`type/task` or `type/epic` pages** if the source mentions future/in-flight/completed work (see the work-item hard constraint above for `status/*`, `slug:`, and `epic:` rules).
+Do not present the plan for approval. Carry it straight into the edits and report what you actually did.
 
-Decide the plan yourself — group it mentally under `Update:` and `Create:` and proceed directly to applying it. Do not present it for approval or wait. You'll list what you actually created and updated in the final report (step 10).
+### 4. Write the pages
 
-### 6. Apply updates
+A `type/summary` page for the source, plus the related pages. Frontmatter per the wiki's `CLAUDE.md`. `sources:` always uses the **final** wiki-relative path — `raw/sessions/<file>.md`, where step 6 moves it, not the queue path it came from.
 
-For each item in your plan (all under `$LLM_WIKI_PATH/pages/`):
+**Work items.** Create or update a `type/task` page for each substantial piece of work the source represents, matched by the wiki's own durable identifier (`slug:`, `jira:` — `CLAUDE.md` says which) and then by title. Update `status/*` in place rather than duplicating the page; a long-running task stays one page across many ingests.
 
-- **Existing page:** read it, integrate new information, add cross-references via `[[wikilinks]]`, bump `updated:` to today, append `$REL` to `sources:` if not already listed.
-- **New page:** create with valid frontmatter (one `domain/*`, one `type/*`, topic tags — plus exactly one `status/*` and an optional `slug:`/`epic:` on `type/task`/`type/epic` work items), body synthesized from the source, cross-references to related pages via `[[wikilinks]]`.
+**Task pages do not carry `## Next steps`.** Live next-steps belong to the handoff document, which `handing-off` writes outside the wiki and keeps current without waiting for an ingest. A `## Next steps` section here would be stale the moment it mattered — it is written by whoever last ingested, not by whoever last worked. Record what the work *is*, its status, and the decisions taken; drop any `## Next steps` you find on a page you touch.
 
-A `[[wikilink]]` to a not-yet-existing page is fine — leave it; lint will surface it later.
+### 5. Refresh `index.md`
 
-### 7. Update `index.md`
+Add an entry for every new non-work-log page under the right domain and topic heading, one line each. This file is also what the session-start hook injects, under a byte budget — so a bloated entry costs every session on the machine, not just this one.
 
-In `$LLM_WIKI_PATH/index.md`, for every new page add an entry under the right `## <Domain>` / `### <Topic>` heading with a one-line summary. Create new topic groups if needed; keep them alphabetized within a domain.
+### 6. Move the capture out of the queue
 
-### 8. Append `log.md`
+For a queued capture, in the same commit as the pages:
 
-Append a new entry at the bottom of `$LLM_WIKI_PATH/log.md`:
+```bash
+git mv "$QUEUE/<file>.md" "raw/sessions/<file>.md"
+```
+
+This *is* the "ingested" marker. Presence in the queue means not yet filed; nothing else records it, so the move and the pages must land together or the file is either ingested twice or lost. For a spooled capture, write it to `raw/sessions/` and delete the spool copy only after the commit succeeds.
+
+### 7. Append `log.md`, commit, push, fast-forward
 
 ```markdown
-## [YYYY-MM-DD] ingest | "<source title>" (<$REL>)
+## [YYYY-MM-DD] ingest | "<source title>" (raw/sessions/<file>.md)
 - Created [[<New Page>]] (<type>)
 - Updated [[<Existing Page>]]
-- Cross-linked from [[<Other Page>]]
-- Notable: <optional plain-text color or surprises that do NOT need user action>
-- ⚠️ REVIEW: <one bullet per review item the user should act on or override — omit these entirely if there are none>
-- 🔧 SKILL-CANDIDATE: <one bullet per repeatable process worth turning into a Claude skill — omit if none>
-- 🛠️ SKILL-CHANGE: <add|modify|remove> <name> — needs redeploy (flake bump + HM activation) — one bullet per skill you added/modified/removed; omit if none
+- Notable: <colour that needs no action>
+- ⚠️ REVIEW: <one per item needing the user's attention; omit if none>
+- 🔧 SKILL-CANDIDATE: <one per repeatable process worth a skill; omit if none>
 ```
 
-Use the literal prefix `⚠️ REVIEW:` (with the warning sign) so the user's standing review queue is just `grep '⚠️ REVIEW:' "$LLM_WIKI_PATH/log.md"`. Add one such bullet per review item, as defined in the hard constraints, or none at all. Keep non-actionable color in a plain `- Notable:` bullet — never under `⚠️ REVIEW:`, or you dilute the marker. The `🛠️ SKILL-CHANGE:` prefix is likewise greppable (`grep '🛠️ SKILL-CHANGE:' "$LLM_WIKI_PATH/log.md"`) — the standing queue of skill changes awaiting a redeploy; `🔧 SKILL-CANDIDATE:` is the parallel shortlist of skills worth authoring later.
-
-### 9. Commit
-
-Commit the work without asking. Stage **only** the files this ingest touched — never `git add -A`, since the working tree may hold unrelated changes:
-
-- the new/updated pages under `pages/`
-- `index.md`
-- `log.md`
-- the associated raw source: if you fetched a URL into `raw/articles/` this run, include that file (`$REL`); if the source was an already-tracked `raw/` file, there's nothing new to stage for it. **If the source is an untracked file (e.g., a `capturing-sessions` extract that has not been committed yet), include `$REL` so the capture and its ingest land in one commit.**
+Stage only what this ingest touched — never `git add -A`. Commit with an imperative subject naming the source, then:
 
 ```bash
-git -C "$LLM_WIKI_PATH" add \
-  pages/<...touched pages...> index.md log.md <$REL if untracked or newly fetched>
+git push origin HEAD:main || { git pull --rebase && git push origin HEAD:main; }
+git -C "$REPO" merge --ff-only "$(git rev-parse HEAD)"
 ```
 
-Then commit with an imperative subject naming the ingested source, e.g.:
+**The fast-forward of `$REPO` is required, not tidy-up.** The canonical checkout is what the session-start hook reads `index.md` from and what `querying-notes` searches. Skip it and every session on the machine reads a wiki missing everything you just filed. It is a sanctioned write to `~/repos` — the same one `tearing-down-a-workspace` performs when work lands — and it is `--ff-only`, so it refuses rather than inventing a merge if that checkout has diverged. If it refuses, say so; do not force it.
 
-```
-Ingest <source title>
-```
+### 8. Report
 
-End the commit message with the trailer:
-
-```
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-```
-
-Commit directly to the current branch (this repo's convention is to commit ingests straight to `main`). If `git commit` fails (e.g., locked index, pre-commit hook rejection), stop and report the failure rather than retrying blindly.
-
-### 10. Report
-
-Summarize for the user: pages created, pages updated, the commit SHA, whether this was a re-ingestion, and any optional follow-up sources worth ingesting.
-
-If you added/modified/removed any skills, state it plainly and prominently — list each `🛠️ SKILL-CHANGE` and say a **redeploy (flake bump + HM activation) is required to activate them**, since deployed skills are store copies, not live. This is the user's signal to bump the wiki flake input and run HM activation (and review the committed skill diff first).
-
-When this skill was spawned as a subagent (e.g., by the `handing-off` skill), this report is your return value — the parent relays it to the originating session, so keep it explicit and self-contained.
-
-**End the report with the review banner, and put it dead last — nothing may come after it.** This is the part the user is most likely to actually see (a leading banner can scroll off the top), so it must be the final thing in your output. The banner restates exactly the `⚠️ REVIEW:` items you wrote to `log.md` in step 8 — same items, same count (parity).
-
-If there are one or more review items:
+Per source: pages created and updated, the commit, whether it was a re-ingestion. Then, once at the end, the review banner — **last, with nothing after it**, because a leading banner scrolls off the top of an unattended run:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️  REVIEW NEEDED — <N> item(s) (also in log.md):
    1. <item>
-   2. <item>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-If there are none, end with exactly this calm line instead — no banner, and still nothing after it:
-
-```
-✓ No review items flagged.
-```
+With none, end with exactly `✓ No review items flagged.` and nothing after it.
 
 ## Examples of when this skill fires
 
+- "ingest the queue" / "drain the backlog"
 - "ingest raw/articles/2026-05-30-pg-tuning.md"
 - "file this article: https://example.com/foo"
-- "add raw/notes/2026-05-29-asset-allocation.md to the wiki"
-- "process the new article I just clipped"
-- spawned by the `handing-off` skill to ingest a freshly-written `raw/sessions/` handoff extract
 
 ## Examples of when this skill does NOT fire
 
-- "what does the wiki say about Postgres?" → querying-notes
-- "lint the wiki" → linting-the-wiki (Milestone 3)
-- "capture this conversation" → capturing-sessions (capture-only; ingest later in a fresh session, or use `handing-off` which ingests for you)
+- "capture this conversation" → `capturing-sessions`
+- "what does the wiki say about Postgres?" → `querying-notes`
+- "hand this off" → `handing-off`
