@@ -343,7 +343,7 @@ let
     '';
 in
 {
-  imports = [ ./workspace-layout.nix ];
+  imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ];
 
   options.cjlarose.llmAgents = {
 
