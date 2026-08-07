@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
+{ system, additionalPackages, stateVersion, llm-wikis ? { }, llm-wiki-module ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
 { pkgs, lib, ... }: {
   # All LLM-agent tooling lives behind the single llm-agents module, which
   # defaults every feature off -- claude included. Everything wanted fleet-wide
@@ -87,11 +87,16 @@
     # skill always documents the extension that is actually installed.
     ghStackSkill = { enable = true; package = additionalPackages.${system}.gh-stack; };
 
-    # The wiki's Claude Code plugin (skills + SessionStart index hook) and
-    # LLM_WIKI_PATH. Only where a wiki worktree actually exists, which is also
-    # the only place llm-wiki-module is threaded in below.
-    wiki.enable = llm-wiki-path != null;
-    wiki.path = llm-wiki-path;
+    # The wiki registry, plus (until the skills move into this module) the
+    # wiki flake's own Claude Code plugin and LLM_WIKI_PATH. Only where a wiki
+    # checkout actually exists, which is also the only place llm-wiki-module is
+    # threaded in below.
+    #
+    # An attrset rather than a path: wiki identity is a first-class parameter
+    # now, because one user can drive several wikis and every skill has to be
+    # told which one it is writing to.
+    wiki.enable = llm-wikis != { };
+    wiki.wikis = llm-wikis;
   };
 
   # lavish and claude.enablePlaywrightMcp are left at their module defaults

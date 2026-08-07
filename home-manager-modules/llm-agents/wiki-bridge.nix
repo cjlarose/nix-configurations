@@ -11,9 +11,17 @@
 # definition. See home/cjlarose for the pairing.
 { config, lib, ... }:
 
+let
+  wiki = config.cjlarose.llmAgents.wiki;
+in
 {
-  programs.llmWiki = lib.mkIf config.cjlarose.llmAgents.wiki.enable {
+  # wiki.solePath, not wiki.path: a consumer may declare its wiki either the new
+  # way (wiki.wikis.<id>) or the deprecated way (wiki.path), and solePath is the
+  # normalization of both. Guarding on it being non-null also keeps the zero-
+  # and multi-wiki cases from crashing here -- default.nix asserts on them and
+  # says something useful, which a `head []` in this file would pre-empt.
+  programs.llmWiki = lib.mkIf (wiki.enable && wiki.solePath != null) {
     enable = true;
-    path = config.cjlarose.llmAgents.wiki.path;
+    path = wiki.solePath;
   };
 }

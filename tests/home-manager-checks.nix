@@ -40,6 +40,27 @@ let
     assert c "git rebase.autosquash" (hm.programs.git.extraConfig.rebase.autosquash or false);
     assert c "git rebase.autostash" (hm.programs.git.extraConfig.rebase.autostash or false);
 
+    # The wiki registry, on the hosts that have a wiki. Conditional rather than
+    # core: most of the fleet has none, and asserting the file exists everywhere
+    # would just be asserting mkIf works.
+    #
+    # Worth a check at all because the registry is the ONLY thing that tells a
+    # skill or the session-start hook which wikis exist and how to reach them.
+    # A wiki whose repoPath is relative, or whose routingHint is blank, breaks
+    # at capture time in an unrelated session rather than here -- so the shape
+    # is pinned where it is cheap to catch.
+    assert c "wiki registry is written when a wiki is enabled"
+      (!hm.cjlarose.llmAgents.wiki.enable
+       || hm.xdg.configFile ? "llm-wiki/wikis.json");
+
+    assert c "every wiki has an absolute repoPath"
+      (builtins.all (w: lib.hasPrefix "/" w.repoPath)
+        (builtins.attrValues hm.cjlarose.llmAgents.wiki.wikis));
+
+    assert c "every wiki has a non-empty routingHint"
+      (builtins.all (w: w.routingHint != "")
+        (builtins.attrValues hm.cjlarose.llmAgents.wiki.wikis));
+
     true;
 
 in {

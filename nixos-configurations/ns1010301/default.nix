@@ -63,7 +63,15 @@
         imports = [
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
-            llm-wiki-path = "/home/cjlarose/repos/cjlarose/llm-wiki";
+            # `personal` is not a label -- it is the literal selector the wiki
+            # skills take, and the routingHint is the only thing a capture has
+            # to go on when deciding between this wiki and the work one. Write
+            # it as a discriminator against the other wiki, not a description
+            # of this one.
+            llm-wikis.personal = {
+              repoPath = "/home/cjlarose/repos/cjlarose/llm-wiki";
+              routingHint = "personal: homelab and NixOS, nix-configurations, AI/agent tooling, self-hosted services, personal finance";
+            };
             llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
           })
         ];

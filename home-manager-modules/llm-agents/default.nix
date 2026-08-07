@@ -64,6 +64,29 @@ let
   # cheaper than a second copy that opencode would only warn about.
   skillsWanted = cfg.claude.enable || cfg.opencode.enable;
 
+  wikiIds = builtins.attrNames cfg.wiki.wikis;
+
+  # The registry file. Live config rather than anything baked into a skill or a
+  # hook: adding a wiki is one attribute here, and nothing that consumes it has
+  # to be rebuilt to learn about it.
+  wikiRegistry = builtins.toJSON {
+    version = 1;
+    wikis = lib.mapAttrs (id: w: {
+      inherit id;
+      inherit (w) repoPath ingestPath routingHint queueDir indexBudgetBytes;
+    }) cfg.wiki.wikis;
+  };
+
+  # programs.llmWiki, which the wiki flake's own module declares, holds exactly
+  # one path -- so while that module is still the delivery mechanism, exactly
+  # one wiki can be installed. The assertion below turns that into a clear
+  # message instead of an arbitrary "which one wins". It stops applying once
+  # the skills live here and that module is gone.
+  soleWikiPath =
+    if builtins.length wikiIds == 1
+    then cfg.wiki.wikis.${builtins.head wikiIds}.repoPath
+    else null;
+
   # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
   # format rather than a typed option per key: tuicr's config surface is its
   # own, and every key it grows would otherwise need a change here before a
@@ -655,25 +678,125 @@ in
       '';
     };
 
-    # --- personal LLM wiki --------------------------------------------------
+    # --- LLM wikis ----------------------------------------------------------
 
     wiki.enable = lib.mkEnableOption ''
-      the personal LLM wiki integration: the `wiki` Claude Code plugin (skills +
-      SessionStart index hook) and LLM_WIKI_PATH. Only valid where the consumer
-      also imports cjlarose-llm-wiki.homeManagerModules.default, which is what
+      the LLM wiki integration: the wiki registry at
+      ~/.config/llm-wiki/wikis.json, LLM_WIKI_PATH, and (until the skills move
+      here) the `wiki` Claude Code plugin from the wiki flake's own module.
+      Only valid where the consumer also imports that module, which is what
       declares programs.llmWiki (see the header comment)
     '';
 
-    wiki.path = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "/home/you/worktrees/owner/llm-wiki/default";
+    wiki.wikis = lib.mkOption {
+      default = { };
+      example = lib.literalExpression ''
+        {
+          personal = {
+            repoPath = "/home/you/repos/you/llm-wiki";
+            routingHint = "homelab, nix, finance, AI tooling";
+          };
+        }
+      '';
       description = ''
-        Absolute path to the writable llm-wiki git worktree on the target
-        machine. Exported as LLM_WIKI_PATH and baked into the plugin's
-        session-start hook, which cats the live index.md there.
+        The LLM wikis installed for this user, keyed by the id that selects
+        them -- `personal`, `work`. The id is not decoration: it is the literal
+        selector the wiki skills take as an argument, so keep it short and
+        semantic.
+
+        Rendered to ~/.config/llm-wiki/wikis.json, which is the single place
+        anything -- skills, the session-start hook -- learns what wikis exist.
+        A scalar env var cannot express more than one, which is why the
+        registry exists at all; LLM_WIKI_PATH survives only as a compatibility
+        export for the single-wiki case.
+      '';
+      type = lib.types.attrsOf (lib.types.submodule {
+        options = {
+          repoPath = lib.mkOption {
+            type = lib.types.str;
+            example = "/home/you/repos/you/llm-wiki";
+            description = ''
+              Absolute path to the canonical checkout of this wiki -- the main
+              worktree under ~/repos, sitting on the default branch.
+
+              READ-side path. The session-start hook reads index.md here, and
+              the query skill reads pages here. It is not where ingests happen:
+              a linked worktree cannot check out the branch the main worktree
+              holds, so writes go through ingestPath and reach this checkout as
+              a fast-forward afterwards.
+            '';
+          };
+
+          ingestPath = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            example = "/home/you/workspaces/wiki-personal/llm-wiki";
+            description = ''
+              Absolute path to the standing ingest worktree for this wiki -- a
+              linked worktree in its own permanent workspace, where the standing
+              agent drains the capture queue.
+
+              This is the serialization primitive: ingest refuses to run
+              anywhere else, so "one agent per worktree" IS the lock. null on a
+              host that only reads this wiki (no standing agent, no ingests).
+            '';
+          };
+
+          routingHint = lib.mkOption {
+            type = lib.types.str;
+            example = "PickTrace engineering and product";
+            description = ''
+              One line naming what belongs in this wiki. Injected at session
+              start for every installed wiki as the routing table, and it is
+              the whole basis on which a capture picks a target -- so write it
+              as a discriminator against the OTHER wikis, not as a description
+              of this one in isolation.
+            '';
+          };
+
+          queueDir = lib.mkOption {
+            type = lib.types.str;
+            default = "raw/inbox";
+            description = ''
+              Wiki-relative directory holding captures that have not been
+              ingested yet. "Uningested" is tracked by presence here and
+              nowhere else: ingest git-mv's the file out of it in the same
+              commit as the pages it produces, so an empty directory means a
+              drained queue, with no manifest to conflict on and no derived
+              state to recompute.
+            '';
+          };
+
+          indexBudgetBytes = lib.mkOption {
+            type = lib.types.ints.positive;
+            default = 24576;
+            description = ''
+              Ceiling on how much of this wiki's index the session-start
+              injection may spend, in bytes. Truncation cuts on heading
+              boundaries and states what it dropped -- a silent cut reads as a
+              complete catalog, and the model concludes a page does not exist.
+
+              Not a micro-optimization: the two indexes here are 152 KB and
+              194 KB, so injecting them whole costs ~90k tokens before the user
+              has typed anything.
+            '';
+          };
+        };
+      });
+    };
+
+    wiki.solePath = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      internal = true;
+      readOnly = true;
+      default = soleWikiPath;
+      description = ''
+        repoPath of the only registered wiki, or null when there are zero or
+        several. Exists because programs.llmWiki holds exactly one path; the
+        null cases are reported by assertion rather than crashing here.
       '';
     };
+
   };
 
   config = lib.mkMerge [
@@ -928,11 +1051,40 @@ in
     # and errors with "option does not exist" on every wiki-less host.
     # Every enable that needs a package asserts it rather than defaulting one, so
     # a host that leaves the feature off never has to name a package at all.
+    # --- LLM wiki registry --------------------------------------------------
+    # The one place anything learns what wikis exist. Written even while the
+    # wiki flake's own module is still delivering the skills and the hook:
+    # nothing reads it yet, and landing it first is what lets the skills move
+    # here one at a time instead of in a single cross-repo commit.
+    #
+    # Deliberately NOT setting LLM_WIKI_PATH here. programs.llmWiki still
+    # defines it, and a second definition of the same option is a conflict, not
+    # an override. It moves here when that module goes away.
+    (lib.mkIf cfg.wiki.enable {
+      xdg.configFile."llm-wiki/wikis.json".text = wikiRegistry + "\n";
+    })
+
     {
       assertions = [
         {
-          assertion = !cfg.wiki.enable || cfg.wiki.path != null;
-          message = "cjlarose.llmAgents.wiki.enable is true but cjlarose.llmAgents.wiki.path is unset.";
+          assertion = !cfg.wiki.enable || cfg.wiki.wikis != { };
+          message = ''
+            cjlarose.llmAgents.wiki.enable is true but no wiki is declared.
+            Set cjlarose.llmAgents.wiki.wikis.<id>, e.g.
+              wiki.wikis.personal = { repoPath = "..."; routingHint = "..."; };
+          '';
+        }
+        {
+          # Not a limitation of the registry -- of programs.llmWiki, which is
+          # still the delivery mechanism and holds a single path. Lifting this
+          # is what moving the skills into this module buys.
+          assertion = !cfg.wiki.enable || soleWikiPath != null;
+          message = ''
+            cjlarose.llmAgents.wiki declares ${toString (builtins.length wikiIds)} wikis
+            (${lib.concatStringsSep ", " wikiIds}), but the wiki flake's
+            programs.llmWiki carries one path, so only one can be installed
+            today. Declare one wiki until the wiki skills move into this module.
+          '';
         }
         {
           assertion = !cfg.superpowers.enable || cfg.superpowers.src != null;

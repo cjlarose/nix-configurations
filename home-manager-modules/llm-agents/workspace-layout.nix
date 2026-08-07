@@ -36,17 +36,24 @@ let
   # Only emitted when the wiki really does live under ~/repos: on a host where
   # it doesn't, the blanket "never write here" rule is simply true and needs no
   # exception.
-  wikiUnderRepos =
-    wiki.enable
-    && wiki.path != null
-    && lib.hasPrefix "${config.home.homeDirectory}/repos/" wiki.path;
+  # A list now, not a path: a user can have several wikis installed (personal
+  # and work), and the carve-out has to name every one that lands under
+  # ~/repos or it silently sanctions writes to one of them and not the other.
+  wikiPathsUnderRepos =
+    lib.filter (p: lib.hasPrefix "${config.home.homeDirectory}/repos/" p)
+      (lib.mapAttrsToList (_: w: w.repoPath)
+        (lib.optionalAttrs wiki.enable wiki.wikis));
+
+  wikiUnderRepos = wikiPathsUnderRepos != [ ];
 
   wikiCarveOut = ''
 
     ## The LLM wiki is the one exception
 
-    `${wiki.path}` is under `~/repos` but is **writable**, and the wiki skills
-    are expected to write to it: `wiki:capturing-sessions` writes `raw/sessions/`,
+    ${lib.concatMapStringsSep "\n" (p: "- `${p}`") wikiPathsUnderRepos}
+
+    These are under `~/repos` but **writable**, and the wiki skills are expected
+    to write there: `wiki:capturing-sessions` writes `raw/sessions/`,
     `wiki:ingesting-sources` writes `pages/`, `index.md` and `log.md`, and commits.
 
     This is deliberate. The wiki is a live document store, not a source checkout —
