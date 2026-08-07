@@ -1,137 +1,152 @@
 ---
 name: capturing-sessions
-description: Use when the user wants to save material from the CURRENT Claude Code session into their LLM wiki — phrases like "capture this to the wiki", "save what we figured out about X to my wiki", "dump this conversation into the wiki", "stash this in the wiki for later". Writes a self-contained markdown extract to the wiki's raw/sessions/ directory and suggests ingesting it later; it does NOT ingest. Runs from any session, not only inside the wiki repo.
+description: Use when the user wants to save material from the CURRENT session into one of their LLM wikis — phrases like "capture this to the wiki", "save what we figured out about X to my wiki", "dump this conversation into the wiki", "stash this in the wiki for later". Writes a self-contained markdown extract into the target wiki's capture queue, commits and pushes only that file, and stops; it does NOT ingest. Runs from any session, not only inside a wiki repo.
 ---
 
 # capturing-sessions
 
-Save material from the current Claude Code session into the LLM wiki's `raw/sessions/` directory. This skill **only captures** — it writes the raw extract and stops; it does **not** file the material into pages. Filing happens later, separately, via `ingesting-sources` (run by you in a fresh session, or by the `handing-off` skill, which orchestrates capture→ingest itself).
+Save material from the current session into one of the user's LLM wikis. This skill **only captures**: it writes one new file into the wiki's capture queue, commits and pushes just that file, and stops. It never edits `pages/`, `index.md` or `log.md`, and it never runs `ingesting-sources`.
 
-**Why ingest is deferred, not automatic.** `ingesting-sources` edits `index.md`/`log.md`/task pages in place and is not concurrency-safe, so running it implicitly on every capture made it easy to race two ingests at once. Decoupling puts you in control of *when* ingest runs — capture freely now (it touches only one new file), then ingest the backlog deliberately, one at a time. Capture runs from any project directory, not just inside the wiki repo.
+Filing happens later and elsewhere, by the standing ingest agent for that wiki.
+
+**Why capture and ingest are decoupled.** `ingesting-sources` rewrites `index.md`, `log.md` and task pages in place and is not concurrency-safe. Spawning it from every capture made it trivial to run two ingests at once. Splitting them means capture is cheap and always safe — it only ever *adds* a file — while ingest runs serially in one designated worktree.
+
+That split is also what makes the push safe. A capture commit adds exactly one file under the queue directory; an ingest commit touches `pages/`, `index.md`, `log.md` and moves a file *out* of the queue. The two never touch the same lines, so a rejected push is resolved by `git pull --rebase` with no possible conflict.
 
 ## Setup contract
 
-This skill requires the `LLM_WIKI_PATH` environment variable to point at the user's LLM wiki repository. The user wires this up via home-manager (or however they manage their shell environment).
+The wiki registry at `${XDG_CONFIG_HOME:-$HOME/.config}/llm-wiki/wikis.json` lists every installed wiki. It is written by home-manager; do not edit it.
+
+```json
+{ "version": 1,
+  "wikis": {
+    "personal": { "id": "personal", "repoPath": "...", "ingestPath": null,
+                  "routingHint": "...", "queueDir": "raw/inbox", "indexBudgetBytes": 24576 }
+  } }
+```
+
+`LLM_WIKI_PATH` is a **compatibility export only**, set when exactly one wiki is installed. Never rely on it: with two wikis it is deliberately unset, and a skill that fell back to it would file work material into the personal wiki. Resolve the target through the registry.
+
+## Choosing the wiki — get this right or stop
+
+**The single most damaging failure this skill has is writing to the wrong wiki**, because the capture is committed and pushed: work material in a personal wiki is a leak, and the fix is a history rewrite.
+
+1. If the user named a wiki (`capture this to work`, `/capturing-sessions personal`), use it.
+2. Otherwise match the material against each wiki's `routingHint`. Take it only when **one** wiki plausibly fits.
+3. If two fit, neither fits, or you are weighing it up — **ask, and wait.** This is the one question in this skill worth interrupting for. Everything else it decides on its own.
+
+Exactly one wiki installed and the material fits it? Proceed without asking.
 
 ## Hard constraints
 
-- **`LLM_WIKI_PATH` must be set and point at a valid LLM wiki.** If not, abort with a clear setup hint pointing the user at their home-manager config. Do NOT guess a path.
-- **Dates are America/Los_Angeles.** Derive today's date with `TZ='America/Los_Angeles' date +%Y-%m-%d`. Use that date in the filename prefix and in the frontmatter `captured` field.
-- **`capturing-sessions` only writes one file under `raw/sessions/`.** It never edits `pages/`, `index.md`, or `log.md`, and it never spawns `ingesting-sources`. Those are `ingesting-sources`'s job, run separately later. Capture also does **not** commit the file — it leaves the new `raw/sessions/` extract untracked (a later `ingesting-sources` stages it in the same commit as the pages it produces; uncommitted captures are also the lightweight signal for "not yet ingested").
-- **One capture per invocation.** If the user wants to capture several discrete topics, run the skill multiple times.
-- **Never include raw secret values.** Treat `raw/sessions/` as a public-facing file even when the repo isn't currently public — it's committed and may be pushed to a remote. Before writing, scan the drafted body for anything that looks like a credential: passwords, API keys, tokens, private keys, CHAP secrets, OAuth client secrets, signed URLs, session cookies, OpenVPN auth env values, etc. For each one:
-  - **If the user has the secret in 1Password**, replace the raw value with a `op read` command that retrieves it. Format: `$(op read --account <account> "op://<vault>/<item>/<field>")`. If you know the account name and `op://` path, use it. If you don't, **do not ask before capturing** — fall back to the placeholder redaction below and note in your post-capture report (step 5) that the secret was redacted with a placeholder and could be swapped for an `op read` reference if the user provides the path. Never guess an `op://` path. (Example: `$(op read --account my "op://Private/TrueNAS iSCSI CHAP ns1010301 user/password")`.)
-  - **Otherwise**, replace the value with a clear placeholder that describes what was redacted and, if relevant, where the real value lives on disk (e.g., `<REDACTED — see /persistence/secrets/foo.env on host>`). Plain `<REDACTED>` is acceptable when there's nowhere obvious to point.
-  - Preserve surrounding shell syntax so command examples remain re-runnable: `-v BS8WLd...` becomes `-v $(op read --account my "op://...")`, not `-v <REDACTED>` which would break the command.
-  - Apply this even for "low-value" homelab secrets. The cost of redaction is small; the cost of an exposed credential plus a history rewrite is large.
-  - **Catch credentials embedded inside larger benign-looking strings.** A "redact secrets" scan misses a secret when it's *inside* another value. Explicitly redact: **JWTs and bearer/access tokens themselves** (any `eyJ…` value, even mid-string); **token-bearing QR / deep-link / device-join payloads** (redact the embedded credential even when you keep the surrounding payload text); and **production IPs / internal hostnames**. (A bulk capture once leaked a live HS256 JWT embedded in a `~|~`-delimited device-join payload because the surrounding string looked benign.)
-  - **Explicitly NOT secrets — keep them** (don't over-redact useful context): repo/service names, commit SHAs, Jira/issue keys, and cloud **project ids**.
-
-## Inputs
-
-A free-text user instruction about what to capture and under what topic. Examples of the kinds of requests this skill handles:
-
-- "capture what we figured out about the Caddy reverse proxy issue"
-- "save this conversation as a note on Postgres tuning gotchas"
-- "dump our asset allocation discussion to the wiki under topic personal-finance"
-
-**Do not ask the user to confirm scope or topic before writing.** This skill is autonomous: infer the best scope and topic from the conversation, capture immediately, and surface any assumptions or caveats *after* the write (see step 5). Even when the instruction is vague ("save this"), pick the most reasonable scope and topic slug, write the capture, and note what you assumed afterward — the user can correct it and you can re-run. The only thing that ever stops a capture before it's written is the hard abort in the constraints above (missing `LLM_WIKI_PATH`).
-
-> **Handoffs:** when ending a session for a fresh agent to pick up, you normally invoke the `handing-off`
-> skill, not `capturing-sessions` directly. `handing-off` drives a capture that *additionally* carries a
-> `## Handoff guidance` section + `handoff: true` frontmatter, then spawns `ingesting-sources` synchronously
-> so the in-flight work lands on `type/task` pages right away. That guidance format and the
-> ingest-spawn live in the `handing-off` skill — `capturing-sessions` itself has no special handoff mode.
+- **Resolve the wiki from the registry.** Missing or unparseable registry, or an id not in it: abort with a setup hint. Never guess a path.
+- **One capture per invocation.** Several discrete topics means several runs.
+- **Only ever add one file.** Never modify or delete anything else in the wiki, and never `git add -A`.
+- **Never run `ingesting-sources`,** not even when the queue is long and the standing agent looks idle. Ingest belongs to the standing worktree; running it from here defeats the serialization.
+- **Dates are America/Los_Angeles**, `TZ='America/Los_Angeles' date +%Y-%m-%d`.
+- **Never include raw secret values.** Treat the capture as public-facing even where the repo is private — it is committed and pushed. Scan the drafted body for anything credential-shaped: passwords, API keys, tokens, private keys, CHAP secrets, OAuth client secrets, signed URLs, session cookies, VPN auth values. For each:
+  - **If the user keeps it in 1Password**, replace the literal with a retrieval command: `$(op read --account <account> "op://<vault>/<item>/<field>")`. Never guess an `op://` path.
+  - **Otherwise** use a placeholder naming what was redacted and where the real value lives: `<REDACTED — see /persistence/secrets/foo.env on host>`.
+  - Preserve surrounding shell syntax so examples stay runnable: `-v BS8WLd…` becomes `-v $(op read …)`, not `-v <REDACTED>` which breaks the command.
+  - Apply this even to "low-value" homelab secrets. Redaction is cheap; an exposed credential plus a history rewrite is not.
+  - **Catch credentials embedded in larger benign-looking strings.** Redact JWTs and bearer tokens themselves (any `eyJ…`, even mid-string), token-bearing QR / deep-link / device-join payloads (redact the embedded credential, keep the surrounding text), and production IPs / internal hostnames. A bulk capture once leaked a live HS256 JWT inside a `~|~`-delimited device-join payload because the wrapper looked harmless.
+  - **Explicitly NOT secrets — keep them:** repo and service names, commit SHAs, issue keys, cloud project ids.
 
 ## Workflow
 
-### 1. Verify the setup contract
-
-Check that `LLM_WIKI_PATH` is set and points at a valid wiki:
+### 1. Resolve the target wiki
 
 ```bash
-test -n "$LLM_WIKI_PATH" \
-  && test -d "$LLM_WIKI_PATH/.git" \
-  && test -d "$LLM_WIKI_PATH/raw/sessions"
+REG="${XDG_CONFIG_HOME:-$HOME/.config}/llm-wiki/wikis.json"
+test -f "$REG" || { echo "no wiki registry; is programs.llmAgents.wiki enabled?"; exit 1; }
+jq -r '.wikis | keys[]' "$REG"                      # what is installed
+jq -r '.wikis | to_entries[] | "\(.key): \(.value.routingHint)"' "$REG"   # routing hints
 ```
 
-If any check fails, tell the user:
-
-> `LLM_WIKI_PATH` must be set to your LLM wiki git repository (e.g., `~/worktrees/cjlarose/llm-wiki/default`). Add the export to your home-manager config. Once it's set, retry.
-
-Then abort — do not write anything.
-
-### 2. Decide scope and topic yourself — do not ask
-
-Determine what to capture and under what topic from the conversation and the user's instruction. Choose a short kebab-case topic slug (lowercase, hyphens, under ~50 chars). **Do not pause for confirmation and do not wait for a response** — proceed straight to writing. Keep a short mental list of any assumptions you made (scope boundaries, topic slug choice, anything you left out or guessed at) so you can report them in step 5 after the capture exists.
-
-### 3. Derive the filename and host
+Then, for the chosen `$ID`:
 
 ```bash
-TODAY=$(TZ='America/Los_Angeles' date +%Y-%m-%d)
-# FILENAME format: ${TODAY}-<topic-slug>.md
-HOST="$(whoami)@$(hostname)"
+REPO=$(jq -r --arg i "$ID" '.wikis[$i].repoPath' "$REG")
+QUEUE=$(jq -r --arg i "$ID" '.wikis[$i].queueDir' "$REG")
 ```
 
-### 4. Write the capture
+### 2. Get a writable worktree
 
-Write `$LLM_WIKI_PATH/raw/sessions/<filename>` with this structure:
+`$REPO` is the canonical checkout under `~/repos` and is **read-only** — the same rule as every other repo there. Captures are written in a linked worktree in the current workspace, exactly like any other change.
+
+If this session's workspace has no worktree of the wiki yet, add one with the **`adding-a-repo-to-a-workspace`** skill. Do not improvise `git worktree add`; that skill owns the naming rule, including the owner-prefix case when a workspace holds repos from several owners.
+
+Work in that worktree, on the workspace's branch. Call it `$WT`.
+
+**If there is no workspace to add it to** — the session is not running under `~/workspaces/<task>/` — fall back to the spool: write the capture to `${XDG_STATE_HOME:-$HOME/.local/state}/llm-wiki/<id>/spool/` instead, and skip steps 4 and 5. The standing agent drains the spool alongside the queue. Say plainly in step 6 that the capture is spooled and not yet in git.
+
+### 3. Write the capture
+
+Filename `$WT/$QUEUE/<YYYY-MM-DD>-<topic-slug>.md`, kebab-case slug under ~50 chars. If that name already exists, append `-2`, `-3`: two captures on one day about one topic is a collision, not a re-capture.
 
 ```markdown
 ---
-captured: <today's LA date, YYYY-MM-DD>
+captured: <today's LA date>
 source: claude-code-session
-host: <whoami>@<hostname>  # the machine where this session ran, not the subject of the discussion
-project: <basename of current working directory, OR omit if not useful>
-topic: <user-confirmed short prose, one line>
+host: <whoami>@<hostname>   # where the session ran, not the subject
+project: <basename of cwd, or omit>
+topic: <one line of prose>
 ---
 
 # <Descriptive title>
 
-<Self-contained synthesis of the material the user wanted captured.>
-
-<Include enough context that a future ingesting-sources run can make sense
-of this file alone, without access to the original conversation.
-If material references "the file we just looked at" or "the issue we
-discussed", spell those out explicitly: file paths, commit SHAs, URLs,
-commands, error messages.>
+<Self-contained synthesis of the material.>
 ```
 
-The body **must be self-contained**. The ingesting-sources workflow that processes this file later will not have the original session's conversation.
+The body **must stand alone**. Whoever ingests it will not have this conversation. Spell out anything referred to as "the file we just looked at" or "the issue we discussed": real paths, commit SHAs, URLs, commands, error text.
 
-**Before writing, do a final secret scan.** Read through the drafted body and apply the "Never include raw secret values" constraint above to every credential-shaped string. This is the last point of intervention; once the file is committed, removing a leaked secret requires a history rewrite.
+Do the final secret scan now, before the file is written. Once it is pushed, removing a secret means rewriting history.
 
-### 5. Report — where it landed, how to ingest, and caveats
+### 4. Commit just that file
 
-The capture now exists on disk, untracked and not yet filed into pages. Do **not** spawn `ingesting-sources` and do **not** commit. Tell the user what happened, **in this order**:
+```bash
+git -C "$WT" add "$QUEUE/<filename>"
+git -C "$WT" commit -m "Capture <topic>"
+```
 
-1. Where the capture landed: `$LLM_WIKI_PATH/raw/sessions/<filename>`.
-2. **How to file it into pages:** it is not ingested yet. To file it, run `ingest raw/sessions/<filename>` in a fresh session (ingest edits pages in place and is best run one at a time). To clear the whole backlog of not-yet-ingested captures at once, a fresh session can find them by cross-referencing `log.md` (every ingest entry cites its source path) against `raw/sessions/`:
+Stage the path explicitly. The workspace may hold unrelated work in that same worktree, and `git add -A` would sweep it into a commit that is about to be pushed to `main`.
 
-   ```bash
-   comm -23 \
-     <(cd "$LLM_WIKI_PATH" && ls raw/sessions/*.md | sort) \
-     <(grep -oE 'raw/sessions/[^)]+\.md' "$LLM_WIKI_PATH/log.md" | sort -u)
-   ```
+### 5. Push to main
 
-   then ingest each listed file one at a time.
-3. **Only if there's anything worth flagging**, a short "Notes" section for capture-side caveats. Include things like:
-   - The topic slug or scope you chose, especially if the instruction was vague.
-   - Anything you deliberately left out, summarized aggressively, or were unsure belonged.
-   - Secrets you redacted with a placeholder that could become an `op read` reference if the user supplies the `op://` path.
+The queue lives on `main` so the standing agent finds it without hunting for branches. Capture commits are additive, so this fast-forwards or rebases cleanly:
 
-   If you made no meaningful assumptions and there's nothing to flag, omit the Notes section entirely — don't manufacture caveats. (Caveats about the *source material* — contradictions, ambiguities — are surfaced later by `ingesting-sources` when the file is filed, not by capture.)
+```bash
+git -C "$WT" push origin HEAD:main || {
+  git -C "$WT" fetch origin main
+  git -C "$WT" rebase origin/main
+  git -C "$WT" push origin HEAD:main
+}
+```
+
+If it still fails — no network, no credentials, a hook rejection — **stop and report**. The commit is safe locally; do not retry blindly and do not force. Tell the user it is committed but unpushed, and name the worktree.
+
+### 6. Wake the standing agent, best effort
+
+If `herdr` is available, find or start the standing space for this wiki and send it a prompt to drain the queue. Use the **`herdr`** skill for the current syntax.
+
+This is an optimization, not a requirement. **A herdr failure never fails the capture** — the capture is already pushed, and the session-start hook reports the backlog to every session on the machine, so the work surfaces even if the standing agent is dead. Report honestly whether the wake landed.
+
+### 7. Report
+
+1. Which wiki, and why that one if the material could have gone either way.
+2. Where it landed: the queue path and the pushed commit (or that it is spooled/unpushed).
+3. Whether the standing agent was woken.
+4. **Only if there is something to flag:** assumptions you made — the slug or scope you chose for a vague instruction, anything deliberately left out, secrets redacted with a placeholder that could become an `op read` reference if the user supplies the path. Nothing to flag, no section.
 
 ## Examples of when this skill fires
 
-- "capture what we figured out about Caddy reverse proxy to the wiki"
-- "save this to my wiki under topic homelab-backups"
+- "capture what we figured out about the Caddy reverse proxy"
+- "save this to my work wiki under topic payroll-exports"
 - "stash this conversation in the wiki for later"
-- "add what we just discussed about asset allocation to the wiki"
 
 ## Examples of when this skill does NOT fire
 
-- "ingest raw/articles/foo.md" → ingesting-sources directly (that's an existing raw/ file, not the current session)
-- "what does my wiki say about X" → querying-notes
-- "remember this for next time" → not a wiki request; might be a memory request
-- "save this file" → ambiguous; ask first whether they mean the wiki
+- "ingest the queue" / "file the backlog" → `ingesting-sources`, in the standing worktree
+- "what does my wiki say about X" → `querying-notes`
+- "hand this off" → `handing-off`, which writes a handoff doc and fires a capture itself
+- "remember this for next time" → not a wiki request
