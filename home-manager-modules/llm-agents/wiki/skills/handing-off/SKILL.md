@@ -1,109 +1,105 @@
 ---
 name: handing-off
-description: Use at the end of a long session to hand off to another agent — phrases like "hand off", "write a handoff", "compact this for a fresh session", "I'm running low on context, hand this off". Captures the session into the LLM wiki via capturing-sessions (with handoff guidance), then spawns ingesting-sources synchronously so durable knowledge becomes pages and each in-flight piece of work becomes/refreshes a type/task page with a "## Next steps" section — then reports the touched task pages for the next agent to querying-notes.
+description: Use at the end of a long session to hand work to another agent — phrases like "hand off", "write a handoff", "compact this for a fresh session", "I'm running low on context, hand this off". Writes a handoff document under XDG_STATE_HOME, composes the prompt for the next agent, and fires a wiki capture that nobody waits on. Does not run or wait for an ingest.
 ---
 
 # handing-off
 
-Hand a long-running session off to a fresh agent by **promoting its context into the wiki**, not into
-a throwaway doc. This skill **orchestrates the capture→ingest cycle**: it runs `capturing-sessions` to write
-a handoff-shaped extract, then spawns `ingesting-sources` itself (synchronously, in a subagent) to file it,
-then relays the result. There is no separate handoff file — the "handoff doc" is the `type/task`
-page(s) the ingest creates or updates, each carrying a `## Next steps` section the next agent picks up
-from.
+End a session so another agent can pick the work up cold.
 
-`capturing-sessions` is **capture-only** and does not ingest on its own; the synchronous ingest is *this
-skill's* job, because a handoff is only useful if the task pages exist immediately for the next agent
-to `querying-notes`.
+Three outputs, and **only the first two are on the critical path**:
 
-This skill is **wiki-coupled**: it requires `LLM_WIKI_PATH`. If `LLM_WIKI_PATH` is unset, say the wiki
-isn't wired up here and fall back to a plain in-chat handoff summary.
+1. A **handoff document** under `$XDG_STATE_HOME`, written immediately.
+2. A **prompt for the next agent**, referencing existing wiki pages, the relevant skills, and that document.
+3. A **wiki capture**, fired and forgotten.
 
-## Why capture first
+## Nothing here waits for an ingest
 
-At a handoff the session is long and the context is rich — exactly what's about to be lost to
-compaction or a fresh start. Capturing **now, while context is full** is the point: durable learnings
-become wiki pages, and the where-I-left-off state lands on the relevant `type/task` page(s) as
-`## Next steps`, queryable by whoever picks up.
+This skill used to write a capture and then run `ingesting-sources` synchronously, so the next agent could not start until 5-15 wiki pages had been rewritten. That is backwards: ingest is the slowest, most failure-prone step, and it now runs serially in a standing worktree that may be busy with a queue. Waiting on it could mean waiting a long time, at the exact moment the handing-off agent is running out of context.
 
-## What to do
+So the handoff document is authoritative and immediate, the capture is asynchronous, and the wiki becomes eventually consistent with the work. **Never run `ingesting-sources` from here, and never wait on one.**
 
-1. **Invoke `capturing-sessions`, directing it to write a handoff-shaped extract.** A handoff capture is a
-   normal capture *plus* two additions — instruct `capturing-sessions` to include both (it has no handoff
-   mode of its own, so you must spell these out):
-   - the **durable knowledge** from this session (decisions+rationale, gotchas, how-things-work,
-     contracts, perf/security learnings, open questions) — as any capture would; **and**
-   - a **`## Handoff guidance` section** plus a **`handoff: true` frontmatter marker**. The marker is
-     the deterministic signal `ingesting-sources` keys on to build `type/task` pages. The section holds **one
-     subsection per distinct in-flight piece of work**, each self-contained (the ingest subagent sees
-     only the capture file, not this conversation — spell out paths/SHAs/exact next actions):
-     - **Work** — a short title, and its stable **`slug:`** if it already has one (so ingest
-       matches/links the existing `type/task`); omit the slug for new ad-hoc work (ingest creates a
-       task and assigns one).
-     - **Mission** — what this work is trying to achieve.
-     - **Current state** — what's done and *verified* vs. assumed.
-     - **Next steps** — the concrete pick-up-here actions, in order.
-     - **Repos / branches / commits** in play, and any **open threads / blockers**.
+## Where the document goes
 
-   The durable-knowledge body is still written as usual (the guidance is *additional*). The capture's
-   secret scan applies to the handoff guidance too. `capturing-sessions` writes the file and stops — it does
-   **not** ingest or commit.
+```
+${XDG_STATE_HOME:-$HOME/.local/state}/llm-handoffs/<task>/<YYYY-MM-DD-HHMM>-<slug>.md
+```
 
-2. **Spawn `ingesting-sources` synchronously on the capture file.** Once `capturing-sessions` reports the written
-   path, spawn a **subagent** to run `ingesting-sources` on `$LLM_WIKI_PATH/raw/sessions/<filename>` (the
-   real absolute path). The subagent gets a clean context — it sees only the raw file, not this
-   session — which keeps its synthesis grounded in the captured artifact. Prompt it along these lines:
+`<task>` is the workspace directory's basename, so the mapping from a workspace to its handoffs is derivable in both directions without a registry.
 
-   > Invoke the `ingesting-sources` skill on `$LLM_WIKI_PATH/raw/sessions/<filename>`. Run it to completion:
-   > it is autonomous, resolves the wiki via `$LLM_WIKI_PATH`, and commits its own work. The capture
-   > file is currently untracked, so its commit step stages it alongside the pages/index/log in one
-   > commit. This is a handoff capture (`handoff: true`) — create-or-update a `type/task` page per
-   > `## Handoff guidance` item with a refreshed `## Next steps`. Return your full step-10 report
-   > verbatim — pages created/updated, the task pages touched, the commit SHA, and any contradictions
-   > or judgment calls — as your final message.
+**Outside the workspace, deliberately.** A handoff doc inside `~/workspaces/<task>/` is destroyed by teardown — `git worktree remove` guards the worktrees, but a file at the workspace root sits outside every repo and nothing guards it at all. State rather than data under XDG because these are strictly local: they name local paths, local branches and uncommitted work in a specific worktree, and mean nothing on another machine.
 
-   `ingesting-sources` is reachable as a user-scoped skill and inherits `LLM_WIKI_PATH` from the environment.
-   Because ingest keys on the `handoff: true` frontmatter (not on who spawned it), it builds the task
-   pages whether spawned here, run by hand, or picked up later in a backlog sweep.
+Timestamped rather than overwritten, so a series of handoffs on one task keeps its history.
 
-   **Failure safeguard.** If the subagent reports that ingest failed (locked git index, merge conflict,
-   a secret it refused to commit, etc.), the capture must not be left as a lost untracked file. Commit
-   the raw extract on its own so it's preserved for a later manual ingest:
+## Hard constraints
 
-   ```bash
-   git -C "$LLM_WIKI_PATH" add raw/sessions/<filename>
-   git -C "$LLM_WIKI_PATH" commit -m "Capture <topic> (ingest deferred)"
-   ```
+- **Never run or wait for `ingesting-sources`.**
+- **The document must stand alone.** The next agent has none of this conversation.
+- **Same secret-redaction rules as `capturing-sessions`** — and they apply to the handoff document too, even though it is not committed. It is a file on disk that will be pasted into another session.
+- **Do not invent progress.** A handoff describing work as further along than it is costs the next agent more than an honest "this is half-built and I am not sure the approach holds".
 
-   End that commit message with the standard `Co-Authored-By` trailer, then tell the user ingest failed
-   and why, and that they can retry from any session with `ingest raw/sessions/<filename>`.
+## Workflow
 
-3. **Relay the `ingesting-sources` subagent's report**, then add a **"Next session"** pointer: list **every**
-   `type/task` page the ingest touched (as `[[links]]`) and tell the next agent to **`querying-notes` each
-   one and read its `## Next steps`** before starting. Also surface the durable pages worth reading.
+### 1. Write the handoff document
 
-4. **End with the `ingesting-sources` subagent's review banner verbatim** — dead last, nothing after it (the
-   `⚠️ REVIEW NEEDED …` block, or its `✓ No review items flagged.` line). If ingest failed and produced
-   no banner, the failure notice from step 2 is the last thing instead.
+```markdown
+---
+task: <workspace basename>
+written: <YYYY-MM-DD HH:MM America/Los_Angeles>
+workspace: <absolute path>
+---
 
-## Known limitation — concurrent ingests
+# Handoff: <what this work is>
 
-`ingesting-sources` edits `index.md`/`log.md` (and task pages) in place and is **not concurrency-safe**: two
-ingests at once race (a check-then-write hazard). Since `handing-off` ingests, don't invoke it while
-another ingest is in flight against the same wiki — a bulk backfill, a manual `ingest`, or another
-`handing-off`. (A plain `capturing-sessions` is safe to run alongside — it only writes one new file and no longer
-ingests.) If you suspect an ingest is running (recent uncommitted page writes in the wiki worktree),
-wait for it to finish first.
+## Where things stand
+<Honest current state. What works, what does not, what is untested.>
+
+## In flight
+<Uncommitted or unpushed work, by worktree and branch. Anything half-done,
+named precisely enough to find: paths, branches, commit SHAs.>
+
+## Next steps
+<Ordered, concrete, pick-up-here actions. THIS is the live list — the wiki's
+task pages deliberately carry no ## Next steps, because a page written by
+whoever last ingested is stale by the time someone picks the work up.>
+
+## Deviations from the wiki
+<Where the wiki is now wrong, incomplete, or not yet updated: decisions taken
+this session that no page reflects, and anything a page asserts that this
+session disproved. The next agent will consult the wiki and needs to know
+where not to trust it.>
+
+## Relevant wiki pages
+<Page titles worth reading first, by name. Pages that exist NOW — do not cite
+pages the pending capture might create.>
+```
+
+### 2. Compose the prompt for the next agent
+
+Name the workspace, the handoff document's absolute path, the wiki pages worth reading, and the skills the work needs. Self-contained enough to paste into a fresh session.
+
+**Discovery is via this prompt and nothing else.** No hook looks for handoff documents, and they live outside the workspace where an `ls` will not trip over them. If the prompt is lost, so is the pointer — which is the intended trade: a handoff nobody acted on is a handoff that was abandoned.
+
+### 3. Fire a capture
+
+Invoke `capturing-sessions` for the durable knowledge — decisions, gotchas, anything worth a page. It queues, commits and pushes, and returns.
+
+Do not wait for the ingest, do not check whether the standing agent woke, and do not report the capture as "filed": it is *queued*. The wiki learns from it whenever the standing agent next drains the queue.
+
+Keep the split clean: durable knowledge goes to the capture, live pick-up-here state goes to the handoff document. Where they overlap, the document wins, because it is written now and the pages are written later.
+
+### 4. Report
+
+The handoff document's path, the prompt (ready to paste), and one line confirming the capture was queued rather than filed.
 
 ## Examples of when this skill fires
 
-- "hand this off to a fresh session"
-- "write a handoff, I'm running low on context"
-- "compact this for another agent to pick up"
-- "let's wrap up and hand off the remaining work"
+- "hand this off"
+- "I'm running low on context, write a handoff"
+- "compact this for a fresh session"
 
 ## Examples of when this skill does NOT fire
 
-- "capture this to the wiki" (no handoff intended) → `capturing-sessions` directly
+- "capture this to the wiki" → `capturing-sessions`
+- "ingest the queue" → `ingesting-sources`, in the standing worktree
 - "what does the wiki say about X" → `querying-notes`
-- a brand-new short session with nothing durable and no continuation → just answer; a handoff is overkill
