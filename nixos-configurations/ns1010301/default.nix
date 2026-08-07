@@ -78,11 +78,15 @@
         cjlarose.neovim.projectWorkspaces = [ "~/repos" "~/workspaces" ];
         cjlarose.neovim.projectMaxDepth = 2;
         cjlarose.llmAgents.claude.workspaceLayout.enable = true;
-        # Commit-message, PR-description and PR-comment conventions as skills.
-        # No extraInstructions: this host has no issue tracker to link, and it
-        # wants the model disclosure all three skills already default to. It is
-        # picktrace that has to ban it, and only on PR descriptions.
+        # Commit-message conventions, and the GitHub ones separately -- this
+        # host does both, but they are independent modules because a commit
+        # message is git's artifact and a PR description is GitHub's.
+        #
+        # No extraInstructions on either: this host has no issue tracker to
+        # link, and it wants the model disclosure the skills already default to.
+        # It is picktrace that has to ban it, and only on PR descriptions.
         cjlarose.llmAgents.gitConventions.enable = true;
+        cjlarose.llmAgents.githubConventions.enable = true;
         # Browser automation for cjlarose's sessions on this host. The shared
         # home/cjlarose profile leaves enablePlaywrightMcp off so the chromium
         # closure only lands where it's wanted; scope the enable to ns1010301
