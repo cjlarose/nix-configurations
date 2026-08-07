@@ -13,7 +13,6 @@
   microvm,
   hermes-agent,
   picktrace-nix-configurations,
-  cjlarose-llm-wiki,
   cjlarose-home-manager-modules,
   self,
   ...
@@ -112,7 +111,7 @@ let
     "ns1010301" = nixpkgs-26-05.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {
-        inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules self;
+        inherit sharedOverlays additionalPackages impermanence disko determinate nix-minecraft microvm picktrace-nix-configurations cjlarose-home-manager-modules self;
         nixpkgs = nixpkgs-26-05;
         home-manager = home-manager-26-05;
         stateVersion = "25.11";

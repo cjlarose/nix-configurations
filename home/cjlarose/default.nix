@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, llm-wikis ? { }, llm-wiki-module ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
+{ system, additionalPackages, stateVersion, llm-wikis ? { }, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
 { pkgs, lib, ... }: {
   # All LLM-agent tooling lives behind the single llm-agents module, which
   # defaults every feature off -- claude included. Everything wanted fleet-wide
@@ -87,10 +87,9 @@
     # skill always documents the extension that is actually installed.
     ghStackSkill = { enable = true; package = additionalPackages.${system}.gh-stack; };
 
-    # The wiki registry, plus (until the skills move into this module) the
-    # wiki flake's own Claude Code plugin and LLM_WIKI_PATH. Only where a wiki
-    # checkout actually exists, which is also the only place llm-wiki-module is
-    # threaded in below.
+    # The wiki registry, the maintenance skills, the session-start context
+    # hook and LLM_WIKI_PATH -- all of it from llm-agents now, none of it from
+    # the wiki repo's own module.
     #
     # An attrset rather than a path: wiki identity is a first-class parameter
     # now, because one user can drive several wikis and every skill has to be
@@ -103,14 +102,12 @@
   # (off) here and enabled per-host in nixos-configurations/ns1010301: a browser
   # review tool and a chromium closure have no business on the headless guests.
   #
-  # llm-wiki-module is the wiki flake's own home-manager module, which is what
-  # DECLARES programs.llmWiki. It has to be imported here rather than inside
-  # llm-agents because `imports` is resolved before config exists, so it can key
-  # off neither an option nor an optional module argument (an arg with a default
-  # forces _module.args evaluation, which recurses). wiki-bridge.nix rides along
-  # with it: it turns the cjlarose.llmAgents.wiki.* options into a
-  # programs.llmWiki definition, and can only be loaded where that option is
-  # declared.
+  # The wiki flake's own home-manager module is deliberately NOT imported any
+  # more, and neither is the wiki-bridge that adapted it. llm-agents now owns
+  # the wiki skills, the session-start hook and LLM_WIKI_PATH outright. Nothing
+  # here declares programs.llmWiki, which is what previously forced this
+  # awkward split -- and, since that option holds a single path, what capped
+  # the whole fleet at one wiki.
   imports = [
     # The skills that used to ship from the wiki repo. Takes llm-wikis so it can
     # gate on a wiki being declared without reaching into module config -- see
@@ -122,11 +119,7 @@
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/llm-agents
   ] ++ lib.optional enableSuperpowers
-    ../../home-manager-modules/llm-agents/superpowers-plugin.nix
-  ++ lib.optionals (llm-wiki-module != null) [
-    llm-wiki-module
-    ../../home-manager-modules/llm-agents/wiki-bridge.nix
-  ];
+    ../../home-manager-modules/llm-agents/superpowers-plugin.nix;
 
   # gh from nixpkgs-unstable (2.96.0) rather than the host's 26-05 (2.93.0);
   # see packages/default.nix.

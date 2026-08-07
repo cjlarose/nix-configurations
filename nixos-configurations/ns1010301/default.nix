@@ -1,4 +1,4 @@
-{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, self, ... }: {
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, self, ... }: {
   imports = [
     microvm.nixosModules.host
     ({ ... }: {
@@ -72,7 +72,6 @@
               repoPath = "/home/cjlarose/repos/cjlarose/llm-wiki";
               routingHint = "personal: homelab and NixOS, nix-configurations, AI/agent tooling, self-hosted services, personal finance";
             };
-            llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
           })
         ];
         # ns1010301 is the trial host for the ~/repos + ~/workspaces layout:
