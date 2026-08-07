@@ -66,6 +66,17 @@ One case it will not do for you: if the space being torn down is the one the
 script is *running in*, it says so and leaves it open, because closing it kills
 the pane mid-teardown. Move to another space and close it by hand.
 
+## The source repos are now behind
+
+Work landing is exactly what makes `~/repos/<owner>/<repo>` stale, and teardown
+is the one moment that is *known* rather than suspected — the landed verdict is
+the evidence. `remove-workspace.sh` therefore fast-forwards each source repo it
+removed a worktree from, and reports which.
+
+Only the boring case: clean, on its default branch, behind and not ahead. A
+parked branch, a dirty tree or a diverged history is somebody's judgement call
+and is listed as left alone — see **refreshing-a-repo**.
+
 ## The branch outlives the worktree
 
 Removing a worktree leaves its branch behind. Deleting that branch runs into the

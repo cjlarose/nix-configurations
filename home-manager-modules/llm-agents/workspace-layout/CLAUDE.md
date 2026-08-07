@@ -121,6 +121,10 @@ when the tree is dirty, so teardown doubles as a safety check. The herdr space
 goes with it — the skill's script closes it, except when it is the space the
 script is running in, which it leaves open rather than killing its own pane.
 
+Landing the work is also what makes the `~/repos` repos it came from stale, so
+teardown fast-forwards them where it safely can. That is the one moment the
+staleness is certain rather than suspected.
+
 ## .claude/worktrees
 
 Fine and **encouraged inside a workspace** — that is how parallel agents on one

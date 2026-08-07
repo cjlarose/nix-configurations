@@ -48,6 +48,28 @@ else
   echo
 fi
 
+# Default branch as this repo understands it. origin/HEAD is a local ref, so
+# this needs no network; when it is missing (a clone made with --no-checkout, or
+# an older git) fall back to asking the remote, then to the usual names.
+default_branch() {
+  local d
+  if d=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null); then
+    echo "${d#refs/remotes/origin/}"; return
+  fi
+  # `git remote show` prints "(unknown)" when the remote HEAD is unset, which is
+  # non-empty and would sail through every caller's test, so confirm the ref
+  # actually exists before trusting it. This branch also hits the network, where
+  # the symbolic-ref path above does not.
+  if d=$(git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p') \
+     && [ -n "$d" ] && git show-ref --quiet "refs/remotes/origin/$d"; then
+    echo "$d"; return
+  fi
+  for d in main master trunk; do
+    git show-ref --quiet "refs/remotes/origin/$d" && { echo "$d"; return; }
+  done
+  echo ""
+}
+
 # Which herdr space is rooted at a given directory.
 #
 # herdr records this itself: session.json holds identity_cwd per space, set when
@@ -173,6 +195,48 @@ else
   ls -A "$ws" | sed 's/^/    /'
   echo "Look at what is left and remove it deliberately."
   exit 1
+fi
+
+# The work just landed, so every source repo these worktrees came from is now
+# behind its remote -- that is what the landed check proved. This is the one
+# moment it is known for certain rather than suspected, and refreshing-a-repo's
+# gate would not fire again until somebody next reads that repo and remembers
+# to. check-landed.sh has already fetched, so the remote-tracking refs are
+# current and this is a local fast-forward.
+#
+# Only the boring case, the same rule repo-status.sh --pull uses: clean, on the
+# default branch, behind and not ahead. Anything else is somebody's judgement
+# call -- a parked branch, a dirty tree, a diverged history -- and moving it
+# silently here is how work disappears.
+refreshed=()
+behindstill=()
+for src in $(printf '%s\n' "${left_src[@]}" | sort -u); do
+  db=$(cd "$src" 2>/dev/null && default_branch)
+  [ -n "$db" ] || { behindstill+=("$src (cannot determine default branch)"); continue; }
+  cur=$(git -C "$src" rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [ "$cur" != "$db" ] || [ -n "$(git -C "$src" status --porcelain 2>/dev/null)" ]; then
+    behindstill+=("$src (on '$cur'$([ -n "$(git -C "$src" status --porcelain 2>/dev/null)" ] && echo ', not clean'))")
+    continue
+  fi
+  ahead=$(git -C "$src" rev-list --count "origin/$db..HEAD" 2>/dev/null || echo 0)
+  behind=$(git -C "$src" rev-list --count "HEAD..origin/$db" 2>/dev/null || echo 0)
+  [ "$behind" = "0" ] && continue
+  if [ "$ahead" = "0" ] && git -C "$src" merge --ff-only "origin/$db" --quiet 2>/dev/null; then
+    refreshed+=("$src ($behind commit(s))")
+  else
+    behindstill+=("$src ($behind behind, $ahead ahead)")
+  fi
+done
+
+if [ ${#refreshed[@]} -gt 0 ]; then
+  echo
+  echo "Refreshed, now that the work has landed:"
+  printf '    %s\n' "${refreshed[@]}"
+fi
+if [ ${#behindstill[@]} -gt 0 ]; then
+  echo
+  echo "Left alone -- these need a judgement call, see the refreshing-a-repo skill:"
+  printf '    %s\n' "${behindstill[@]}"
 fi
 
 # Branches outlive their worktrees, and the obvious cleanup runs into the same
