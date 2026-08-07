@@ -1,14 +1,32 @@
 # The ~/repos + ~/workspaces checkout layout, as it affects Claude Code.
 #
 # Split out of default.nix rather than added to it: this is a self-contained,
-# opt-in concern (one option, one CLAUDE.md) and default.nix is already long.
+# opt-in concern (one option, one CLAUDE.md, four skills) and default.nix is
+# already long.
+#
+# The division between the two halves: the CLAUDE.md carries the rules and the
+# reasons, because it is loaded into every session whether or not it is wanted,
+# and it names the skill to reach for at each gate. The skills carry the
+# commands, the decision trees and the scripts, because those cost nothing until
+# something actually invokes them. Anything stated in both places will drift, so
+# it is stated once.
 # Off by default: home-manager-modules/ is shared across the fleet and only
 # hosts actually migrated to this layout should carry the CLAUDE.md.
 { lib, config, ... }:
 
 let
   cfg = config.cjlarose.llmAgents.claude.workspaceLayout;
+  agents = config.cjlarose.llmAgents;
   wiki = config.cjlarose.llmAgents.wiki;
+
+  # Named once so the two harness blocks below cannot drift to different paths
+  # while still looking symmetrical.
+  skills = {
+    refreshing-a-repo = ./workspace-layout/skills/refreshing-a-repo;
+    starting-a-workspace = ./workspace-layout/skills/starting-a-workspace;
+    adding-a-repo-to-a-workspace = ./workspace-layout/skills/adding-a-repo-to-a-workspace;
+    tearing-down-a-workspace = ./workspace-layout/skills/tearing-down-a-workspace;
+  };
 
   # The wiki is the one writable path under ~/repos. Rather than restate the
   # path in prose (two hosts, two different paths, guaranteed to drift), derive
@@ -80,9 +98,25 @@ in
     # through home.file. Consequence: ~/.claude/CLAUDE.md becomes a read-only
     # store symlink, and Claude's `#` memory-append shortcut cannot write to
     # it -- the same trade this module already makes for settings.json.
-    home.file.".claude/CLAUDE.md".text =
-      builtins.readFile ./workspace-layout/CLAUDE.md
-      + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
-      + lib.optionalString wikiUnderRepos wikiCarveOut;
+    home.file = {
+      ".claude/CLAUDE.md".text =
+        builtins.readFile ./workspace-layout/CLAUDE.md
+        + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
+        + lib.optionalString wikiUnderRepos wikiCarveOut;
+    }
+    # The mechanics the CLAUDE.md above deliberately does not carry. It states
+    # the rules and names the skill at each gate; the commands, the decision
+    # trees and the scripts live here, where they cost nothing until invoked.
+    #
+    # ~/.claude/skills only: opencode scans it natively, so a second copy under
+    # opencode/skills would collide rather than help (see default.nix). None is
+    # gated beyond that -- the read-side gate applies on every host with
+    # ~/repos, which is exactly the hosts enabling this module.
+    // lib.optionalAttrs (agents.claude.enable || agents.opencode.enable) {
+      ".claude/skills/refreshing-a-repo".source = skills.refreshing-a-repo;
+      ".claude/skills/starting-a-workspace".source = skills.starting-a-workspace;
+      ".claude/skills/adding-a-repo-to-a-workspace".source = skills.adding-a-repo-to-a-workspace;
+      ".claude/skills/tearing-down-a-workspace".source = skills.tearing-down-a-workspace;
+    };
   };
 }
