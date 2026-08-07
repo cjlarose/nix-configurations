@@ -111,6 +111,12 @@ git push origin HEAD:main || { git pull --rebase && git push origin HEAD:main; }
 git -C "$REPO" merge --ff-only "$(git rev-parse HEAD)"
 ```
 
+Then refresh the context digest, which is what opencode reads at session start (Claude Code regenerates it live, opencode can only be handed a path):
+
+```bash
+inject-wiki-context "$REG" --write "${XDG_CACHE_HOME:-$HOME/.cache}/llm-wiki/context.md"
+```
+
 **The fast-forward of `$REPO` is required, not tidy-up.** The canonical checkout is what the session-start hook reads `index.md` from and what `querying-notes` searches. Skip it and every session on the machine reads a wiki missing everything you just filed. It is a sanctioned write to `~/repos` — the same one `tearing-down-a-workspace` performs when work lands — and it is `--ff-only`, so it refuses rather than inventing a merge if that checkout has diverged. If it refuses, say so; do not force it.
 
 ### 8. Report

@@ -56,6 +56,12 @@ let
 
   registryPath = "${config.xdg.configHome}/llm-wiki/wikis.json";
 
+  # The materialised digest opencode reads. Claude Code runs the generator live
+  # on every session start, so it is never stale there; opencode can only be
+  # given a file path, so it gets this one -- refreshed at activation and again
+  # after each ingest, which is when a wiki's index actually changes.
+  digestPath = "${config.xdg.cacheHome}/llm-wiki/context.md";
+
   # LLM_WIKI_PATH survives only for the single-wiki case, and only because the
   # skills still read it. It cannot express two wikis -- that is what the
   # registry is for -- so with several declared it is left unset rather than
@@ -95,6 +101,24 @@ in
           ];
         }
       ];
+    })
+
+    # opencode's half. It has no hook that can run a command at session start;
+    # `instructions` takes file paths and reads them, so it gets the digest.
+    #
+    # Generated at activation rather than left to appear after the first ingest:
+    # opencode reading a path that does not exist yet is not a state worth
+    # finding out about experimentally, and generation is cheap.
+    (lib.mkIf cfg.opencode.enable {
+      programs.opencode.settings.instructions = [ digestPath ];
+
+      home.activation.llmWikiContextDigest =
+        lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+          # Best-effort: a wiki checkout may not exist yet on a fresh machine,
+          # and a missing digest must not fail activation.
+          $DRY_RUN_CMD ${injector}/bin/inject-wiki-context \
+            ${lib.escapeShellArg registryPath} --write ${lib.escapeShellArg digestPath} || true
+        '';
     })
   ]);
 }

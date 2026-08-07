@@ -19,9 +19,35 @@
 #
 # Reads $1, the registry written by the llm-agents module. No paths are baked
 # in -- adding a wiki is one attribute in nix, and this script picks it up.
+#
+# Usage:
+#   inject-wiki-context.sh <registry.json>              -> stdout (the hook)
+#   inject-wiki-context.sh <registry.json> --write <p>  -> atomically into <p>
+#
+# The --write form exists for opencode. opencode has no session-start hook that
+# can run a command; what it does have is an `instructions` config listing FILE
+# paths, read at session start. So the same output that Claude Code's hook
+# streams is materialised to a file, and opencode is pointed at it. One
+# generator, one wording, both harnesses -- rather than a second implementation
+# that drifts.
 set -euo pipefail
 
-registry="${1:?usage: inject-wiki-context.sh <registry.json>}"
+registry="${1:?usage: inject-wiki-context.sh <registry.json> [--write <path>]}"
+
+# --write is handled by re-running ourselves and redirecting, so the generation
+# logic below stays a single straight-line path with no output plumbing threaded
+# through it. Written to a temp file and renamed, because a reader (an opencode
+# session starting right now) must never see a half-written digest.
+if [ "${2:-}" = "--write" ]; then
+  out="${3:?--write needs a path}"
+  mkdir -p "$(dirname "$out")"
+  tmp="$(mktemp "$out.XXXXXX")"
+  trap 'rm -f "$tmp"' EXIT
+  "$0" "$registry" > "$tmp"
+  mv "$tmp" "$out"
+  trap - EXIT
+  exit 0
+fi
 
 # Nothing to say on a host with no registry. Silent success, so the hook is
 # harmless everywhere it is deployed but not configured.
