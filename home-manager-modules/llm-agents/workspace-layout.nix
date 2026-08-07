@@ -28,17 +28,23 @@ let
     tearing-down-a-workspace = ./workspace-layout/skills/tearing-down-a-workspace;
   };
 
-  # The wiki is the one writable path under ~/repos. Rather than restate the
-  # path in prose (two hosts, two different paths, guaranteed to drift), derive
-  # it from the option that already decides it -- so the carve-out cannot name
-  # a directory the wiki isn't actually in.
+  # The LLM wikis used to be carved out of the read-only rule: the skills wrote
+  # pages and committed directly in ~/repos. They no longer do. Captures are
+  # written in a linked worktree in a workspace like any other change, and
+  # ingests run in a standing worktree of their own, so the wiki checkouts under
+  # ~/repos are ordinary read-only checkouts and the blanket rule is simply true
+  # of them.
   #
-  # Only emitted when the wiki really does live under ~/repos: on a host where
-  # it doesn't, the blanket "never write here" rule is simply true and needs no
-  # exception.
-  # A list now, not a path: a user can have several wikis installed (personal
-  # and work), and the carve-out has to name every one that lands under
-  # ~/repos or it silently sanctions writes to one of them and not the other.
+  # One sanctioned write remains, and it is worth stating rather than leaving to
+  # be rediscovered: after an ingest lands, the standing agent fast-forwards the
+  # wiki's ~/repos checkout. Without it that checkout -- which is what the
+  # session-start hook reads index.md from, and what queries search -- silently
+  # serves a wiki missing everything just filed. It is exactly the move
+  # tearing-down-a-workspace already makes when work lands, and it is --ff-only,
+  # so it refuses rather than inventing a merge.
+  #
+  # Emitted only where a wiki checkout really is under ~/repos; elsewhere there
+  # is nothing to qualify.
   wikiPathsUnderRepos =
     lib.filter (p: lib.hasPrefix "${config.home.homeDirectory}/repos/" p)
       (lib.mapAttrsToList (_: w: w.repoPath)
@@ -48,20 +54,22 @@ let
 
   wikiCarveOut = ''
 
-    ## The LLM wiki is the one exception
+    ## The LLM wiki checkouts are read-only too
 
     ${lib.concatMapStringsSep "\n" (p: "- `${p}`") wikiPathsUnderRepos}
 
-    These are under `~/repos` but **writable**, and the wiki skills are expected
-    to write there: `wiki:capturing-sessions` writes `raw/sessions/`,
-    `wiki:ingesting-sources` writes `pages/`, `index.md` and `log.md`, and commits.
+    These are ordinary `~/repos` checkouts and the rule above applies to them
+    unchanged. Do not edit pages, commit, or create worktrees here.
 
-    This is deliberate. The wiki is a live document store, not a source checkout —
-    the whole point is that pages are live rather than store copies, which is why
-    only the skills are pinned to a flake rev and the pages are not.
+    They were once an exception, and are not any more. Captures are written in a
+    linked worktree in a workspace, like every other change; ingests run in a
+    standing worktree of their own, which is also what serializes them.
 
-    The read-only rule still holds for every other directory under `~/repos`, and
-    the worktree rule holds here too: do not create worktrees in the wiki either.
+    **The one sanctioned write** is the `--ff-only` fast-forward the ingest agent
+    performs on these checkouts after pushing. It is not an edit — it advances a
+    read-only checkout to what the remote already has, so that the session-start
+    hook and `querying-notes`, both of which read from here, do not serve a wiki
+    missing what was just filed. Do not "clean it up".
   '';
 
 in
