@@ -65,13 +65,6 @@ Worth a close look at the landed-detection logic. The naming rule is settled —
 please don't relitigate it here.
 ```
 
-Easy to leave out, because it is the one part of a PR body that is not about
-the code. In a study of 80K pull requests across 156 projects, stating the
-desired feedback type **predicted acceptance and reviewer engagement better
-than any other element** — including the purpose and code explanations the same
-study found developers *rate* as more important. Write for what moves a review,
-not for what reviewers say they value.
-
 "Any feedback welcome" says nothing. Naming what is closed is the half that
 saves time, by keeping a settled decision from being re-opened.
 
