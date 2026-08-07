@@ -792,8 +792,13 @@ in
       default = soleWikiPath;
       description = ''
         repoPath of the only registered wiki, or null when there are zero or
-        several. Exists because programs.llmWiki holds exactly one path; the
-        null cases are reported by assertion rather than crashing here.
+        several.
+
+        Exists for LLM_WIKI_PATH alone, which is a scalar and so cannot name
+        more than one wiki. With several declared it is deliberately left unset
+        rather than resolved to an arbitrary one -- a skill that fell back to
+        the wrong wiki would write work material into the personal wiki and
+        commit it. The registry is what expresses more than one.
       '';
     };
 
@@ -1072,18 +1077,6 @@ in
             cjlarose.llmAgents.wiki.enable is true but no wiki is declared.
             Set cjlarose.llmAgents.wiki.wikis.<id>, e.g.
               wiki.wikis.personal = { repoPath = "..."; routingHint = "..."; };
-          '';
-        }
-        {
-          # Not a limitation of the registry -- of programs.llmWiki, which is
-          # still the delivery mechanism and holds a single path. Lifting this
-          # is what moving the skills into this module buys.
-          assertion = !cfg.wiki.enable || soleWikiPath != null;
-          message = ''
-            cjlarose.llmAgents.wiki declares ${toString (builtins.length wikiIds)} wikis
-            (${lib.concatStringsSep ", " wikiIds}), but the wiki flake's
-            programs.llmWiki carries one path, so only one can be installed
-            today. Declare one wiki until the wiki skills move into this module.
           '';
         }
         {
