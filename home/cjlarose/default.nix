@@ -112,6 +112,10 @@
   # programs.llmWiki definition, and can only be loaded where that option is
   # declared.
   imports = [
+    # The skills that used to ship from the wiki repo. Takes llm-wikis so it can
+    # gate on a wiki being declared without reaching into module config -- see
+    # the file's header for why they are gated at all.
+    (import ./claude-skills.nix { inherit llm-wikis; })
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
     ../../home-manager-modules/git.nix
