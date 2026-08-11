@@ -45,6 +45,32 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    basic-memory = {
+      # basicmachines-co/basic-memory -- the local knowledge-graph MCP server
+      # backing ~/basic-memory/personal. Source only: nixpkgs does not carry it,
+      # and upstream ships no flake, so packages/basic-memory builds it from
+      # this pinned tag via uv2nix (see that file for why not buildPythonApplication).
+      url = "github:basicmachines-co/basic-memory/v0.22.1";
+      flake = false;
+    };
+    pyproject-nix = {
+      # The three inputs below are the uv2nix stack, used only by
+      # packages/basic-memory. They all follow nixpkgs-26-05, the channel that
+      # package builds against, so no second nixpkgs subtree lands in the lock.
+      url = "github:pyproject-nix/pyproject.nix";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
+    };
+    uv2nix = {
+      url = "github:pyproject-nix/uv2nix";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
+    };
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.uv2nix.follows = "uv2nix";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
+    };
     home-manager-25-05 = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs-25-05";
@@ -192,6 +218,10 @@
     gh-stack,
     lavish-axi,
     herdr,
+    basic-memory,
+    pyproject-nix,
+    uv2nix,
+    pyproject-build-systems,
   }:
     let
       supportedPlatforms = [
@@ -206,6 +236,7 @@
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
             inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi herdr;
+            inherit basic-memory pyproject-nix uv2nix pyproject-build-systems;
           };
         in
           import ./packages packageArgs

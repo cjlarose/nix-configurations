@@ -17,6 +17,10 @@
   superpowers,
   lavish-axi,
   herdr,
+  basic-memory,
+  pyproject-nix,
+  uv2nix,
+  pyproject-build-systems,
   ...
 }:
 
@@ -90,6 +94,16 @@ let
 in
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
+  # Local knowledge-graph MCP server over ~/basic-memory/personal. Built from
+  # the pinned source via uv2nix rather than hand-listed against python3Packages
+  # -- see ./basic-memory for why that distinction is load-bearing here. Built
+  # against 26-05 to match the hosts that run it.
+  basic-memory = import ./basic-memory {
+    pkgs = nixpkgs-26-05.legacyPackages.${system};
+    src = basic-memory;
+    version = "0.22.1";
+    inherit pyproject-nix uv2nix pyproject-build-systems;
+  };
   claude-code = claude-code-bun;
   claude-code-node = claude-code-node-pkg;
   cs-automation = cs-automation.packages.${system}.default;
