@@ -141,10 +141,6 @@
     picktrace-nix-configurations = {
       url = "git+ssh://git@github.com/picktrace/nix-configurations";
     };
-    cjlarose-llm-wiki = {
-      url = "git+ssh://git@github.com/cjlarose/llm-wiki";
-      inputs.nixpkgs.follows = "nixpkgs-26-05";
-    };
     gh-stack = {
       # github/gh-stack -- GitHub's official stacked-PR gh CLI extension
       # (https://github.github.com/gh-stack/). flake = false: upstream ships no
@@ -212,7 +208,6 @@
     microvm,
     hermes-agent,
     picktrace-nix-configurations,
-    cjlarose-llm-wiki,
     tuicr,
     llm-agents,
     gh-stack,
@@ -279,7 +274,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules self;
+          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-home-manager-modules self;
         }
       );
 

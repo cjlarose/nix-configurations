@@ -1,4 +1,4 @@
-{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, self, ... }: {
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, self, ... }: {
   imports = [
     microvm.nixosModules.host
     ({ ... }: {
@@ -61,10 +61,13 @@
       home-manager.backupFileExtension = "hm-backup";
       home-manager.users.cjlarose = {
         imports = [
+          # llm-wiki-path is deliberately unset: the wiki migrated to Basic
+          # Memory, so the `wiki` Claude Code plugin, its SessionStart index
+          # hook and LLM_WIKI_PATH all go away with it. Leaving it null also
+          # drops the wiki flake's own module and the bridge that reads it.
+          # Basic Memory replaces the whole arrangement, wired below.
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
-            llm-wiki-path = "/home/cjlarose/repos/cjlarose/llm-wiki";
-            llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
           })
         ];
         # ns1010301 is the trial host for the ~/repos + ~/workspaces layout:
@@ -92,6 +95,21 @@
         # closure only lands where it's wanted; scope the enable to ns1010301
         # here rather than in home/cjlarose (which fans out to every linux host).
         cjlarose.llmAgents.claude.enablePlaywrightMcp = true;
+        # Basic Memory, replacing the hand-rolled LLM wiki. Registered once via
+        # programs.mcp.servers, which reaches Claude Code and opencode alike.
+        # Scoped to this host rather than home/cjlarose: it is the only one with
+        # the knowledge base on disk, and the headless guests have no use for an
+        # embedding model.
+        #
+        # ~/basic-memory rather than ~/repos: a daemon-written document store is
+        # not a source checkout, and moving it out means the read-only rule for
+        # ~/repos needs no exception carved out of it.
+        cjlarose.llmAgents.basicMemory = {
+          enable = true;
+          package = additionalPackages.${system}.basic-memory;
+          projects.personal.path = "/home/cjlarose/basic-memory/personal";
+          defaultProject = "personal";
+        };
         # Upstream lavish-axi CLI (built from source, telemetry off) + its Lavish
         # Editor Claude skill. Scoped to this interactive/browser host (not the
         # shared profile, which fans out to the headless cjlarose hosts that have

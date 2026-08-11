@@ -52,7 +52,7 @@
 # The consumer therefore imports cjlarose-llm-wiki.homeManagerModules.default
 # alongside this module -- see home/cjlarose -- and this module owns everything
 # else about the wiki, including turning it on and pointing it at a worktree.
-{ lib, pkgs, config, ... }:
+{ lib, pkgs, config, options, ... }:
 
 let
   cfg = config.cjlarose.llmAgents;
@@ -655,13 +655,75 @@ in
       '';
     };
 
-    # --- personal LLM wiki --------------------------------------------------
+    # --- Basic Memory -------------------------------------------------------
+
+    basicMemory.enable = lib.mkEnableOption ''
+      Basic Memory: a local knowledge-graph MCP server over a folder of plain
+      markdown, registered with Claude Code and opencode alike.
+
+      This supersedes the wiki.* options below. It is a separate opt-in rather
+      than a rename because picktrace/nix-configurations still consumes wiki.*
+      from this module and cannot migrate on the same activation
+
+      Requires home-manager >= 25.11, which is where programs.mcp first appears
+    '';
+
+    basicMemory.package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = ''
+        The basic-memory package (packages/basic-memory in this repo). Required
+        when basicMemory.enable is set.
+      '';
+    };
+
+    basicMemory.projects = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule {
+        options = {
+          path = lib.mkOption {
+            type = lib.types.str;
+            description = "Absolute path to the folder of markdown notes.";
+          };
+        };
+      });
+      default = { };
+      example = lib.literalExpression ''
+        { personal.path = "/home/you/basic-memory/personal"; }
+      '';
+      description = ''
+        Projects, exported as BASIC_MEMORY_PROJECTS rather than written into
+        ~/.basic-memory/config.json.
+
+        Basic Memory resolves config as env vars -> config file -> defaults, and
+        `projects` is an ordinary model field, so the env var wins on every
+        load. That is what makes this declarative in a way a generated config
+        file could not be: Basic Memory rewrites that file at runtime (last_sync
+        and friends), so it cannot be a read-only store symlink, and anything
+        that merged into it could be silently drifted by `bm project add`.
+      '';
+    };
+
+    basicMemory.defaultProject = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "personal";
+      description = ''
+        Fallback project for calls that do not name one. Also pins MCP sessions
+        to it, so a stray tool call cannot write into a different knowledge base.
+      '';
+    };
+
+    # --- personal LLM wiki (superseded by basicMemory.*) ---------------------
 
     wiki.enable = lib.mkEnableOption ''
       the personal LLM wiki integration: the `wiki` Claude Code plugin (skills +
       SessionStart index hook) and LLM_WIKI_PATH. Only valid where the consumer
       also imports cjlarose-llm-wiki.homeManagerModules.default, which is what
-      declares programs.llmWiki (see the header comment)
+      declares programs.llmWiki (see the header comment).
+
+      DEPRECATED in favour of basicMemory.enable, but still live: picktrace's
+      wiki has not migrated, and its home config sets this option from THIS
+      module. Do not remove it until that wiki moves to Basic Memory too
     '';
 
     wiki.path = lib.mkOption {
@@ -920,6 +982,63 @@ in
         "${herdrIntegrations}/opencode-plugin.js";
     })
 
+    # --- Basic Memory -------------------------------------------------------
+    # Declared ONCE through programs.mcp.servers, which both programs.claude-code
+    # and programs.opencode consume when their enableMcpIntegration is set (both
+    # default false). That is why there is no second, parallel block here: the
+    # claude-code module runs lib.hm.mcp.addType over each server, so `type` is
+    # supplied for us and must NOT be set by hand.
+    #
+    # programs.mcp only exists from home-manager 25.11, hence the separate
+    # opt-in: an unconditional definition would break any consumer still on
+    # 25.05, the same way programs.llmWiki would (see the note further down).
+    (lib.mkIf (cfg.basicMemory.enable && cfg.basicMemory.package != null) {
+      programs.mcp = {
+        enable = true;
+        servers.basic-memory = {
+          command = "${cfg.basicMemory.package}/bin/basic-memory";
+          args = [ "mcp" ];
+        };
+      };
+
+      # Guarded on the option EXISTING, not on a flag. home-manager 25.11 ships
+      # programs.mcp and opencode's enableMcpIntegration but not claude-code's,
+      # and mkIf does not help: the module system distributes it down to the
+      # attribute path and checks the declaration regardless of the condition,
+      # so a plain `mkIf false` definition still fails with "option does not
+      # exist" (the same trap programs.llmWiki hits, noted further down).
+      # optionalAttrs omits the attribute outright instead.
+      programs.claude-code = lib.optionalAttrs
+        (options.programs.claude-code ? enableMcpIntegration)
+        { enableMcpIntegration = true; };
+      programs.opencode = lib.optionalAttrs
+        (options.programs.opencode ? enableMcpIntegration)
+        { enableMcpIntegration = true; };
+
+      home.packages = [ cfg.basicMemory.package ];
+
+      # Configuration by environment rather than by config file. Basic Memory
+      # resolves env -> ~/.basic-memory/config.json -> defaults, and rewrites
+      # that file at runtime, so the file cannot be a store symlink and anything
+      # merged into it drifts the moment someone runs `bm project add`. The env
+      # var wins on every load instead.
+      home.sessionVariables =
+        {
+          BASIC_MEMORY_PROJECTS = builtins.toJSON (
+            lib.mapAttrs (_: p: {
+              inherit (p) path;
+              mode = "local";
+            }) cfg.basicMemory.projects
+          );
+        }
+        // lib.optionalAttrs (cfg.basicMemory.defaultProject != null) {
+          BASIC_MEMORY_DEFAULT_PROJECT = cfg.basicMemory.defaultProject;
+          # Highest-priority project constraint: pins an MCP session to one
+          # project, so a stray call cannot write into the wrong knowledge base.
+          BASIC_MEMORY_MCP_PROJECT = cfg.basicMemory.defaultProject;
+        };
+    })
+
     # --- personal LLM wiki --------------------------------------------------
     # The programs.llmWiki definition itself lives in ./wiki-bridge.nix, which
     # the consumer imports next to the wiki flake's module. It cannot live here:
@@ -933,6 +1052,17 @@ in
         {
           assertion = !cfg.wiki.enable || cfg.wiki.path != null;
           message = "cjlarose.llmAgents.wiki.enable is true but cjlarose.llmAgents.wiki.path is unset.";
+        }
+        {
+          assertion = !cfg.basicMemory.enable || cfg.basicMemory.package != null;
+          message = "cjlarose.llmAgents.basicMemory.enable is true but cjlarose.llmAgents.basicMemory.package is unset.";
+        }
+        {
+          assertion =
+            !cfg.basicMemory.enable
+            || cfg.basicMemory.defaultProject == null
+            || cfg.basicMemory.projects ? ${cfg.basicMemory.defaultProject};
+          message = "cjlarose.llmAgents.basicMemory.defaultProject names a project that is not in basicMemory.projects.";
         }
         {
           assertion = !cfg.superpowers.enable || cfg.superpowers.src != null;

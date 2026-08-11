@@ -124,26 +124,6 @@
     "cjlarose-llm-wiki": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-26-05"
-        ]
-      },
-      "locked": {
-        "lastModified": 1782972013,
-        "narHash": "sha256-K/ZC7dKeQl4dTtiYBWIJ1B3PCzvKQjPPUneCv8nDcig=",
-        "ref": "refs/heads/main",
-        "rev": "78018bda52e8c52f34e413b581c4a9d1618db47b",
-        "revCount": 100,
-        "type": "git",
-        "url": "ssh://git@github.com/cjlarose/llm-wiki"
-      },
-      "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/cjlarose/llm-wiki"
-      }
-    },
-    "cjlarose-llm-wiki_2": {
-      "inputs": {
-        "nixpkgs": [
           "picktrace-nix-configurations",
           "nixpkgs-26-05"
         ]
@@ -1674,7 +1654,7 @@
       "inputs": {
         "cjlarose-darwin-modules": "cjlarose-darwin-modules",
         "cjlarose-home-manager-modules": "cjlarose-home-manager-modules",
-        "cjlarose-llm-wiki": "cjlarose-llm-wiki_2",
+        "cjlarose-llm-wiki": "cjlarose-llm-wiki",
         "cstyles-nvr": "cstyles-nvr",
         "determinate": "determinate_2",
         "gh-stack": "gh-stack_2",
@@ -1848,7 +1828,6 @@
     "root": {
       "inputs": {
         "basic-memory": "basic-memory",
-        "cjlarose-llm-wiki": "cjlarose-llm-wiki",
         "cs-automation": "cs-automation",
         "determinate": "determinate",
         "disko": "disko",
