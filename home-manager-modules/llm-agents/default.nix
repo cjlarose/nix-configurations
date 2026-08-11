@@ -140,6 +140,49 @@ let
   # The chromium revision is globbed at runtime to survive nixpkgs bumps.
   # Headless because this targets displayless hosts; isolated keeps the profile
   # in memory.
+  # Basic Memory's configuration, as environment. `projects` is JSON, which is
+  # why it does NOT go through home.sessionVariables: those are written as
+  # `export NAME="value"` with no escaping, so a shell eats the JSON's own
+  # quotes and pydantic-settings then refuses to parse the field, taking the
+  # whole process down. Delivered instead by the two routes that never involve
+  # a shell -- the MCP client's JSON config, and a makeWrapper --set.
+  basicMemoryEnv =
+    {
+      BASIC_MEMORY_PROJECTS = builtins.toJSON (
+        lib.mapAttrs (_: p: {
+          inherit (p) path;
+          mode = "local";
+        }) cfg.basicMemory.projects
+      );
+    }
+    // lib.optionalAttrs (cfg.basicMemory.defaultProject != null) {
+      BASIC_MEMORY_DEFAULT_PROJECT = cfg.basicMemory.defaultProject;
+      # Highest-priority project constraint: pins an MCP session to one project,
+      # so a stray call cannot write into the wrong knowledge base.
+      BASIC_MEMORY_MCP_PROJECT = cfg.basicMemory.defaultProject;
+    };
+
+  # basic-memory with that environment baked in, so `bm` from a login shell and
+  # the MCP server the harness spawns agree on which projects exist.
+  basicMemoryWrapped =
+    if cfg.basicMemory.package == null then
+      null
+    else
+      pkgs.symlinkJoin {
+        name = "basic-memory-configured";
+        paths = [ cfg.basicMemory.package ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          for exe in basic-memory bm; do
+            wrapProgram "$out/bin/$exe" ${
+              lib.concatStringsSep " " (
+                lib.mapAttrsToList (n: v: "--set ${n} ${lib.escapeShellArg v}") basicMemoryEnv
+              )
+            }
+          done
+        '';
+      };
+
   playwrightMcp = pkgs.writeShellScriptBin "playwright-mcp-chromium" ''
     chrome=( ${pkgs.playwright-driver.browsers}/chromium-*/chrome-linux*/chrome )
     exec ${pkgs.playwright-mcp}/bin/playwright-mcp \
@@ -691,7 +734,7 @@ in
         { personal.path = "/home/you/basic-memory/personal"; }
       '';
       description = ''
-        Projects, exported as BASIC_MEMORY_PROJECTS rather than written into
+        Projects, passed as BASIC_MEMORY_PROJECTS rather than written into
         ~/.basic-memory/config.json.
 
         Basic Memory resolves config as env vars -> config file -> defaults, and
@@ -700,6 +743,13 @@ in
         file could not be: Basic Memory rewrites that file at runtime (last_sync
         and friends), so it cannot be a read-only store symlink, and anything
         that merged into it could be silently drifted by `bm project add`.
+
+        The value is JSON, so it never travels through home.sessionVariables:
+        those are emitted as `export NAME="value"` with no escaping, and a shell
+        then strips the JSON's own quotes, leaving `{personal:{path:...}}` --
+        which pydantic-settings rejects outright, so nothing starts. It reaches
+        the MCP server through programs.mcp.servers.<name>.env (serialised into
+        the client's JSON config, never a shell) and the CLI through a wrapper.
       '';
     };
 
@@ -996,8 +1046,12 @@ in
       programs.mcp = {
         enable = true;
         servers.basic-memory = {
-          command = "${cfg.basicMemory.package}/bin/basic-memory";
+          command = "${basicMemoryWrapped}/bin/basic-memory";
           args = [ "mcp" ];
+          # Same settings the wrapper bakes in. Redundant with it by design:
+          # the server must not depend on how the harness that spawned it was
+          # launched, and these are what a client's own config records.
+          env = basicMemoryEnv;
         };
       };
 
@@ -1008,35 +1062,22 @@ in
       # so a plain `mkIf false` definition still fails with "option does not
       # exist" (the same trap programs.llmWiki hits, noted further down).
       # optionalAttrs omits the attribute outright instead.
+      # `options ? programs.claude-code.enableMcpIntegration`, not
+      # `options.programs.claude-code ? enableMcpIntegration`: the latter
+      # evaluates the attrpath before testing, so it throws outright on a
+      # consumer that never imports the claude-code module -- the broader case
+      # this guard is here to survive.
       programs.claude-code = lib.optionalAttrs
-        (options.programs.claude-code ? enableMcpIntegration)
+        (options ? programs.claude-code.enableMcpIntegration)
         { enableMcpIntegration = true; };
       programs.opencode = lib.optionalAttrs
-        (options.programs.opencode ? enableMcpIntegration)
+        (options ? programs.opencode.enableMcpIntegration)
         { enableMcpIntegration = true; };
 
-      home.packages = [ cfg.basicMemory.package ];
-
-      # Configuration by environment rather than by config file. Basic Memory
-      # resolves env -> ~/.basic-memory/config.json -> defaults, and rewrites
-      # that file at runtime, so the file cannot be a store symlink and anything
-      # merged into it drifts the moment someone runs `bm project add`. The env
-      # var wins on every load instead.
-      home.sessionVariables =
-        {
-          BASIC_MEMORY_PROJECTS = builtins.toJSON (
-            lib.mapAttrs (_: p: {
-              inherit (p) path;
-              mode = "local";
-            }) cfg.basicMemory.projects
-          );
-        }
-        // lib.optionalAttrs (cfg.basicMemory.defaultProject != null) {
-          BASIC_MEMORY_DEFAULT_PROJECT = cfg.basicMemory.defaultProject;
-          # Highest-priority project constraint: pins an MCP session to one
-          # project, so a stray call cannot write into the wrong knowledge base.
-          BASIC_MEMORY_MCP_PROJECT = cfg.basicMemory.defaultProject;
-        };
+      # The wrapper, not the bare package: an interactive `bm` has to see the
+      # same projects the MCP server does, and home.sessionVariables cannot
+      # carry them (see the projects option's description).
+      home.packages = [ basicMemoryWrapped ];
     })
 
     # --- personal LLM wiki --------------------------------------------------

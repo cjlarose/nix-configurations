@@ -125,18 +125,6 @@ Landing the work is also what makes the `~/repos` repos it came from stale, so
 teardown fast-forwards them where it safely can. That is the one moment the
 staleness is certain rather than suspected.
 
-## ~/basic-memory — knowledge, not code
-
-`~/basic-memory/<project>` holds a Basic Memory project: a folder of plain
-markdown that a local daemon indexes into a searchable knowledge graph. Reach it
-through the `basic-memory` MCP tools rather than by reading files — that is what
-the index is for.
-
-It is a git repo, but it is **not** a source checkout and does not belong to
-either root above. Nothing branches from it, nothing worktrees it, and the
-daemon writes to it continuously. Filing it here rather than under `~/repos` is
-what lets the read-only rule up there stay absolute.
-
 ## .claude/worktrees
 
 Fine and **encouraged inside a workspace** — that is how parallel agents on one

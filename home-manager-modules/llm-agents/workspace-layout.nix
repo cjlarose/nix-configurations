@@ -57,6 +57,26 @@ let
     the worktree rule holds here too: do not create worktrees in the wiki either.
   '';
 
+  # Emitted only where a Basic Memory project actually exists. Baking this into
+  # the shared CLAUDE.md would tell agents on every host -- including ones with
+  # no basic-memory package, no MCP server and no ~/basic-memory -- to reach
+  # knowledge "through the basic-memory MCP tools", which is the same drift the
+  # wiki carve-out above is gated to avoid.
+  basicMemoryNote = ''
+
+    ## ~/basic-memory — knowledge, not code
+
+    `~/basic-memory/<project>` holds a Basic Memory project: a folder of plain
+    markdown that a local daemon indexes into a searchable knowledge graph. Reach
+    it through the `basic-memory` MCP tools rather than by reading files — that is
+    what the index is for.
+
+    It is a git repo, but it is **not** a source checkout and does not belong to
+    either root above. Nothing branches from it, nothing worktrees it, and the
+    daemon writes to it continuously. Filing it here rather than under `~/repos`
+    is what lets the read-only rule up there stay absolute.
+  '';
+
 in
 {
   options.cjlarose.llmAgents.claude.workspaceLayout = {
@@ -102,7 +122,8 @@ in
       ".claude/CLAUDE.md".text =
         builtins.readFile ./workspace-layout/CLAUDE.md
         + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
-        + lib.optionalString wikiUnderRepos wikiCarveOut;
+        + lib.optionalString wikiUnderRepos wikiCarveOut
+        + lib.optionalString agents.basicMemory.enable basicMemoryNote;
     }
     # The mechanics the CLAUDE.md above deliberately does not carry. It states
     # the rules and names the skill at each gate; the commands, the decision
