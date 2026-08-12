@@ -109,6 +109,10 @@
           package = additionalPackages.${system}.basic-memory;
           projects.personal.path = "/home/cjlarose/basic-memory/personal";
           defaultProject = "personal";
+          # Replaces the wiki's `wiki:handing-off`. Basic Memory ships the
+          # pieces but chains none of them, and the durable-knowledge versus
+          # in-flight-state split is the judgement worth writing down.
+          handoffSkill.enable = true;
         };
         # Upstream lavish-axi CLI (built from source, telemetry off) + its Lavish
         # Editor Claude skill. Scoped to this interactive/browser host (not the

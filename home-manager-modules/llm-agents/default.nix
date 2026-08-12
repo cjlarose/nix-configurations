@@ -386,7 +386,7 @@ let
     '';
 in
 {
-  imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ];
+  imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ./basic-memory.nix ];
 
   options.cjlarose.llmAgents = {
 
