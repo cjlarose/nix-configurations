@@ -119,16 +119,56 @@
     ../../home-manager-modules/llm-agents/wiki-bridge.nix
   ];
 
-  # gh from nixpkgs-unstable (2.96.0) rather than the host's 26-05 (2.93.0);
-  # see packages/default.nix.
-  cjlarose.devTools.ghPackage = additionalPackages.${system}.gh;
+  # The dev tools this profile wants. Every one is off until named, so this
+  # list is the whole answer to what these hosts carry from that module.
+  cjlarose.devTools = {
+    csvtool.enable = true;
+    dig.enable = true;
+    gitAbsorb.enable = true;
+    gitFilterRepo.enable = true;
+    htop.enable = true;
+    jq.enable = true;
+    jqPager.enable = true;
+    ripgrep.enable = true;
+    shellcheck.enable = true;
+    tfenv.enable = true;
+    tmux.enable = true;
+    tree.enable = true;
+    watch.enable = true;
+    wget.enable = true;
+    wrk.enable = true;
+    yqGo.enable = true;
 
-  # GitHub's official stacked-PR extension: `gh stack ...` and a gh-stack on
-  # PATH. Useful at the keyboard, independent of any agent -- the SKILL.md that
-  # ships in the same package is installed by llm-agents above.
-  cjlarose.devTools.ghStack = {
-    enable = true;
-    package = additionalPackages.${system}.gh-stack;
+    kubernetes = {
+      kubectl.enable = true;
+      helm.enable = true;
+      kubeseal.enable = true;
+      kustomize.enable = true;
+    };
+
+    languageServers = {
+      bash.enable = true;
+      kotlin.enable = true;
+      nix.enable = true;
+      python.enable = true;
+      typescript.enable = true;
+      web.enable = true;
+    };
+
+    gh = {
+      enable = true;
+      # gh from nixpkgs-unstable (2.96.0) rather than the host's 26-05 (2.93.0);
+      # see packages/default.nix.
+      package = additionalPackages.${system}.gh;
+
+      # GitHub's official stacked-PR extension: `gh stack ...` and a gh-stack on
+      # PATH. Useful at the keyboard, independent of any agent -- the SKILL.md
+      # that ships in the same package is installed by llm-agents above.
+      stack = {
+        enable = true;
+        package = additionalPackages.${system}.gh-stack;
+      };
+    };
   };
 
   cjlarose.shell.nvrPackage = additionalPackages.${system}.nvr;
