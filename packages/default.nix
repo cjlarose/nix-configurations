@@ -166,20 +166,11 @@ in
       cp 24-bit-color.sh $out/bin
     '';
   };
-  wrappedJq = pkgs.writeShellScriptBin "jqp" ''
-    if [ -t 1 ]; then
-      ${pkgs.jq}/bin/jq --color-output "$@" | less
-    else
-      ${pkgs.jq}/bin/jq "$@"
-    fi
-  '';
-  wrappedRg = pkgs.writeShellScriptBin "rg" ''
-    if [ -t 1 ]; then
-      ${pkgs.ripgrep}/bin/rg --hidden --glob '!.git' --sort path --pretty "$@" | less
-    else
-      ${pkgs.ripgrep}/bin/rg --hidden --glob '!.git' --sort path "$@"
-    fi
-  '';
+  # Shared with home-manager-modules/dev-tools.nix, which installs the same two
+  # wrappers directly. They live over there because that directory is its own
+  # flake and cannot import from here, while this one can import from there.
+  inherit (import ../home-manager-modules/shell-wrappers.nix { inherit pkgs; })
+    wrappedJq wrappedRg;
   wrappedTailscale = pkgs.writeShellScriptBin "tailscale" ''
     exec /Applications/Tailscale.app/Contents/MacOS/Tailscale "$@"
   '';
