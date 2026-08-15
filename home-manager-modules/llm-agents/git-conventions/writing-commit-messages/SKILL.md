@@ -36,6 +36,27 @@ Imperative test: the subject completes "If applied, this commit will ___".
   unshared, so the numbering outlives its referent. Use descriptive language
   instead — "after the producer flip", "once the new subscription is attached".
 
+## Referencing another commit
+
+Write the **full 40-character SHA, bare** — no backticks, no markdown link, and
+no abbreviating it yourself:
+
+```
+Reverts 9c1f3ae4b2d80a7e6f5c14b93d2e8a0f7c6b5d43, which assumed the
+producer still owned the offset.
+```
+
+GitHub shortens the hash to its display form and links it to the commit when it
+renders the message. That happens on its own, after the fact — so every hand-made
+version of it is worse than doing nothing. Backticks make it a code span, which
+suppresses the autolink and leaves a 40-character hash sitting raw in the prose.
+A hand-written link is a URL to maintain, and a hand-abbreviated hash is the one
+form that can go ambiguous later as the repo grows.
+
+The full hash is also what makes the reference resolvable outside GitHub, where
+nothing is expanding anything: `git show <sha>` works from the message text as
+written.
+
 ## Disclosing the models
 
 One trailer per model, repeated:
