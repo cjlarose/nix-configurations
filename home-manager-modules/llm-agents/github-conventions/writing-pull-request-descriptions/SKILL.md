@@ -41,6 +41,26 @@ Same instinct, same fix, in three other places:
   that". The diff is the record of what changed.
 - **No testing-plan section** unless the consumer rules below ask for one.
 
+## Referencing a commit
+
+When a SHA is the right reference, write the **full 40-character hash, bare** —
+no backticks, no markdown link, and no abbreviating it yourself:
+
+```
+Reverted in 9c1f3ae4b2d80a7e6f5c14b93d2e8a0f7c6b5d43 once the offset moved.
+```
+
+GitHub shortens it to the display form and links it to the commit when it
+renders the body — automatically, after the fact. Every hand-made version of
+that is worse than leaving it alone. Backticks make a code span, which
+suppresses the autolink and strands a 40-character hash in the prose; a written
+link is a URL to keep current; a hand-abbreviated hash can go ambiguous as the
+repo grows.
+
+This is *how* to write a SHA, not *when*. The rule below on citing subjects
+rather than SHAs while a stack is live still decides whether a SHA belongs there
+at all.
+
 ## Model disclosure: included by default
 
 **End the description with a plain sentence naming the models**, unless the
