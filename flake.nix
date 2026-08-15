@@ -149,6 +149,23 @@
       url = "github:herdrdev/herdr/v0.8.0";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    ai-memory = {
+      # akitaonrails/ai-memory -- local-first session memory for coding agents,
+      # on a two-week parallel trial against the llm-wiki. flake = false:
+      # upstream ships no nix packaging, so packages/ai-memory builds it.
+      #
+      # Pinned to a tag, not a branch, and deliberately so: this is a
+      # three-month-old project with a 3,000-line changelog whose hook payloads
+      # are baked into ~/.claude/settings.json and an opencode plugin. An
+      # unpinned bump would silently rewrite both.
+      #
+      # NOTE when bumping: home-manager-modules/llm-agents/ai-memory.nix diffs
+      # the hook payloads this version generates against the ones checked in
+      # there, so a contract change fails the BUILD rather than half-wiring the
+      # hooks. Expect to re-render those files on a bump.
+      url = "github:akitaonrails/ai-memory/v1.26.1";
+      flake = false;
+    };
     lavish-axi = {
       # Upstream lavish-axi, pinned to a release tag and built from source in
       # packages/lavish-axi (flake = false: upstream ships no nix packaging).
@@ -193,6 +210,7 @@
     gh-stack,
     lavish-axi,
     herdr,
+    ai-memory,
   }:
     let
       supportedPlatforms = [
@@ -206,7 +224,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi herdr;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi herdr ai-memory;
           };
         in
           import ./packages packageArgs

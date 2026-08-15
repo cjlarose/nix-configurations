@@ -17,6 +17,7 @@
   superpowers,
   lavish-axi,
   herdr,
+  ai-memory,
   ...
 }:
 
@@ -90,6 +91,14 @@ let
 in
 {
   atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
+  # Local-first session memory for coding agents (akitaonrails/ai-memory), on a
+  # two-week parallel trial. Built from nixpkgs-26-05, whose rustc is 1.95.0 --
+  # exactly what upstream's rust-toolchain.toml pins. Not in nixpkgs.
+  ai-memory = import ./ai-memory {
+    pkgs = nixpkgs-26-05.legacyPackages.${system};
+    src = ai-memory;
+    version = "1.26.1";
+  };
   claude-code = claude-code-bun;
   claude-code-node = claude-code-node-pkg;
   cs-automation = cs-automation.packages.${system}.default;

@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "ai-memory": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786738031,
+        "narHash": "sha256-aWCqWriN5y2SvlAk5sYG82lDfYgiVntDLcE+gxo5JBo=",
+        "owner": "akitaonrails",
+        "repo": "ai-memory",
+        "rev": "f2ee46ef5cf104c5df949fa7cb02f1854c772032",
+        "type": "github"
+      },
+      "original": {
+        "owner": "akitaonrails",
+        "ref": "v1.26.1",
+        "repo": "ai-memory",
+        "type": "github"
+      }
+    },
     "bun2nix": {
       "inputs": {
         "flake-parts": [
@@ -1784,6 +1801,7 @@
     },
     "root": {
       "inputs": {
+        "ai-memory": "ai-memory",
         "cjlarose-llm-wiki": "cjlarose-llm-wiki",
         "cs-automation": "cs-automation",
         "determinate": "determinate",
