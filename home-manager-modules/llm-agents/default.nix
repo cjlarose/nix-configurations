@@ -610,13 +610,31 @@ in
 
     # --- standalone agent CLIs ---------------------------------------------
 
-    opencode.enable = lib.mkEnableOption
-      "opencode, the standalone terminal coding agent (programs.opencode)";
+    opencode.enable = lib.mkEnableOption ''
+      opencode, the standalone terminal coding agent: its integrations here --
+      the shared ~/.claude/skills, the herdr plugin, superpowers' skills.paths
+      -- and, when `package` is set, the binary itself through
+      programs.opencode
+    '';
 
     opencode.package = lib.mkOption {
       type = lib.types.nullOr lib.types.package;
       default = null;
-      description = "The opencode package to install. Required when opencode.enable is set.";
+      description = ''
+        The opencode package, installed through programs.opencode.
+
+        Null means opencode reaches this host from somewhere else -- another
+        module owning programs.opencode -- and this module contributes only the
+        integrations above. That is what lets a host take the binary from
+        whichever module installs it, including one that has to place it
+        outside the nix store, while keeping the personal wiring here. Nothing
+        is installed and nothing collides.
+
+        The integrations that write files -- the skills and the herdr plugin --
+        land either way. The one that does not is superpowers' skills.paths,
+        which is a programs.opencode SETTING and so needs whichever module owns
+        that option to have enabled it.
+      '';
     };
 
     herdr.enable = lib.mkEnableOption ''
@@ -941,10 +959,6 @@ in
         {
           assertion = !cfg.lavish.enable || cfg.lavish.package != null;
           message = "cjlarose.llmAgents.lavish.enable is true but cjlarose.llmAgents.lavish.package is unset.";
-        }
-        {
-          assertion = !cfg.opencode.enable || cfg.opencode.package != null;
-          message = "cjlarose.llmAgents.opencode.enable is true but cjlarose.llmAgents.opencode.package is unset.";
         }
         {
           assertion = !cfg.herdr.enable || cfg.herdr.package != null;
