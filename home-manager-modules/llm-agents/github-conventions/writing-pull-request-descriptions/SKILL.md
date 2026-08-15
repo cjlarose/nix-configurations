@@ -8,6 +8,26 @@ description: Use when opening a pull request, writing or editing a PR body, or u
 A PR description states the **problem and the proposed solution**. It is not a
 tour of the branch.
 
+## Never hard-wrap the body
+
+**Every paragraph is one long line.** No newline until the paragraph ends — not
+at 72 characters, not at 80, not at any column.
+
+GitHub renders the body as markdown and soft-wraps it to the reader's viewport,
+so hard wraps are not a neutral formatting choice: they are line breaks the
+renderer honors as authored. A body wrapped at 72 reads as a narrow ragged
+column on a wide screen, and re-flows into a jagged mess on a phone. Editing one
+is worse — a sentence added mid-paragraph pushes every following line out of
+alignment, so a one-word change means re-wrapping the whole paragraph and a diff
+that touches lines nobody edited.
+
+Lists, tables, code blocks and quotes keep their own line structure. This rule
+governs prose lines only: within a bullet or a paragraph, do not break.
+
+This is the **opposite** of the commit-message rule, where bodies stay wrapped
+at 72 because git tooling does no wrapping of its own. Do not carry the habit
+across — see the asymmetry section below.
+
 ## Do not restate the commits
 
 The reviewer reads the commits. A description that walks through them commit by
@@ -47,10 +67,10 @@ or to dodge a requirement.
 ## The rules invert between artifacts — do not generalize
 
 A commit message and a PR description are deliberately asymmetric, and each may
-*require* what the other *forbids* — issue keys and model attribution are the two
-that bite. A **comment** posted on the user's behalf is a third artifact with a
-third rule, and it is the *opposite* of the description's: see
-**writing-pull-request-comments**.
+*require* what the other *forbids* — hard wrapping, issue keys and model
+attribution are the three that bite. A **comment** posted on the user's behalf
+is a third artifact with a third rule, and it is the *opposite* of the
+description's: see **writing-pull-request-comments**.
 
 Never carry a rule across artifacts by analogy. Where the rules for this repo
 below speak, they are the authority.
@@ -93,6 +113,7 @@ identifiers that no longer exist, and rationales for decisions since reversed.
 
 - Writing the body from the branch's history instead of from the reader's
   question, "what problem is this solving?"
+- Hard-wrapping the prose, usually by carrying the commit-message habit across.
 - Leaving a stale description after rewriting the branch.
 - Copying the previous PR's structure without checking whether its conventions
   are the ones that apply here.
