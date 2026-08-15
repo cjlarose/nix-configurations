@@ -38,8 +38,8 @@ Imperative test: the subject completes "If applied, this commit will ___".
 
 ## Referencing another commit
 
-Write the **full 40-character SHA, bare** — no backticks, no markdown link, and
-no abbreviating it yourself:
+**In this repo:** write the full 40-character SHA, bare — no backticks, no
+markdown link, and no abbreviating it yourself:
 
 ```
 Reverts 9c1f3ae4b2d80a7e6f5c14b93d2e8a0f7c6b5d43, which assumed the
@@ -56,6 +56,29 @@ form that can go ambiguous later as the repo grows.
 The full hash is also what makes the reference resolvable outside GitHub, where
 nothing is expanding anything: `git show <sha>` works from the message text as
 written.
+
+### A commit in another repo is the exception
+
+**Autolinking is repo-scoped.** GitHub expands a bare hash only when the commit
+is in the repo rendering the text. A SHA from anywhere else — an upstream
+project, a sibling repo in the same fleet — matches nothing, so it renders as 40
+characters of raw hex that lead nowhere. There nothing is doing the work for
+you, and doing it yourself is the only way the reference resolves at all.
+
+So for a **foreign commit**, shorten to 7 characters and link it explicitly:
+
+```
+Picks up the upstream fix in
+[165dca4](https://github.com/herdrdev/herdr/commit/165dca453d12a93b91b490cd58362e7dbd36c46d).
+```
+
+The URL carries the full hash, so nothing is lost to the abbreviation and the
+ambiguity objection doesn't apply — the link resolves one exact commit no matter
+how the upstream repo grows.
+
+The test is **which repo will render this text**, not which repo you are sitting
+in. A commit message written here and read on GitHub renders in this repo, so
+this repo's own commits stay bare.
 
 ## Disclosing the models
 

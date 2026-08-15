@@ -43,8 +43,9 @@ Same instinct, same fix, in three other places:
 
 ## Referencing a commit
 
-When a SHA is the right reference, write the **full 40-character hash, bare** —
-no backticks, no markdown link, and no abbreviating it yourself:
+When a SHA is the right reference and the commit is **in the repo the PR is
+against**, write the full 40-character hash, bare — no backticks, no markdown
+link, and no abbreviating it yourself:
 
 ```
 Reverted in 9c1f3ae4b2d80a7e6f5c14b93d2e8a0f7c6b5d43 once the offset moved.
@@ -56,6 +57,29 @@ that is worse than leaving it alone. Backticks make a code span, which
 suppresses the autolink and strands a 40-character hash in the prose; a written
 link is a URL to keep current; a hand-abbreviated hash can go ambiguous as the
 repo grows.
+
+### A commit in another repo is the exception
+
+**Autolinking is repo-scoped.** GitHub expands a bare hash only when the commit
+lives in the repo rendering the body — the repo the PR is against. An upstream
+project's SHA, or one from a sibling repo in the same fleet, matches nothing and
+renders as 40 characters of raw hex that lead nowhere. Nothing is doing the work
+for you there, so doing it by hand is what makes the reference resolve at all.
+
+For a **foreign commit**, shorten to 7 characters and link it explicitly:
+
+```
+Fixed upstream in [165dca4](https://github.com/herdrdev/herdr/commit/165dca453d12a93b91b490cd58362e7dbd36c46d) and released in v0.8.0.
+```
+
+The URL still carries the full hash, so the abbreviation loses nothing and the
+ambiguity objection doesn't apply — the link resolves one exact commit however
+much the upstream repo grows.
+
+The test is **which repo renders the text**, not which repo you are working in.
+A cross-repo lock bump is the case that catches people out: the PR is against
+this repo, so this repo's SHAs stay bare while the upstream ones it cites get
+shortened and linked.
 
 This is *how* to write a SHA, not *when*. The rule below on citing subjects
 rather than SHAs while a stack is live still decides whether a SHA belongs there
