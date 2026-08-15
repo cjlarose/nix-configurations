@@ -144,8 +144,9 @@
       # zig builds for the arch baseline -- no AVX on the Goldmont pve guests.
       #
       # NOTE when bumping the tag: upstream moved SKILL.md from the repo root to
-      # skills/herdr/ after v0.7.5; packages/default.nix accepts either.
-      url = "github:herdrdev/herdr/v0.7.5";
+      # skills/herdr/ after v0.7.5, and v0.8.0 has only the new path. The
+      # llm-agents module tries both in order, so either layout resolves.
+      url = "github:herdrdev/herdr/v0.8.0";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     lavish-axi = {
