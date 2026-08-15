@@ -100,6 +100,28 @@
           enable = true;
           package = additionalPackages.${system}.lavish-axi;
         };
+        # ai-memory, on a two-week parallel trial against the llm-wiki. Scoped
+        # to this host and no further: it is the trial host for the
+        # ~/repos + ~/workspaces layout above, and the marker below only makes
+        # sense where that layout exists. The wiki is untouched -- the two run
+        # side by side and the trial is judged on evidence, not on switching.
+        #
+        # Everything else stays at the module's defaults, which ARE the trial
+        # configuration: loopback bind, no auth token, no LLM provider, and
+        # upstream's own ~/.local/share/ai-memory data dir rather than a scratch
+        # one, so a trial that goes well needs no migration to adopt.
+        cjlarose.llmAgents.aiMemory = {
+          enable = true;
+          package = additionalPackages.${system}.ai-memory;
+          workspace = "personal";
+          # The experiment itself: one marker at the root of ~/workspaces makes
+          # each per-task directory its own project (writes stay task-scoped)
+          # while default_global recall spans all of them (reads do not). The
+          # question the trial answers is whether that task-shaped project is a
+          # useful unit of memory or a pile of dead workspaces -- see the
+          # option's description.
+          workspacesMarker.enable = true;
+        };
       };
     }
   ];
