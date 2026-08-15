@@ -109,6 +109,15 @@
     };
   };
 
+  # OpenVPN's --ping-restart teardown exits 0, so a dropped PIA tunnel looks
+  # like a clean stop and oci-containers' Restart=on-failure never brings the
+  # container back. On 2026-07-08 that left transmission down for over a month,
+  # surfacing only as a 502 from the nginx vhost below.
+  systemd.services.docker-transmission.serviceConfig = {
+    Restart = lib.mkForce "always";
+    RestartSec = 10;
+  };
+
   services.jellyfin = {
     enable = true;
     cacheDir = "/var/lib/jellyfin/cache";
