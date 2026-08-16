@@ -283,6 +283,139 @@ let
     '';
 
   tomlFormat = pkgs.formats.toml { };
+
+  wikiDir = "${cfg.dataDir}/wiki";
+
+  # The `repoPath != null` half is not redundant with the assertion below: the
+  # setup script interpolates the path, so a null would reach the derivation and
+  # fail with a type error rather than the readable assertion message.
+  wikiWorktreeWanted = cfg.wikiWorktree.enable && cfg.wikiWorktree.repoPath != null;
+
+  # Attaches <dataDir>/wiki as a linked worktree of an orphan branch, once.
+  #
+  # Every branch below is either idempotent or a loud refusal. The one thing it
+  # must never do is destroy an existing wiki: if ai-memory got there first and
+  # made a standalone repo, that repo holds real captured history, and the
+  # correct response is to stop and let a human move it rather than to "fix" the
+  # layout by deleting it.
+  wikiWorktreeSetup = pkgs.writeShellApplication {
+    name = "ai-memory-wiki-worktree-setup";
+    runtimeInputs = [ pkgs.git ];
+    text = ''
+      wiki=${lib.escapeShellArg wikiDir}
+      repo=${lib.escapeShellArg (toString cfg.wikiWorktree.repoPath)}
+      branch=${lib.escapeShellArg cfg.wikiWorktree.branch}
+
+      if [ ! -d "$repo/.git" ] && [ ! -f "$repo/.git" ]; then
+        echo "host repo $repo is not a git repository" >&2
+        exit 1
+      fi
+
+      # Already attached. `.git` is a FILE in a linked worktree (a `gitdir:`
+      # pointer) and a directory in a standalone repo, which is exactly the
+      # discriminator needed here.
+      if [ -f "$wiki/.git" ]; then
+        actual=$(git -C "$wiki" rev-parse --path-format=absolute --git-common-dir)
+        expected=$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir)
+        if [ "$actual" = "$expected" ]; then
+          echo "wiki is already a linked worktree of $repo"
+          exit 0
+        fi
+        echo "$wiki is a linked worktree of $actual, not of $repo." >&2
+        echo "Refusing to re-point it; move or remove it by hand." >&2
+        exit 1
+      fi
+
+      if [ -d "$wiki/.git" ]; then
+        echo "$wiki is a STANDALONE git repository -- ai-memory initialised it" >&2
+        echo "before this unit ran, and it holds captured history." >&2
+        echo "" >&2
+        echo "Nothing here will delete it. To adopt it into $repo:" >&2
+        echo "  git -C $repo fetch $wiki refs/heads/master:refs/heads/$branch" >&2
+        echo "  mv $wiki $wiki.premigration" >&2
+        echo "  systemctl --user start ai-memory-wiki-worktree" >&2
+        echo "(the orphan history is disjoint, so the fetch grafts it whole)" >&2
+        exit 1
+      fi
+
+      # A leftover non-empty directory that is not a repo at all: also not ours
+      # to delete.
+      if [ -e "$wiki" ] && [ -n "$(ls -A "$wiki" 2>/dev/null)" ]; then
+        echo "$wiki exists, is not a git repository, and is not empty" >&2
+        exit 1
+      fi
+
+      mkdir -p "$(dirname "$wiki")"
+      rmdir "$wiki" 2>/dev/null || true
+
+      if git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
+        # Existing branch -- the restore-onto-a-new-machine path.
+        echo "attaching existing branch $branch as a worktree at $wiki"
+        git -C "$repo" worktree add "$wiki" "$branch"
+      else
+        # `--orphan -b <branch> <path>` is the correct argument order; the
+        # `--orphan <branch> <path>` form is rejected as "option '--orphan' and
+        # commit-ish cannot be used together".
+        echo "creating orphan branch $branch as a worktree at $wiki"
+        git -C "$repo" worktree add --orphan -b "$branch" "$wiki"
+      fi
+    '';
+  };
+
+  # Nightly: sweep up anything ai-memory has not committed, then push.
+  #
+  # ai-memory commits at SessionEnd and on PreCompact checkpoints, so in the
+  # normal case there is nothing to commit here. The sweep exists for the
+  # abnormal one, which is precisely the case this timer is for: if the machine
+  # dies mid-session, that session never reached SessionEnd, and push-only
+  # backup would lose exactly the work the user most wanted kept.
+  wikiPush = pkgs.writeShellApplication {
+    name = "ai-memory-wiki-push";
+    runtimeInputs = [ pkgs.git pkgs.openssh ];
+    text = ''
+      wiki=${lib.escapeShellArg wikiDir}
+      remote=${lib.escapeShellArg cfg.autoPush.remote}
+      branch=${lib.escapeShellArg cfg.wikiWorktree.branch}
+
+      # No agent exists at 03:00 -- no ssh-agent socket, no unlocked desktop
+      # keyring. IdentitiesOnly stops ssh offering other keys first and
+      # tripping GitHub's auth-attempt limit; BatchMode turns any prompt into
+      # an immediate failure instead of a unit that hangs until the next run.
+      export GIT_SSH_COMMAND=${lib.escapeShellArg
+        "ssh -i ${toString cfg.autoPush.sshKey} -o IdentitiesOnly=yes -o BatchMode=yes"}
+
+      # `.git/info/exclude` lives in the COMMON git dir, so the host repo's
+      # ignore rules apply inside this worktree -- verified, and invisible:
+      # an ignored page does not appear in `git status` at all, and ai-memory
+      # commits with add_all, which treats "everything ignored" as "nothing to
+      # commit". A page could therefore be dropped from history silently. Warn
+      # rather than fail: a backup that refuses to run is worse than one that
+      # is incomplete and says so.
+      if ignored=$(git -C "$wiki" status --porcelain --ignored=matching | grep '^!!' || true); [ -n "$ignored" ]; then
+        echo "WARNING: paths inside the wiki are git-ignored and will NOT be backed up." >&2
+        echo "Check the host repo's .git/info/exclude and global core.excludesFile:" >&2
+        echo "$ignored" >&2
+      fi
+
+      if [ -n "$(git -C "$wiki" status --porcelain)" ]; then
+        echo "committing wiki state ai-memory had not yet committed"
+        git -C "$wiki" add -A
+        # A distinct author from ai-memory's own `ai-memory <ai-memory@local>`:
+        # this commit is the backup timer's, not the daemon's, and labelling it
+        # otherwise would misattribute it in the history.
+        git -C "$wiki" \
+          -c user.name="ai-memory-backup" \
+          -c user.email="ai-memory-backup@local" \
+          commit -q -m "backup: wiki state uncommitted at backup time"
+      fi
+
+      # No --force, ever. The orphan branch only gains commits, so a push that
+      # is rejected as non-fast-forward means something unexpected rewrote it,
+      # and failing loudly is the correct outcome.
+      git -C "$wiki" push "$remote" "refs/heads/$branch:refs/heads/$branch"
+      echo "pushed $branch to $remote"
+    '';
+  };
 in
 {
   options.cjlarose.llmAgents.aiMemory = {
@@ -521,6 +654,127 @@ in
       '';
     };
 
+    wikiWorktree = {
+      enable = lib.mkEnableOption ''
+        backing <dataDir>/wiki with a linked git worktree of an ORPHAN branch in
+        an existing repository, instead of the standalone repo ai-memory would
+        otherwise `git init` there.
+
+        Only `wiki/` is redirected. `db/` (derived and rebuildable from the
+        markdown), `raw/`, `logs/` and `models/` stay local, so what lands in the
+        repo is exactly the durable content.
+
+        This works because ai-memory's git surface is minimal and append-only:
+        it opens the repo, commits to HEAD, and reads history. There is no
+        set_head, reset, checkout, or remote anywhere in its wiki crate -- so it
+        appends to whichever branch the worktree has checked out and cannot
+        disturb the main checkout. Its `open_or_init` only initialises when
+        `Repository::open` FAILS, and libgit2 opens a linked worktree (a `.git`
+        pointer file) fine, so an existing worktree is adopted rather than
+        clobbered.
+
+        An ORPHAN branch specifically: its history is disjoint from the host
+        repo's, so ai-memory's per-session commits never interleave with the
+        repo's real history and cannot be merged into it by accident. The two
+        share only an object store.
+
+        Ordering is load-bearing. The worktree must exist BEFORE ai-memory
+        first opens the data dir, or ai-memory wins the race and git-inits a
+        standalone repo that then has to be migrated by hand. That is why this
+        is a oneshot unit the daemon `Requires` and runs `After`, rather than an
+        activation script
+      '';
+
+      repoPath = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/home/you/repos/you/llm-wiki";
+        description = ''
+          Absolute path to the MAIN worktree of the repository to host the
+          orphan branch. Required when wikiWorktree.enable is set.
+
+          Note what this does to that repo: it gains a branch ref and a
+          `.git/worktrees/<name>/` administrative directory, and its object
+          store accumulates ai-memory's per-session commits permanently. Point
+          it at a repo where that is wanted, not merely tolerable.
+        '';
+      };
+
+      branch = lib.mkOption {
+        type = lib.types.str;
+        default = "ai-memory";
+        description = ''
+          Name of the orphan branch holding the wiki. Created on first run if
+          absent; an existing branch is checked out as-is, so this is also how
+          a wiki restored from the remote is re-attached on a new machine.
+        '';
+      };
+    };
+
+    autoPush = {
+      enable = lib.mkEnableOption ''
+        a nightly systemd user timer that commits any straggling wiki state and
+        pushes the branch to its remote, so the memory survives losing this
+        machine.
+
+        ai-memory NEVER pushes on its own -- `git2::Remote` is not constructed
+        anywhere in the tree, which is a deliberate upstream choice, not an
+        oversight. So this is the piece that makes the wiki durable off-host,
+        and it is plain git rather than anything ai-memory provides.
+
+        Requires wikiWorktree, since a standalone `git init`ed wiki has no
+        remote to push to.
+
+        Read the sshKey description before enabling: this publishes captured
+        session content to whatever the remote is
+      '';
+
+      remote = lib.mkOption {
+        type = lib.types.str;
+        default = "origin";
+        description = "Git remote to push the wiki branch to.";
+      };
+
+      onCalendar = lib.mkOption {
+        type = lib.types.str;
+        default = "daily";
+        example = "*-*-* 03:30:00";
+        description = ''
+          systemd OnCalendar expression. `daily` is midnight. The timer is
+          Persistent, so a run missed while the machine was off fires shortly
+          after the next boot rather than being skipped.
+        '';
+      };
+
+      sshKey = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/home/you/.ssh/id_ed25519";
+        description = ''
+          Absolute path to a PASSPHRASELESS ssh private key with push access to
+          the remote. Required when autoPush.enable is set.
+
+          Named explicitly, and used with IdentitiesOnly plus BatchMode, because
+          a timer has no agent: there is no ssh-agent socket and no desktop
+          session to unlock a 1Password agent at 03:00. A passphrase-protected
+          key, or reliance on an agent, means the push simply fails every night
+          -- silently, since nothing watches a timer's exit code.
+
+          WHAT THIS SENDS. The wiki holds captured session content: prompts,
+          tool calls, file paths, and rule-based summaries of the work. Pushing
+          copies all of it to the remote, permanently and beyond your control
+          once it lands. ai-memory sanitises credentials on the way in with a
+          typestate that makes skipping the scrubber a compile error, covering
+          bearer tokens, vendor key prefixes, JWTs, PEM blocks, URL credentials,
+          generic `*_KEY=` shapes and .ssh/.aws/.gnupg paths -- but it has a
+          DOCUMENTED GAP: a bare high-entropy string with no prefix and no
+          `NAME=` shape is not recognised and passes through. Push to a private
+          remote, and treat the branch as carrying secrets even though it mostly
+          does not.
+        '';
+      };
+    };
+
     requireScopedMcp = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -576,6 +830,14 @@ in
         Unit = {
           Description = "ai-memory session-memory server (loopback, zero-LLM)";
           Documentation = "https://github.com/akitaonrails/ai-memory";
+          # Ordering, not decoration. ai-memory git-inits a STANDALONE repo at
+          # <dataDir>/wiki the first time it opens a data dir with no repo
+          # there. If the daemon wins that race the worktree can no longer be
+          # created without a hand migration -- so when the worktree is wanted,
+          # its unit is a hard requirement: Requires => it must succeed,
+          # After => it must finish first.
+          Requires = lib.optional wikiWorktreeWanted "ai-memory-wiki-worktree.service";
+          After = lib.optional wikiWorktreeWanted "ai-memory-wiki-worktree.service";
         };
         Service = {
           Type = "simple";
@@ -598,6 +860,54 @@ in
           PrivateTmp = true;
         };
         Install.WantedBy = [ "default.target" ];
+      };
+    })
+
+    # --- wiki as a linked worktree of an orphan branch -----------------------
+    (lib.mkIf (enabled && wikiWorktreeWanted) {
+      systemd.user.services.ai-memory-wiki-worktree = {
+        Unit = {
+          Description = "Attach ai-memory's wiki to an orphan branch worktree";
+          # RemainAfterExit + this ordering means it runs once per boot before
+          # the daemon, and is a no-op on every run after the first.
+          Before = [ "ai-memory.service" ];
+        };
+        Service = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${wikiWorktreeSetup}/bin/ai-memory-wiki-worktree-setup";
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+    })
+
+    # --- nightly push --------------------------------------------------------
+    (lib.mkIf (enabled && wikiWorktreeWanted
+      && cfg.autoPush.enable && cfg.autoPush.sshKey != null) {
+      systemd.user.services.ai-memory-push = {
+        Unit = {
+          Description = "Push ai-memory's wiki branch to its remote";
+          # Nothing to push before the worktree exists.
+          Requires = [ "ai-memory-wiki-worktree.service" ];
+          After = [ "ai-memory-wiki-worktree.service" "network-online.target" ];
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${wikiPush}/bin/ai-memory-wiki-push";
+        };
+      };
+
+      systemd.user.timers.ai-memory-push = {
+        Unit.Description = "Nightly ai-memory wiki push";
+        Timer = {
+          OnCalendar = cfg.autoPush.onCalendar;
+          # A run missed while the machine was off fires after the next boot
+          # rather than being skipped -- which is the whole point on a machine
+          # that is not up 24/7.
+          Persistent = true;
+          RandomizedDelaySec = "15m";
+        };
+        Install.WantedBy = [ "timers.target" ];
       };
     })
 
@@ -701,6 +1011,31 @@ in
             calls. ai-memory's own documentation calls that against Anthropic's
             usage policies. Use an API key provider, or leave it null for
             zero-LLM mode.
+          '';
+        }
+        {
+          assertion = !cfg.wikiWorktree.enable || cfg.wikiWorktree.repoPath != null;
+          message = "cjlarose.llmAgents.aiMemory.wikiWorktree.enable is true but wikiWorktree.repoPath is unset.";
+        }
+        {
+          assertion = !cfg.autoPush.enable || cfg.autoPush.sshKey != null;
+          message = ''
+            cjlarose.llmAgents.aiMemory.autoPush.enable is true but
+            autoPush.sshKey is unset. A systemd timer has no ssh-agent and no
+            unlocked keyring, so the key must be named explicitly and must be
+            passphraseless -- otherwise every nightly push fails silently.
+          '';
+        }
+        {
+          # Push-without-worktree is not a degraded mode, it is a no-op: a
+          # standalone `git init`ed wiki has no remote, so the unit would fail
+          # every night against a repo that can never accept it.
+          assertion = !cfg.autoPush.enable || cfg.wikiWorktree.enable;
+          message = ''
+            cjlarose.llmAgents.aiMemory.autoPush.enable is true but
+            wikiWorktree.enable is false. Without the worktree, ai-memory's
+            wiki is a standalone repository with no remote and there is nothing
+            to push to.
           '';
         }
         {

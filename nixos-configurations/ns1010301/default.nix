@@ -138,6 +138,38 @@
             enable = true;
             project = "cjlarose";
           };
+
+          # The wiki lives on an orphan branch of the llm-wiki repo rather than
+          # in a standalone repo of its own. Disjoint history, so ai-memory's
+          # per-session commits never mix with the wiki's real history -- the
+          # two share only an object store, one backup target, and one remote.
+          #
+          # Safe because ai-memory's git surface is append-only: it opens the
+          # repo, commits to HEAD, and reads history. No set_head, reset,
+          # checkout or remote anywhere in its wiki crate, so it cannot disturb
+          # the main checkout.
+          #
+          # Only wiki/ is redirected; db/ (derived, rebuildable), raw/ and
+          # logs/ stay local.
+          wikiWorktree = {
+            enable = true;
+            repoPath = "/home/cjlarose/repos/cjlarose/llm-wiki";
+          };
+
+          # Nightly push, so the memory survives losing this machine.
+          # ai-memory never pushes on its own -- git2::Remote is not constructed
+          # anywhere in the tree -- so this is plain git on a timer.
+          #
+          # The key is named explicitly and must stay passphraseless: a timer
+          # firing at 03:30 has no ssh-agent and no unlocked 1Password, and a
+          # push that prompts would hang or fail with nothing watching.
+          # cjlarose/llm-wiki is a PRIVATE repo, which is a precondition here
+          # rather than a detail -- the branch carries captured session content.
+          autoPush = {
+            enable = true;
+            sshKey = "/home/cjlarose/.ssh/id_ed25519";
+            onCalendar = "*-*-* 03:30:00";
+          };
         };
       };
     }
