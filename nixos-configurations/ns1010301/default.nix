@@ -114,13 +114,30 @@
           enable = true;
           package = additionalPackages.${system}.ai-memory;
           workspace = "personal";
-          # The experiment itself: one marker at the root of ~/workspaces makes
-          # each per-task directory its own project (writes stay task-scoped)
-          # while default_global recall spans all of them (reads do not). The
-          # question the trial answers is whether that task-shaped project is a
-          # useful unit of memory or a pile of dead workspaces -- see the
-          # option's description.
-          workspacesMarker.enable = true;
+          # One marker at $HOME, pinning every session to a single project.
+          #
+          # This deliberately drops the per-task-project idea the trial started
+          # with (each ~/workspaces/<task>/ its own project, plus default_global
+          # recall to read across them). Two things decided it. The read half of
+          # that design is delivered only by the MCP tools, and the write half
+          # collides with them: the server keeps ONE process-wide "active
+          # project" pointer in the default auto_scope mode, so concurrent
+          # agents in different task dirs can have an unscoped write land in
+          # each other's project (upstream's own docs/auto-scope.md). Pinning
+          # one project removes that by construction -- there is no other
+          # project to resolve to -- and gets the same cross-task read reach
+          # that default_global was for, without the pointer machinery.
+          #
+          # Automatic session-resume survives the change: SessionEnd handoffs
+          # are selected by cwd path boundary rather than by project, so
+          # starting in ~/workspaces/<task>/ still gets that task's baton.
+          #
+          # At $HOME rather than ~/workspaces so it is the backstop for every
+          # session, including ones started under ~/repos.
+          marker = {
+            enable = true;
+            project = "cjlarose";
+          };
         };
       };
     }
