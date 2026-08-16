@@ -737,7 +737,7 @@ in
           };
           skipDangerousModePermissionPrompt = true;
           remoteControlAtStartup = cfg.claude.remoteControlAtStartup;
-          effortLevel = "high";
+          effortLevel = "xhigh";
           model = "claude-opus-4-8";
           autoMemoryEnabled = false;
           # Keep session transcripts effectively forever (default is 30 days, which
