@@ -645,28 +645,6 @@ in
         '';
       };
 
-      defaultGlobalRecall = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = ''
-          Set [recall] default_global, which upstream documents for "meta-repos
-          that constantly need sibling-project context": an unscoped
-          memory_query behaves as global=true, and memory_recent returns recent
-          pages across every project, each hit annotated with its workspace and
-          project.
-
-          Only meaningful WITHOUT a pinned `project` -- it is what would make a
-          per-task layout survivable, by letting reads span every task while
-          writes stay task-scoped. With a single pinned project there are no
-          sibling projects to reach, so it is dead config; the assertion below
-          rejects the combination rather than letting it read as if it did
-          something.
-
-          Note it is consumed ONLY by the MCP tools (memory_query,
-          memory_recent). The hook router publishes the flag and never reads it,
-          so on a hooks-only install this setting has no effect at all.
-        '';
-      };
     };
 
     enableMcp = lib.mkOption {
@@ -958,22 +936,14 @@ in
     })
 
     # --- the marker that decides project scoping -----------------------------
-    # Written through home.file so it is a store symlink like everything else:
-    # the point of the trial is to judge the tool, and a hand-edited marker
-    # drifting from what this module says would make the result unattributable.
+    # Written through home.file so it is a store symlink like everything else,
+    # and so the scoping the module declares is the scoping in force.
     (lib.mkIf (enabled && cfg.marker.enable) {
       home.file.${markerTarget}.source =
         tomlFormat.generate "ai-memory-marker.toml" ({
           workspace = cfg.workspace;
         } // lib.optionalAttrs (cfg.marker.project != null) {
           project = cfg.marker.project;
-        } // lib.optionalAttrs cfg.marker.defaultGlobalRecall {
-          # A real TOML boolean. Upstream's docs show the quoted `"true"`
-          # spelling, but its marker reader (marker.rs, parse_toml_flag) strips
-          # surrounding quotes and then applies shell-parity truthiness over
-          # 1/true/yes/on -- so both spellings resolve identically, and this is
-          # the one pkgs.formats.toml emits naturally.
-          recall.default_global = true;
         });
     })
 
@@ -1082,22 +1052,6 @@ in
             wikiWorktree.enable is false. Without the worktree, ai-memory's
             wiki is a standalone repository with no remote and there is nothing
             to push to.
-          '';
-        }
-        {
-          # Two settings that cancel each other out. default_global broadens an
-          # unscoped read to every SIBLING project; a pinned project means there
-          # are none, so the combination reads as if recall were configured when
-          # nothing is. Reject it rather than let it sit in the marker looking
-          # load-bearing.
-          assertion = !(cfg.marker.project != null && cfg.marker.defaultGlobalRecall);
-          message = ''
-            cjlarose.llmAgents.aiMemory.marker sets both `project` (pinning every
-            session to one project) and `defaultGlobalRecall` (broadening
-            unscoped reads across projects). With a single project there are no
-            other projects to reach, so default_global is dead config. Drop one:
-            keep the pin for a single bucket, or drop it for per-task projects
-            with global recall.
           '';
         }
         {
