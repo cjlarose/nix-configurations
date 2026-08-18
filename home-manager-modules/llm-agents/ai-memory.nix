@@ -494,10 +494,9 @@ in
         to a directory the server never reads. Naming one absolute path makes
         the divergence unrepresentable.
 
-        Deliberately NOT a scratch directory. The prior Basic Memory evaluation
-        never created ~/.basic-memory and threw its index away; this trial is
-        run at the real location so that a trial that goes well needs no
-        migration to adopt.
+        Upstream's own default location, so the memory this accumulates is
+        where every other ai-memory tool -- its CLI, its backup and restore
+        subcommands -- expects to find it without being told.
       '';
     };
 
