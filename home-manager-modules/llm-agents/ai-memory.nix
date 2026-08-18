@@ -886,6 +886,13 @@ in
             "--bind ${cfg.bind}"
             "--workspace ${cfg.workspace}"
           ] ++ lib.optional cfg.enableWeb "--enable-web");
+          # Zero-LLM unless a provider is named. Set through the unit rather
+          # than left to the ambient environment: a user service does not
+          # inherit a login shell's exports, so an AI_MEMORY_LLM_PROVIDER in
+          # the profile would apply to the CLI and the hooks but not to the
+          # daemon that actually calls the provider.
+          Environment = lib.optional (cfg.llmProvider != null)
+            "AI_MEMORY_LLM_PROVIDER=${cfg.llmProvider}";
           Restart = "on-failure";
           RestartSec = "5s";
           # Upstream's own unit sets both. Cheap, and this process reads a git
