@@ -223,6 +223,15 @@ let
         exit 1
       fi
 
+      # Keep the renderer's verbatim output. It is installed as
+      # ~/.claude/hooks/ai-memory-rendered-payload.json, which is BOTH what
+      # forces this derivation to be realised on a claude-only host (a plain
+      # Nix value would put nothing in the closure) and the thing to read when
+      # asking what ai-memory believes it registered. Rendering into work/ and
+      # forgetting this copy left that a dangling symlink -- home-manager
+      # symlinks without stat'ing, so it built clean and broke only on open.
+      cp work/claude-settings.json "$out/claude-settings.json"
+
       # --- OpenCode ---------------------------------------------------------
       # No hand-written half and no diff: this one is a whole generated
       # TypeScript file, installed verbatim as a store symlink, so there is
