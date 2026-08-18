@@ -9,15 +9,11 @@
 # storage on an orphan branch of cjlarose/llm-wiki, so the two have disjoint
 # histories but one object store, one remote and one backup. See that option.
 #
-# This began as a two-week trial asking whether a TASK-shaped project is a
-# useful unit of memory -- one ai-memory project per ~/workspaces/<task>/, with
-# default_global recall reading across them. That is NOT what this ships. The
-# design does not survive contact with the MCP surface: cross-task recall is
-# delivered only by the MCP tools, and those same tools resolve an omitted scope
-# through a single process-wide "active project" pointer, which concurrent
-# agents in different task dirs overwrite for each other. A single pinned
-# project gets the same read reach with that whole class removed. The reasoning,
-# and what it costs, is on the `marker.project` option.
+# Sessions are scoped to ONE project, pinned by a marker at $HOME. ai-memory
+# resolves a project from the session's cwd, and the MCP tools resolve an
+# omitted scope through a single process-wide "active project" pointer that
+# concurrent sessions share; one project means there is nothing for them to
+# disagree about. See the `marker.project` option for what that costs.
 #
 # Split into its own file rather than folded into default.nix, like
 # git-conventions.nix and github-conventions.nix: it owns a systemd user
