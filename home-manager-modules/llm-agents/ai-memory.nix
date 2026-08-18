@@ -504,10 +504,10 @@ in
       type = lib.types.str;
       default = "http://127.0.0.1:49374";
       description = ''
-        Base URL the hooks POST to and the MCP clients connect to; also what the
-        service binds. Upstream's own default, restated here because it is baked
-        into three generated artifacts and one systemd unit, and all four have
-        to agree.
+        Base URL the hooks POST to and the MCP clients connect to. The socket
+        the daemon opens is `bind`, a separate option that must address this
+        same endpoint. Upstream's own default, restated here because it is
+        baked into three generated artifacts, and all of them have to agree.
 
         Loopback only. The daemon has no auth token in this configuration, so
         the bind address IS the access control -- anything that can reach the
