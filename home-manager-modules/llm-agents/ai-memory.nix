@@ -353,8 +353,27 @@ let
       mkdir -p "$(dirname "$wiki")"
       rmdir "$wiki" 2>/dev/null || true
 
-      if git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
-        # Existing branch -- the restore-onto-a-new-machine path.
+      # Reattach if the branch is reachable AT ALL, create only if it is not.
+      #
+      # The test deliberately covers remote-tracking refs, not just local ones.
+      # A fresh `git clone` -- which is exactly the disaster-recovery case this
+      # whole worktree-plus-push arrangement exists for -- has the branch only
+      # as refs/remotes/<remote>/<branch>. Checking refs/heads alone would miss
+      # it there and fall through to creating an EMPTY orphan, whereupon
+      # ai-memory captures into a branch sharing no history with the backed-up
+      # one and every subsequent push is rejected non-fast-forward, silently,
+      # for as long as nobody reads the timer's exit code.
+      #
+      # The remote half is matched with for-each-ref over refs/remotes/*/, not
+      # with rev-parse: `git rev-parse <name>` walks refs/, refs/tags/,
+      # refs/heads/ and refs/remotes/<name>, and never reaches
+      # refs/remotes/<remote>/<name>. Only `worktree add` and `checkout` DWIM
+      # that, which is the resolution being relied on one line below -- it sets
+      # up tracking too, so nothing here has to name the remote or fetch first.
+      # The glob also avoids hardcoding "origin", which is autoPush's option.
+      if git -C "$repo" show-ref --verify --quiet "refs/heads/$branch" \
+        || git -C "$repo" for-each-ref --format='%(refname)' "refs/remotes/*/$branch" \
+           | grep -q .; then
         echo "attaching existing branch $branch as a worktree at $wiki"
         git -C "$repo" worktree add "$wiki" "$branch"
       else
