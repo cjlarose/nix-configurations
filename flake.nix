@@ -151,7 +151,7 @@
     };
     ai-memory = {
       # akitaonrails/ai-memory -- local-first session memory for coding agents,
-      # on a two-week parallel trial against the llm-wiki. flake = false:
+      # running alongside the llm-wiki rather than replacing it. flake = false:
       # upstream ships no nix packaging, so packages/ai-memory builds it.
       #
       # Pinned to a tag, not a branch, and deliberately so: this is a

@@ -1,11 +1,16 @@
 # ai-memory (akitaonrails/ai-memory) -- local-first session memory for coding
 # agents, wired declaratively for BOTH harnesses.
 #
-# On a two-week parallel trial against the llm-wiki. Nothing here touches the
-# wiki; the two run side by side and the trial is judged on evidence.
+# Runs ALONGSIDE the llm-wiki, not as a replacement for it: they are different
+# products -- coding-agent session memory versus a curated research wiki -- and
+# nothing here changes how the wiki is written or read.
 #
-# The trial began asking whether a TASK-shaped project is a useful unit of
-# memory -- one ai-memory project per ~/workspaces/<task>/ directory, with
+# It does, however, share the wiki's REPOSITORY. `wikiWorktree` puts ai-memory's
+# storage on an orphan branch of cjlarose/llm-wiki, so the two have disjoint
+# histories but one object store, one remote and one backup. See that option.
+#
+# This began as a two-week trial asking whether a TASK-shaped project is a
+# useful unit of memory -- one ai-memory project per ~/workspaces/<task>/, with
 # default_global recall reading across them. That is NOT what this ships. The
 # design does not survive contact with the MCP surface: cross-task recall is
 # delivered only by the MCP tools, and those same tools resolve an omitted scope
@@ -106,7 +111,7 @@ let
   # would resolve it again under an interactive shell's. Naming one path here
   # makes them agree by construction.
   #
-  # No --auth-token: the server is loopback-bound and tokenless for the trial
+  # No --auth-token: the server is loopback-bound and tokenless here
   # (see the service below). Adding auth means adding it on both sides at once,
   # and the diff guard catches a payload that has it on only one.
   hookCommand = event:
@@ -430,8 +435,9 @@ in
       without one; see llmProvider below for why that is a floor rather than a
       default to relax casually.
 
-      On a two-week trial. Enabling this changes nothing about the llm-wiki,
-      which keeps running exactly as before
+      Runs alongside the llm-wiki rather than replacing it: nothing here
+      changes how the wiki is written or read. It does share the wiki's
+      repository when wikiWorktree is enabled -- see that option
     '';
 
     package = lib.mkOption {
