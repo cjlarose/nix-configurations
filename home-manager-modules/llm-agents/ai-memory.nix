@@ -456,8 +456,8 @@ in
       Runs as a loopback-only systemd user service in zero-LLM mode -- no
       provider, no API key, no outbound traffic, no billing. FTS5, entity and
       graph search, rule-based session summaries and auto-handoffs all work
-      without one; see llmProvider below for why that is a floor rather than a
-      default to relax casually.
+      without one. Nothing here sets AI_MEMORY_LLM_PROVIDER, so adding one is
+      a deliberate change to this module rather than a value to fill in.
 
       Runs alongside the llm-wiki rather than replacing it: nothing here
       changes how the wiki is written or read. It does share the wiki's
@@ -809,26 +809,6 @@ in
       '';
     };
 
-    llmProvider = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "anthropic";
-      description = ''
-        AI_MEMORY_LLM_PROVIDER, or null for zero-LLM mode.
-
-        Null on purpose, and the trial starts here: rule-based session summaries
-        and auto-handoffs, FTS5, entity and graph search all work with no
-        provider, no key, no outbound traffic and no bill. Reach for a provider
-        only if the trial specifically shows rule-based summaries are the
-        limiting factor -- that is a finding to record, not a default to relax.
-
-        Never set this to `anthropic-oauth`. That mode borrows a Claude
-        subscription's OAuth credentials for API calls, which ai-memory's OWN
-        documentation calls against Anthropic's usage policies. An API key is
-        the supported path, at roughly $0.01-0.05 per session against a bounded
-        6,500-in / 1,000-out budget.
-      '';
-    };
   };
 
   config = lib.mkMerge [
@@ -869,13 +849,6 @@ in
             "--bind ${cfg.bind}"
             "--workspace ${cfg.workspace}"
           ] ++ lib.optional cfg.enableWeb "--enable-web");
-          # Zero-LLM unless a provider is named. Set through the unit rather
-          # than left to the ambient environment: a user service does not
-          # inherit a login shell's exports, so an AI_MEMORY_LLM_PROVIDER in
-          # the profile would apply to the CLI and the hooks but not to the
-          # daemon that actually calls the provider.
-          Environment = lib.optional (cfg.llmProvider != null)
-            "AI_MEMORY_LLM_PROVIDER=${cfg.llmProvider}";
           Restart = "on-failure";
           RestartSec = "5s";
           # Upstream's own unit sets both. Cheap, and this process reads a git
@@ -1016,18 +989,6 @@ in
         {
           assertion = !cfg.enable || cfg.package != null;
           message = "cjlarose.llmAgents.aiMemory.enable is true but cjlarose.llmAgents.aiMemory.package is unset.";
-        }
-        {
-          # The whole point of the trial configuration. A provider is a
-          # deliberate, recorded decision; anthropic-oauth is never one.
-          assertion = cfg.llmProvider != "anthropic-oauth";
-          message = ''
-            cjlarose.llmAgents.aiMemory.llmProvider is set to "anthropic-oauth",
-            which borrows a Claude subscription's OAuth credentials for API
-            calls. ai-memory's own documentation calls that against Anthropic's
-            usage policies. Use an API key provider, or leave it null for
-            zero-LLM mode.
-          '';
         }
         {
           assertion = !cfg.wikiWorktree.enable || cfg.wikiWorktree.repoPath != null;
