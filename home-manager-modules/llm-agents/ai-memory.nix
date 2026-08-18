@@ -546,10 +546,20 @@ in
         frontend API.
 
         On by default here because it is the only legible view of what the tool
-        has actually captured, and that is precisely what the trial has to
-        judge: pages land at wiki/<workspace-uuid>/<project-uuid>/<page>.md, so
-        UUID directories are what a plain `ls` shows. Safe only while the bind
-        stays loopback -- see serverUrl.
+        has actually captured: pages land at
+        wiki/<workspace-uuid>/<project-uuid>/<page>.md, so UUID directories are
+        what a plain `ls` shows.
+
+        This flag is NOT the boundary of the unauthenticated surface, and
+        turning it off does not make the daemon read-only. With no auth token,
+        /admin/* answers unauthenticated whether or not it is set, and the MCP
+        tool surface handed to every agent includes memory_delete_page,
+        memory_forget_sweep and memory_consolidate. Any local process can read,
+        write and delete. Loopback is doing all the work -- see serverUrl and
+        bind, which are asserted together for that reason.
+
+        Deletions are recoverable in the ordinary case: they land as commits on
+        the wiki branch like anything else.
       '';
     };
 
@@ -1117,18 +1127,33 @@ in
           '';
         }
         {
-          # Loopback is the only access control here. Catch the combination that
-          # publishes session history rather than trusting a reviewer to notice.
+          # BOTH halves, because they are separate options by design: serverUrl
+          # is what clients dial, bind is the socket the daemon opens. Asserting
+          # only on serverUrl left the actual exposure unchecked -- bind =
+          # "0.0.0.0:49374" passed every assertion here and published a
+          # tokenless server to the network, which is precisely what this exists
+          # to prevent.
+          #
+          # The bind test is on the host part only: a bare port, or an address
+          # that is not loopback, both fail.
           assertion = !cfg.enable
-            || lib.hasPrefix "http://127.0.0.1:" cfg.serverUrl
-            || lib.hasPrefix "http://localhost:" cfg.serverUrl
-            || lib.hasPrefix "http://[::1]:" cfg.serverUrl;
+            || ((lib.hasPrefix "http://127.0.0.1:" cfg.serverUrl
+                 || lib.hasPrefix "http://localhost:" cfg.serverUrl
+                 || lib.hasPrefix "http://[::1]:" cfg.serverUrl)
+                && (lib.hasPrefix "127.0.0.1:" cfg.bind
+                    || lib.hasPrefix "localhost:" cfg.bind
+                    || lib.hasPrefix "[::1]:" cfg.bind));
           message = ''
-            cjlarose.llmAgents.aiMemory.serverUrl is not a loopback address.
-            This configuration runs the daemon with no auth token, so the bind
-            address is the only thing keeping captured sessions and the whole
-            wiki off the network. Set AI_MEMORY_AUTH_TOKEN and front it with TLS
-            before relaxing this.
+            cjlarose.llmAgents.aiMemory.serverUrl and .bind must BOTH be
+            loopback. This configuration runs the daemon with no auth token, so
+            the bind address is the only thing keeping captured sessions and the
+            whole wiki off the network -- and the unauthenticated surface is
+            wider than the web UI: /admin/* answers without a token regardless
+            of enableWeb, and the MCP tools include memory_delete_page and
+            memory_forget_sweep.
+
+            Set AI_MEMORY_AUTH_TOKEN and front it with TLS before relaxing
+            either.
           '';
         }
       ];
