@@ -54,7 +54,69 @@ let
     only the skills are pinned to a flake rev and the pages are not.
 
     The read-only rule still holds for every other directory under `~/repos`, and
-    the worktree rule holds here too: do not create worktrees in the wiki either.
+    the worktree rule holds here too: ${
+      if aiMemoryWorktreeInWiki
+      then "see the ai-memory exception below, and create no others."
+      else "do not create worktrees in the wiki either."
+    }
+  '';
+
+  # ai-memory parks its wiki on an orphan branch of a repo under ~/repos, which
+  # the blanket "do not create worktrees here" rule would otherwise forbid. It
+  # is a real exception rather than a loophole, so CLAUDE.md has to state it --
+  # an agent that reads the rule and finds a worktree contradicting it learns
+  # the rules are approximate, which is worse than the worktree.
+  #
+  # Derived from the same options that create the thing, like the wiki path
+  # above: the carve-out cannot name a repo ai-memory is not actually using, and
+  # it disappears on a host where ai-memory is off.
+  aiMemory = config.cjlarose.llmAgents.aiMemory;
+
+  aiMemoryWorktreeUnderRepos =
+    aiMemory.enable
+    && aiMemory.wikiWorktree.enable
+    && aiMemory.wikiWorktree.repoPath != null
+    && lib.hasPrefix "${config.home.homeDirectory}/repos/" aiMemory.wikiWorktree.repoPath;
+
+  # Whether ai-memory's worktree is in the WIKI specifically, as opposed to some
+  # other repo under ~/repos. Only then does the wiki carve-out's own "create no
+  # worktrees here" sentence contradict the section below, and only then does it
+  # have to defer. Two sections flatly disagreeing is worse than either rule on
+  # its own: an agent that catches CLAUDE.md contradicting itself has learned to
+  # weigh all of it more loosely.
+  aiMemoryWorktreeInWiki =
+    aiMemoryWorktreeUnderRepos
+    && wikiUnderRepos
+    && aiMemory.wikiWorktree.repoPath == wiki.path;
+
+  # Stated as a property of the machine rather than an instruction, because
+  # there is nothing here for an agent to do: systemd creates and maintains it.
+  # The point is that finding it should not read as a violation to be tidied up
+  # -- an agent that meets a worktree contradicting the rule it just read learns
+  # the rules are approximate, which costs more than the worktree.
+  #
+  # A section of its own rather than a clause inside the wiki carve-out above:
+  # the two are independent. ai-memory's repo need not be the wiki, and on a
+  # host where the wiki is not under ~/repos this exception can still apply.
+  aiMemoryCarveOut = ''
+
+    ## ai-memory keeps a worktree under `~/repos`
+
+    `${aiMemory.wikiWorktree.repoPath}` has a second worktree, checked out at
+    `${aiMemory.dataDir}/wiki` on the `${aiMemory.wikiWorktree.branch}` branch.
+    It is created and maintained by the `ai-memory-wiki-worktree` systemd user
+    service, and it holds ai-memory's session memory rather than source.
+
+    The branch is an **orphan**: its history is disjoint from `main`, so the two
+    share an object store and nothing else.
+
+    So `git worktree list` there shows an entry outside `~/workspaces`, and
+    `git branch` shows a branch sharing no commits with `main`. Both are
+    correct, and neither is yours to clean up. Do not remove the worktree,
+    delete the branch, or merge it anywhere — `tearing-down-a-workspace` does
+    not apply to it.
+
+    This is the **only** exception. Create no other worktrees under `~/repos`.
   '';
 
 in
@@ -102,7 +164,8 @@ in
       ".claude/CLAUDE.md".text =
         builtins.readFile ./workspace-layout/CLAUDE.md
         + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
-        + lib.optionalString wikiUnderRepos wikiCarveOut;
+        + lib.optionalString wikiUnderRepos wikiCarveOut
+        + lib.optionalString aiMemoryWorktreeUnderRepos aiMemoryCarveOut;
     }
     # The mechanics the CLAUDE.md above deliberately does not carry. It states
     # the rules and names the skill at each gate; the commands, the decision
