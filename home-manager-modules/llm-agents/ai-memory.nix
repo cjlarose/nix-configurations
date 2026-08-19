@@ -453,11 +453,11 @@ in
       agents, with lifecycle hooks for Claude Code and opencode, a ~13-tool MCP
       surface, and a read-only web browser over the wiki it builds.
 
-      Runs as a loopback-only systemd user service in zero-LLM mode -- no
-      provider, no API key, no outbound traffic, no billing. FTS5, entity and
-      graph search, rule-based session summaries and auto-handoffs all work
-      without one. Nothing here sets AI_MEMORY_LLM_PROVIDER, so adding one is
-      a deliberate change to this module rather than a value to fill in.
+      Runs as a loopback-only systemd user service. Capture, FTS5, the entity
+      and graph indexes and rule-based handoffs need no LLM; `llm.provider`
+      adds one, which is what turns a session ledger into a summary of what was
+      learned. See that option for the difference, and for why the credential
+      is read from a file rather than set here.
 
       Runs alongside the llm-wiki rather than replacing it: nothing here
       changes how the wiki is written or read. It does share the wiki's
@@ -792,6 +792,76 @@ in
       };
     };
 
+    llm = {
+      provider = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "anthropic";
+        description = ''
+          AI_MEMORY_LLM_PROVIDER. Null leaves the daemon in zero-LLM mode.
+
+          Zero-LLM is not a crippled mode -- FTS5, the entity and graph
+          indexes, capture, and rule-based handoffs all work without a provider
+          -- but it is a MATERIALLY different product. The rule-based session
+          summary records that a session happened and roughly how many tools it
+          used: its "Tool calls" section is a count per coarse class
+          (`tool file: 1`, `tool non-file: 1`, `tool unknown: 2`) with no tool
+          names, no paths and no results, and its handoff restates the opening
+          prompt under three headings. A provider is what turns that ledger
+          into a summary of what was actually learned.
+
+          Never set this to `anthropic-oauth`. That mode borrows a Claude
+          subscription's OAuth credentials for API calls, which ai-memory's own
+          documentation calls against Anthropic's usage policies. An API key is
+          the supported path; the assertion below refuses the other.
+        '';
+      };
+
+      model = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "claude-haiku-4-5-20251001";
+        description = ''
+          AI_MEMORY_LLM_MODEL. Null takes the provider's built-in default,
+          which for most providers is a mid-tier model -- name one explicitly
+          rather than inheriting a default that can move under a version bump
+          and change the bill without a config change.
+
+          Summarising one session is a small, bounded job (upstream caps it at
+          roughly 6,500 in / 1,000 out), so the cheapest current model is the
+          right default here rather than a compromise.
+        '';
+      };
+
+      environmentFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "/home/you/.config/ai-memory/env";
+        description = ''
+          Absolute path to a systemd EnvironmentFile holding the provider's API
+          key, e.g. a single line `ANTHROPIC_API_KEY=sk-ant-...`. Required
+          whenever `provider` is set.
+
+          A path rather than a value, and read at RUNTIME rather than baked in,
+          because everything Nix evaluates lands in the world-readable store: a
+          key passed as an option value would be readable by every user on the
+          machine and preserved in every generation that referenced it. This
+          file is yours to create, `chmod 600`, and keep out of git -- the same
+          shape as the other secrets on this fleet, which live beside their
+          service rather than inside a Nix expression.
+
+          systemd EnvironmentFile is not shell: one KEY=value per line, no
+          `export`, and no quoting unless the value itself contains quotes.
+
+          Referenced WITHOUT systemd's leading `-`, so a missing or unreadable
+          file fails the unit loudly at start. The tolerant form would leave the
+          daemon running with a provider configured and no credential, which
+          degrades to silence -- summaries quietly stop improving and nothing
+          says why. A dead daemon is noticed within one session.
+        '';
+      };
+    };
+
     requireScopedMcp = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -867,6 +937,18 @@ in
           # glance, which is the story the whole scoping design rests on.
           ++ lib.optional (cfg.marker.project != null) "--project ${cfg.marker.project}"
           ++ lib.optional cfg.enableWeb "--enable-web");
+          # Provider selection lives in the unit; the CREDENTIAL does not. The
+          # key arrives from environmentFile at start, so it is never a store
+          # path and never in a generation.
+          Environment =
+            lib.optional (cfg.llm.provider != null)
+              "AI_MEMORY_LLM_PROVIDER=${cfg.llm.provider}"
+            ++ lib.optional (cfg.llm.model != null)
+              "AI_MEMORY_LLM_MODEL=${cfg.llm.model}";
+          # No leading `-`: fail loudly rather than run credential-less. See
+          # the environmentFile option.
+          EnvironmentFile = lib.optional (cfg.llm.environmentFile != null)
+            cfg.llm.environmentFile;
           Restart = "on-failure";
           RestartSec = "5s";
           # Upstream's own unit sets both. Cheap, and this process reads a git
@@ -1007,6 +1089,28 @@ in
         {
           assertion = !cfg.enable || cfg.package != null;
           message = "cjlarose.llmAgents.aiMemory.enable is true but cjlarose.llmAgents.aiMemory.package is unset.";
+        }
+        {
+          # A provider with no credential is the silent-degradation case: the
+          # daemon starts, capture works, and summaries quietly stay
+          # rule-based. Catch it at build time rather than at 03:00.
+          assertion = cfg.llm.provider == null || cfg.llm.environmentFile != null;
+          message = ''
+            cjlarose.llmAgents.aiMemory.llm.provider is set but
+            llm.environmentFile is unset. The API key must come from a file
+            read at runtime -- putting it in a Nix option would place it in the
+            world-readable store. Point environmentFile at a chmod 600 file
+            containing one KEY=value line.
+          '';
+        }
+        {
+          assertion = cfg.llm.provider != "anthropic-oauth";
+          message = ''
+            cjlarose.llmAgents.aiMemory.llm.provider is set to
+            "anthropic-oauth", which borrows a Claude subscription's OAuth
+            credentials for API calls. ai-memory's own documentation calls that
+            against Anthropic's usage policies. Use "anthropic" with an API key.
+          '';
         }
         {
           assertion = !cfg.wikiWorktree.enable || cfg.wikiWorktree.repoPath != null;

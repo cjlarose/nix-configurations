@@ -170,6 +170,27 @@
             sshKey = "/home/cjlarose/.ssh/id_ed25519";
             onCalendar = "*-*-* 03:30:00";
           };
+
+          # Haiku for session summaries. Without a provider the summary is a
+          # ledger -- tool counts by coarse class, and the opening prompt
+          # restated under three headings -- which records that a session
+          # happened rather than what came out of it.
+          #
+          # Haiku rather than a larger model because summarising one session is
+          # small and bounded (upstream caps it around 6,500 in / 1,000 out),
+          # so the cheapest current model is the right fit rather than a
+          # compromise. Named explicitly so a provider-side default cannot move
+          # the model, and the bill, without a change here.
+          #
+          # The key is NOT in this file, and must never be: everything nix
+          # evaluates lands in the world-readable store. It is read at runtime
+          # from the file below, which is created by hand, chmod 600, and not
+          # in git -- the same shape as this fleet's other secrets.
+          llm = {
+            provider = "anthropic";
+            model = "claude-haiku-4-5-20251001";
+            environmentFile = "/home/cjlarose/.config/ai-memory/env";
+          };
         };
       };
     }
