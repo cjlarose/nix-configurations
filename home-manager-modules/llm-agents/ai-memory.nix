@@ -822,14 +822,47 @@ in
         default = null;
         example = "claude-haiku-4-5-20251001";
         description = ''
-          AI_MEMORY_LLM_MODEL. Null takes the provider's built-in default,
-          which for most providers is a mid-tier model -- name one explicitly
-          rather than inheriting a default that can move under a version bump
-          and change the bill without a config change.
+          AI_MEMORY_LLM_MODEL. Null takes the provider's built-in default --
+          name one explicitly rather than inheriting a default that can move
+          under a version bump and change the bill without a config change.
 
-          Summarising one session is a small, bounded job (upstream caps it at
-          roughly 6,500 in / 1,000 out), so the cheapest current model is the
-          right default here rather than a compromise.
+          Consolidation is bounded but not small: upstream's defaults cap it at
+          100,000 input and 32,000 output tokens per call. Those are ceilings, so
+          a typical session costs a fraction of them -- but size the choice
+          against the ceiling, not the median. On Haiku 4.5 ($1/MTok in,
+          $5/MTok out) a worst-case call is about $0.26 and a typical one a cent
+          or two; the same call on an Opus-tier model would be roughly 5x that.
+
+          Prefer a dated snapshot over a floating alias here. This is a nix
+          config whose whole point is that a rebuild is reproducible; an alias
+          that silently rolls onto a new model would change both behaviour and
+          cost with no diff to show for it.
+        '';
+      };
+
+      consolidateOnSessionEnd = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          AI_MEMORY_CONSOLIDATE_ON_SESSION_END -- run LLM consolidation when a
+          session ends, not only on PreCompact and explicit memory_consolidate.
+
+          On by default here because OFF is the surprising case: with a provider
+          configured but this unset, upstream still writes the rule-based
+          session page at SessionEnd and the LLM never touches it. The provider
+          would then only fire for sessions long enough to compact, or when an
+          agent explicitly asks -- so most sessions keep the ledger-shaped
+          summary that having a provider was supposed to fix, and nothing says
+          why.
+
+          This is the setting that costs money per session. Turning it off keeps
+          the provider available for PreCompact and on-demand consolidation
+          while dropping the per-session charge.
+
+          The work is durably queued AFTER the deterministic session page and
+          handoff are written, then run by a bounded retrying worker outside the
+          hook response -- so a provider outage delays the richer summary rather
+          than losing the session.
         '';
       };
 
@@ -944,7 +977,11 @@ in
             lib.optional (cfg.llm.provider != null)
               "AI_MEMORY_LLM_PROVIDER=${cfg.llm.provider}"
             ++ lib.optional (cfg.llm.model != null)
-              "AI_MEMORY_LLM_MODEL=${cfg.llm.model}";
+              "AI_MEMORY_LLM_MODEL=${cfg.llm.model}"
+            # Only meaningful with a provider; setting it alone would be a flag
+            # the daemon reads and can never act on.
+            ++ lib.optional (cfg.llm.provider != null && cfg.llm.consolidateOnSessionEnd)
+              "AI_MEMORY_CONSOLIDATE_ON_SESSION_END=true";
           # No leading `-`: fail loudly rather than run credential-less. See
           # the environmentFile option.
           EnvironmentFile = lib.optional (cfg.llm.environmentFile != null)
