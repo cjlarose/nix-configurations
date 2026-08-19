@@ -823,6 +823,16 @@ in
       # opencode can both write through it concurrently and safely. A user
       # service rather than a system one because the wiki it commits into is
       # this user's, and so is every session it captures.
+      #
+      # Reading its log needs sudo despite being a user unit:
+      #
+      #     sudo journalctl _SYSTEMD_USER_UNIT=ai-memory.service -n 50
+      #
+      # The obvious `journalctl --user -u ai-memory` fails with "No journal
+      # files were opened due to insufficient permissions" unless the user is
+      # in the systemd-journal group, which cjlarose is not (users + wheel
+      # only). The daemon also keeps its own log under <dataDir>/logs/, which
+      # needs no privileges at all and is usually the easier read.
       systemd.user.services.ai-memory = {
         Unit = {
           Description = "ai-memory session-memory server (loopback, zero-LLM)";
@@ -848,7 +858,15 @@ in
             "--transport http"
             "--bind ${cfg.bind}"
             "--workspace ${cfg.workspace}"
-          ] ++ lib.optional cfg.enableWeb "--enable-web");
+          ]
+          # Name the pinned project here too. `serve` takes a --project for
+          # events that arrive with no usable cwd, and defaults it to "scratch"
+          # -- so leaving it unset creates a second, permanently empty project
+          # that shows up in /api/v1/projects and the web UI beside the real
+          # one. Cosmetic, but it contradicts the single-project story at a
+          # glance, which is the story the whole scoping design rests on.
+          ++ lib.optional (cfg.marker.project != null) "--project ${cfg.marker.project}"
+          ++ lib.optional cfg.enableWeb "--enable-web");
           Restart = "on-failure";
           RestartSec = "5s";
           # Upstream's own unit sets both. Cheap, and this process reads a git
