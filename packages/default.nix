@@ -97,7 +97,7 @@ in
   ai-memory = import ./ai-memory {
     pkgs = nixpkgs-26-05.legacyPackages.${system};
     src = ai-memory;
-    version = "1.26.1";
+    version = "1.30.0";
   };
   claude-code = claude-code-bun;
   claude-code-node = claude-code-node-pkg;

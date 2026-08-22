@@ -3,16 +3,16 @@
     "ai-memory": {
       "flake": false,
       "locked": {
-        "lastModified": 1786738031,
-        "narHash": "sha256-aWCqWriN5y2SvlAk5sYG82lDfYgiVntDLcE+gxo5JBo=",
+        "lastModified": 1787332651,
+        "narHash": "sha256-xXlrd+aIoIqWpbMlLXYoVjJrzZS2nTmSKj0S1FcFiI0=",
         "owner": "akitaonrails",
         "repo": "ai-memory",
-        "rev": "f2ee46ef5cf104c5df949fa7cb02f1854c772032",
+        "rev": "77e890740d3e0f34bf6665dea530372e341b6024",
         "type": "github"
       },
       "original": {
         "owner": "akitaonrails",
-        "ref": "v1.26.1",
+        "ref": "v1.30.0",
         "repo": "ai-memory",
         "type": "github"
       }

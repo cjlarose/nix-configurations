@@ -151,8 +151,17 @@
     };
     ai-memory = {
       # akitaonrails/ai-memory -- local-first session memory for coding agents,
-      # running alongside the llm-wiki rather than replacing it. flake = false:
-      # upstream ships no nix packaging, so packages/ai-memory builds it.
+      # running alongside the llm-wiki rather than replacing it. flake = false,
+      # so packages/ai-memory builds it from source with our own derivation.
+      #
+      # Upstream added its own flake.nix in v1.29.0, and we deliberately do not
+      # consume it: it makes the same core choices ours does (cargoLock.lockFile,
+      # TAILWIND_SKIP=1, doCheck=false, hooks -> share/ai-memory), but building
+      # its packages.default would pull rust-overlay + flake-utils into our lock,
+      # build the whole workspace including the evals crate, and drop the lean
+      # single-crate build and versionCheckHook smoke test packages/ai-memory
+      # keeps. flake = false plus our derivation stays leaner and insulated from
+      # upstream restructuring its flake outputs.
       #
       # Pinned to a tag, not a branch, and deliberately so: this is a
       # three-month-old project with a 3,000-line changelog whose hook payloads
@@ -163,7 +172,7 @@
       # the hook payloads this version generates against the ones checked in
       # there, so a contract change fails the BUILD rather than half-wiring the
       # hooks. Expect to re-render those files on a bump.
-      url = "github:akitaonrails/ai-memory/v1.26.1";
+      url = "github:akitaonrails/ai-memory/v1.30.0";
       flake = false;
     };
     lavish-axi = {
