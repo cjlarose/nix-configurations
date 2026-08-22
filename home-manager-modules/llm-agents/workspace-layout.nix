@@ -54,7 +54,83 @@ let
     only the skills are pinned to a flake rev and the pages are not.
 
     The read-only rule still holds for every other directory under `~/repos`, and
-    the worktree rule holds here too: do not create worktrees in the wiki either.
+    the worktree rule holds here too: ${
+      if aiMemoryWorktreeInWiki
+      then "see the ai-memory exception below, and create no others."
+      else "do not create worktrees in the wiki either."
+    }
+  '';
+
+  # ai-memory attaches a linked worktree to an orphan branch of a repo under
+  # ~/repos and commits session memory to it. The worktree itself is checked out
+  # in ai-memory's data dir (~/.local by default), NOT under ~/repos -- so the
+  # "no worktree directories under ~/repos" rule is not what is at stake. What is:
+  # an agent grepping that repo meets a `git worktree list` / `git branch` it did
+  # not expect, and the read-only rule for ~/repos would otherwise read as
+  # forbidding the service's writes to it. So CLAUDE.md states it -- an agent that
+  # finds this contradicting the rules it just read learns the rules are
+  # approximate, which is worse than the worktree.
+  #
+  # Derived from the same options that create the thing, like the wiki path
+  # above: the carve-out cannot name a repo ai-memory is not actually using, and
+  # it disappears on a host where ai-memory is off.
+  aiMemory = config.cjlarose.llmAgents.aiMemory;
+
+  # True when ai-memory's HOST repo -- the one gaining the orphan branch and the
+  # .git/worktrees entry -- is under ~/repos. Not a claim about where the worktree
+  # is checked out, which is the data dir.
+  aiMemoryRepoUnderRepos =
+    aiMemory.enable
+    && aiMemory.wikiWorktree.enable
+    && aiMemory.wikiWorktree.repoPath != null
+    && lib.hasPrefix "${config.home.homeDirectory}/repos/" aiMemory.wikiWorktree.repoPath;
+
+  # Whether ai-memory's host repo is the WIKI specifically, as opposed to some
+  # other repo under ~/repos. Only then does the wiki carve-out's own "create no
+  # worktrees here" sentence touch the same repo as the section below, and only
+  # then does it have to defer. Two sections flatly disagreeing is worse than
+  # either rule on its own: an agent that catches CLAUDE.md contradicting itself
+  # has learned to weigh all of it more loosely.
+  aiMemoryWorktreeInWiki =
+    aiMemoryRepoUnderRepos
+    && wikiUnderRepos
+    && aiMemory.wikiWorktree.repoPath == wiki.path;
+
+  # Stated as a property of the machine rather than an instruction, because
+  # there is nothing here for an agent to do: systemd creates and maintains it.
+  # The point is that finding it should not read as a violation to be tidied up
+  # -- an agent that meets a worktree contradicting the rule it just read learns
+  # the rules are approximate, which costs more than the worktree.
+  #
+  # A section of its own rather than a clause inside the wiki carve-out above:
+  # the two are independent. ai-memory's repo need not be the wiki, and on a
+  # host where the wiki is not under ~/repos this exception can still apply.
+  aiMemoryCarveOut = ''
+
+    ## ai-memory keeps a linked worktree of a repo under `~/repos`
+
+    `${aiMemory.wikiWorktree.repoPath}`, a repo under `~/repos`, has a second,
+    **linked** worktree — but it is checked out at `${aiMemory.dataDir}/wiki`, in
+    ai-memory's data directory rather than under `~/repos`, on the
+    `${aiMemory.wikiWorktree.branch}` branch. It is created and maintained by the
+    `ai-memory-wiki-worktree` systemd user service, and it holds ai-memory's
+    session memory rather than source.
+
+    So the checkout itself is not under `~/repos`. What lands in that repo is a
+    `.git/worktrees/` administrative entry, the branch ref, and the per-session
+    commits the service makes — always to its own orphan branch, never to `main`.
+
+    The branch is an **orphan**: its history is disjoint from `main`, so the two
+    share an object store and nothing else.
+
+    So `git worktree list` run in that repo shows an entry pointing outside both
+    `~/repos` and `~/workspaces`, and `git branch` shows a branch sharing no
+    commits with `main`. Both are correct, and neither is yours to clean up. Do
+    not remove the worktree, delete the branch, or merge it anywhere —
+    `tearing-down-a-workspace` does not apply to it.
+
+    This anomaly is expected. The blanket rule is unchanged: create no worktrees
+    of your own under `~/repos`, and route your work through `~/workspaces`.
   '';
 
 in
@@ -102,7 +178,8 @@ in
       ".claude/CLAUDE.md".text =
         builtins.readFile ./workspace-layout/CLAUDE.md
         + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
-        + lib.optionalString wikiUnderRepos wikiCarveOut;
+        + lib.optionalString wikiUnderRepos wikiCarveOut
+        + lib.optionalString aiMemoryRepoUnderRepos aiMemoryCarveOut;
     }
     # The mechanics the CLAUDE.md above deliberately does not carry. It states
     # the rules and names the skill at each gate; the commands, the decision
