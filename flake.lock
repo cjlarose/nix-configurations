@@ -128,11 +128,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787381007,
-        "narHash": "sha256-6UapNauKkfAKhBFmEfC/rzs4ctygeLMUMpOgKZQVr8c=",
+        "lastModified": 1787436715,
+        "narHash": "sha256-j4MZeXDnoJ9ylTti3oe+1pUjL3VaIh+SKExdX93yXxs=",
         "ref": "refs/heads/main",
-        "rev": "32b81f41de63a89cda46dc8b9a43106a78b316ea",
-        "revCount": 157,
+        "rev": "e6f202acf546706600e3bd1d672266059260baa8",
+        "revCount": 158,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/llm-wiki"
       },
