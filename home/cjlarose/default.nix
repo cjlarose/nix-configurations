@@ -1,4 +1,4 @@
-{ system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-module ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
+{ system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-skill-src ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
 { pkgs, lib, ... }: {
   # All LLM-agent tooling lives behind the single llm-agents module, which
   # defaults every feature off -- claude included. Everything wanted fleet-wide
@@ -87,25 +87,24 @@
     # skill always documents the extension that is actually installed.
     ghStackSkill = { enable = true; package = additionalPackages.${system}.gh-stack; };
 
-    # The wiki's Claude Code plugin (skills + SessionStart index hook) and
-    # LLM_WIKI_PATH. Only where a wiki worktree actually exists, which is also
-    # the only place llm-wiki-module is threaded in below.
+    # The read-only querying-notes skill (into ~/.claude/skills, so both claude
+    # and opencode see it) and LLM_WIKI_PATH. Only where a wiki checkout
+    # actually exists, which is also the only place llm-wiki-skill-src is
+    # threaded in below. skillSrc is the wiki flake input's skills/ tree.
     wiki.enable = llm-wiki-path != null;
     wiki.path = llm-wiki-path;
+    wiki.skillSrc = llm-wiki-skill-src;
   };
 
   # lavish and claude.enablePlaywrightMcp are left at their module defaults
   # (off) here and enabled per-host in nixos-configurations/ns1010301: a browser
   # review tool and a chromium closure have no business on the headless guests.
   #
-  # llm-wiki-module is the wiki flake's own home-manager module, which is what
-  # DECLARES programs.llmWiki. It has to be imported here rather than inside
-  # llm-agents because `imports` is resolved before config exists, so it can key
-  # off neither an option nor an optional module argument (an arg with a default
-  # forces _module.args evaluation, which recurses). wiki-bridge.nix rides along
-  # with it: it turns the cjlarose.llmAgents.wiki.* options into a
-  # programs.llmWiki definition, and can only be loaded where that option is
-  # declared.
+  # The wiki integration needs no extra import any more: the llm-agents module
+  # installs the querying-notes skill and LLM_WIKI_PATH itself from
+  # wiki.skillSrc + wiki.path. It used to import the wiki flake's own HM module
+  # (which declared programs.llmWiki and shipped a claude-only plugin) plus
+  # wiki-bridge.nix; both are gone, and opencode now sees the skill.
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
@@ -113,11 +112,7 @@
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/llm-agents
   ] ++ lib.optional enableSuperpowers
-    ../../home-manager-modules/llm-agents/superpowers-plugin.nix
-  ++ lib.optionals (llm-wiki-module != null) [
-    llm-wiki-module
-    ../../home-manager-modules/llm-agents/wiki-bridge.nix
-  ];
+    ../../home-manager-modules/llm-agents/superpowers-plugin.nix;
 
   # gh from nixpkgs-unstable (2.96.0) rather than the host's 26-05 (2.93.0);
   # see packages/default.nix.

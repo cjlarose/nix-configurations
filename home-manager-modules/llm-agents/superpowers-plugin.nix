@@ -1,9 +1,9 @@
 # Bridge between cjlarose.llmAgents.superpowers.finalPackage and
 # programs.claude-code.plugins.
 #
-# Separate from ./default.nix for the same reason ./wiki-bridge.nix is: the
-# definition has to be absent, not merely disabled, on hosts where the option
-# does not exist. home-manager 25-11's programs.claude-code module has no
+# Separate from ./default.nix because the definition has to be absent, not
+# merely disabled, on hosts where the option does not exist. home-manager
+# 25-11's programs.claude-code module has no
 # `plugins` option at all, and a definition of an undeclared option is an error
 # even under a false mkIf -- the module system distributes mkIf down to the
 # attribute path before the declaration check. So default.nix declares the
