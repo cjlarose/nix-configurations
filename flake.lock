@@ -17,6 +17,23 @@
         "type": "github"
       }
     },
+    "ai-memory_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787332651,
+        "narHash": "sha256-xXlrd+aIoIqWpbMlLXYoVjJrzZS2nTmSKj0S1FcFiI0=",
+        "owner": "akitaonrails",
+        "repo": "ai-memory",
+        "rev": "77e890740d3e0f34bf6665dea530372e341b6024",
+        "type": "github"
+      },
+      "original": {
+        "owner": "akitaonrails",
+        "ref": "v1.30.0",
+        "repo": "ai-memory",
+        "type": "github"
+      }
+    },
     "bun2nix": {
       "inputs": {
         "flake-parts": [
@@ -107,11 +124,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1786909289,
-        "narHash": "sha256-XBBan3+X/AJmLy9Bb/lZabUAdGRsVBddz+JXJK7epfo=",
+        "lastModified": 1787437505,
+        "narHash": "sha256-yymm2DTFlacTCiaTbO+8BD8dhjdosDFvKV87+Wlz7hE=",
         "ref": "refs/heads/main",
-        "rev": "70e7226c0f830536bfc2d34cf03846bc27cc3fe4",
-        "revCount": 1172,
+        "rev": "c3dae3be5ad15107118b616c9ffc90c905476426",
+        "revCount": 1197,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/nix-configurations"
       },
@@ -149,11 +166,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782649611,
-        "narHash": "sha256-pT8+5v8OXU1qKjJhfjp4T6EMKLcv6HZ9CE5coILXYZU=",
+        "lastModified": 1787451218,
+        "narHash": "sha256-ZWY62lTHUsg46+ELrUTiFk676wjOKFKMHOnaSrkvpwE=",
         "ref": "refs/heads/main",
-        "rev": "dffb3e121d73503d8479a939c6f898b37346161e",
-        "revCount": 108,
+        "rev": "3bc5d1e6e61c5d6bdf13f9b8092856250ed07a3d",
+        "revCount": 227,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/cjlarose-llm-wiki"
       },
@@ -1672,6 +1689,7 @@
     },
     "picktrace-nix-configurations": {
       "inputs": {
+        "ai-memory": "ai-memory_2",
         "cjlarose-darwin-modules": "cjlarose-darwin-modules",
         "cjlarose-home-manager-modules": "cjlarose-home-manager-modules",
         "cjlarose-llm-wiki": "cjlarose-llm-wiki_2",
@@ -1698,11 +1716,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1786909336,
-        "narHash": "sha256-HX+lX7uly10yOHXjxo9FaelTfmvkl1TCgIaWSIclCQc=",
+        "lastModified": 1787452301,
+        "narHash": "sha256-1HFZtODXHEY0vxfNXvaVPz4plJWMNgqT23p827WLlJY=",
         "ref": "refs/heads/main",
-        "rev": "65f1e8caa8dec972dc276dad5db52ae0d4212f14",
-        "revCount": 457,
+        "rev": "8eaf2d487e73e2df8b8b30195f9fc8052fbc31b4",
+        "revCount": 466,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
