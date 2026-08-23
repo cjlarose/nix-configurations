@@ -524,6 +524,54 @@ in
       '';
     };
 
+    lavish.host = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "myhost.example.ts.net";
+      description = ''
+        Bind address for the lavish-axi review server (LAVISH_AXI_HOST). Null
+        leaves lavish on its 127.0.0.1 default -- reachable only from this host.
+        A hostname or IP binds that interface instead; a hostname that resolves
+        to a tailscale IP serves the review UI over the tailnet with no literal
+        IP in config. Binding beyond loopback exposes the files lavish serves to
+        anything that can reach the socket, so pair it with a firewall that only
+        opens the port on the intended interface.
+      '';
+    };
+
+    lavish.linkHost = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = ''
+        Hostname written into the session URLs lavish prints
+        (LAVISH_AXI_LINK_HOST). Null uses the bind address. Set it to the name a
+        reviewer actually reaches the server by, so the printed links are
+        clickable from their machine.
+      '';
+    };
+
+    lavish.allowedHosts = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "myhost.example.ts.net" ];
+      description = ''
+        Extra Host-header values lavish's DNS-rebinding guard accepts
+        (LAVISH_AXI_ALLOWED_HOSTS, space-joined). Loopback, localhost and the
+        bind/link hosts are always allowed; add any other name a reviewer reaches
+        the server by. Empty leaves only that built-in set.
+      '';
+    };
+
+    lavish.port = lib.mkOption {
+      type = lib.types.nullOr lib.types.port;
+      default = null;
+      description = ''
+        Fixed port for the lavish-axi server (LAVISH_AXI_PORT). Null uses
+        lavish's own default (4387). Pin it when a firewall rule has to name the
+        same port.
+      '';
+    };
+
     # --- gh stacked PRs (skill only) ----------------------------------------
 
     ghStackSkill.enable = lib.mkEnableOption ''
@@ -864,6 +912,16 @@ in
         ".claude/skills/lavish/SKILL.md".source =
           "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
       };
+
+      # The LAVISH_AXI_* env vars the CLI reads, rendered only from the options a
+      # host actually sets -- an unconfigured host keeps lavish's loopback
+      # default. The firewall that exposes the port is a system-level concern and
+      # lives in the host's nixos config, not here.
+      home.sessionVariables =
+        lib.optionalAttrs (cfg.lavish.host != null) { LAVISH_AXI_HOST = cfg.lavish.host; }
+        // lib.optionalAttrs (cfg.lavish.linkHost != null) { LAVISH_AXI_LINK_HOST = cfg.lavish.linkHost; }
+        // lib.optionalAttrs (cfg.lavish.allowedHosts != [ ]) { LAVISH_AXI_ALLOWED_HOSTS = lib.concatStringsSep " " cfg.lavish.allowedHosts; }
+        // lib.optionalAttrs (cfg.lavish.port != null) { LAVISH_AXI_PORT = toString cfg.lavish.port; };
     })
 
     # --- gh stacked PRs (skill only) ----------------------------------------

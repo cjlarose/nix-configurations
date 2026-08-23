@@ -25,6 +25,11 @@
       interfaces."microvm".allowedUDPPorts = [
         67  # DHCP server for microvm bridge (bridge interface only)
       ];
+      # lavish-axi's review UI, reachable over tailscale only (never the public
+      # path). cjlarose's home sets LAVISH_AXI_HOST/PORT so lavish binds the
+      # tailscale interface on 4387; this opens that port on tailscale0 alone,
+      # the same tailscale-only trade as mosh below.
+      interfaces."tailscale0".allowedTCPPorts = [ 4387 ];
       # mosh sessions, reachable over tailscale only (never the public path).
       # programs.mosh.openFirewall is disabled below so the range isn't opened
       # on every interface.
