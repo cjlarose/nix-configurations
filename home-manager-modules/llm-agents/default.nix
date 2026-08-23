@@ -344,7 +344,7 @@ let
     '';
 in
 {
-  imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ./ai-memory.nix ];
+  imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ./ai-memory.nix ./pr-feedback.nix ];
 
   options.cjlarose.llmAgents = {
 

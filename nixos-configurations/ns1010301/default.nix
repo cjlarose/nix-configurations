@@ -119,6 +119,10 @@
           allowedHosts = [ "ns1010301.cjlarose.dev" ];
           port = 4387;
         };
+        # The soliciting-pr-feedback skill and its mock-pr-html renderer, which
+        # drive lavish above to review a change as a GitHub PR before it is
+        # opened or pushed to. Paired with lavish here because it needs it.
+        cjlarose.llmAgents.prFeedback.enable = true;
         # ai-memory, on a two-week parallel trial against the llm-wiki. Scoped
         # to this host and no further: it is the trial host for the
         # ~/repos + ~/workspaces layout above, and the marker below only makes
