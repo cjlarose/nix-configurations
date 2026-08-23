@@ -124,11 +124,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1787437505,
-        "narHash": "sha256-yymm2DTFlacTCiaTbO+8BD8dhjdosDFvKV87+Wlz7hE=",
+        "lastModified": 1787517086,
+        "narHash": "sha256-sro3dveFYtskBpeYe14rSeD2XxrHdjqwC32NMvOcBpM=",
         "ref": "refs/heads/main",
-        "rev": "c3dae3be5ad15107118b616c9ffc90c905476426",
-        "revCount": 1197,
+        "rev": "39ff06b032014acb5db81f90ace536c4bd361984",
+        "revCount": 1207,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/nix-configurations"
       },
@@ -1716,11 +1716,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1787452301,
-        "narHash": "sha256-1HFZtODXHEY0vxfNXvaVPz4plJWMNgqT23p827WLlJY=",
+        "lastModified": 1787517631,
+        "narHash": "sha256-efP3vKpuNE4lDRQS/9zhqveCxtCAS0A0N2ZcQuWoKlQ=",
         "ref": "refs/heads/main",
-        "rev": "8eaf2d487e73e2df8b8b30195f9fc8052fbc31b4",
-        "revCount": 466,
+        "rev": "c52811a0dd26e2948aa711d83eb7c619e19b2587",
+        "revCount": 470,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
