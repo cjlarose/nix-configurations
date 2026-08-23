@@ -550,6 +550,20 @@ in
       '';
     };
 
+    lavish.linkBase = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "https://lavish.example.ts.net";
+      description = ''
+        Full scheme+host (+optional port) base URL lavish prints its session
+        links against (LAVISH_AXI_LINK_BASE), e.g. when a TLS-terminating reverse
+        proxy fronts the loopback server. When set, printed links become
+        `<linkBase>/session/<key>` instead of the built-in
+        `http://<linkHost>:<port>/session/<key>`. Null leaves upstream behavior.
+        Requires the reverse-proxy build patch in packages/lavish-axi.
+      '';
+    };
+
     lavish.allowedHosts = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -920,6 +934,7 @@ in
       home.sessionVariables =
         lib.optionalAttrs (cfg.lavish.host != null) { LAVISH_AXI_HOST = cfg.lavish.host; }
         // lib.optionalAttrs (cfg.lavish.linkHost != null) { LAVISH_AXI_LINK_HOST = cfg.lavish.linkHost; }
+        // lib.optionalAttrs (cfg.lavish.linkBase != null) { LAVISH_AXI_LINK_BASE = cfg.lavish.linkBase; }
         // lib.optionalAttrs (cfg.lavish.allowedHosts != [ ]) { LAVISH_AXI_ALLOWED_HOSTS = lib.concatStringsSep " " cfg.lavish.allowedHosts; }
         // lib.optionalAttrs (cfg.lavish.port != null) { LAVISH_AXI_PORT = toString cfg.lavish.port; };
     })

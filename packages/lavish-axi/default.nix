@@ -29,6 +29,32 @@ stdenv.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
     pnpm run build
+
+    # --- Reverse-proxy patches (local; not upstream) --------------------------
+    # We front lavish with a TLS-terminating nginx vhost on ns1010301
+    # (lavish.ns1010301.cjlarose.dev:443 -> http://127.0.0.1:4387). Two edits to
+    # the built bundle make lavish behave correctly behind that proxy:
+    #
+    # 1. `app.set("trust proxy", true)` — lavish's same-origin guard on the
+    #    share/export and whiteboard routes compares the browser Origin against
+    #    `req.protocol://host`. Without trusting the proxy, req.protocol is the
+    #    upstream http connection, so it computes http:// while the browser sends
+    #    https:// -> those routes 403. Trusting the proxy makes req.protocol honor
+    #    nginx's X-Forwarded-Proto. The Host-allowlist guard is unaffected (it
+    #    reads the Host header directly, which nginx forwards verbatim).
+    #
+    # 2. LAVISH_AXI_LINK_BASE — the printed session URL is hardcoded
+    #    `http://<linkHost>:<port>`; there is no env for scheme/port. When set,
+    #    this env makes it emit `<base>/session/<key>` so the link is a clean
+    #    `https://lavish.ns1010301.cjlarose.dev/session/<key>`. Unset -> upstream
+    #    behavior. --replace-fail so an upstream drift fails the build loudly.
+    substituteInPlace dist/cli.mjs \
+      --replace-fail 'const app = express()' \
+                     'const app = express(); app.set("trust proxy", true)'
+    substituteInPlace dist/cli.mjs \
+      --replace-fail '`http://''${hostForUrl(linkHostName)}:''${publicPort}/session/''${key}`' \
+                     '(process.env.LAVISH_AXI_LINK_BASE ? `''${process.env.LAVISH_AXI_LINK_BASE}/session/''${key}` : `http://''${hostForUrl(linkHostName)}:''${publicPort}/session/''${key}`)'
+
     # Drop devDependencies (esbuild + native binaries, the whiteboard build-only
     # deps like @excalidraw/mermaid/react, eslint, prettier, typescript) now that
     # dist/ is built — only the prod deps are imported at run time. Shrinks the
