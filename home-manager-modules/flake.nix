@@ -11,11 +11,12 @@
       _1password = import ./_1password.nix;
       # Unified LLM-agent tooling: Claude Code, lavish-axi, the LLM wiki
       # integration, opencode and herdr. Replaces the former separate claude /
-      # phx-workflow / lavish / opencode modules.
+      # phx-workflow / lavish / opencode modules. The wiki integration is now
+      # self-contained here (the read-only querying-notes skill into
+      # ~/.claude/skills, plus LLM_WIKI_PATH, driven by cjlarose.llmAgents.wiki.*),
+      # so the former `llm-agents-wiki` output (a programs.llmWiki bridge paired
+      # with the wiki flake's own module) is gone.
       llm-agents = import ./llm-agents;
-      # Pair with llm-agents ONLY where the LLM wiki flake's own module is also
-      # imported -- it defines programs.llmWiki, which that module declares.
-      llm-agents-wiki = import ./llm-agents/wiki-bridge.nix;
       # Pair with llm-agents ONLY where home-manager's claude-code module has a
       # `plugins` option -- 26.05 and later. It does not exist on 25-11, where
       # defining it is a hard error rather than a no-op.

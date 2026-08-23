@@ -45,13 +45,14 @@
 # one particular shape of consuming flake and silently broke if that flake
 # renamed or dropped an attr.
 #
-# The one thing this module cannot own is the `imports` of the wiki flake's own
-# module (which declares programs.llmWiki): `imports` is resolved before config
-# exists, so it can key off neither an option nor an optional module argument
-# (an arg with a default forces _module.args evaluation => infinite recursion).
-# The consumer therefore imports cjlarose-llm-wiki.homeManagerModules.default
-# alongside this module -- see home/cjlarose -- and this module owns everything
-# else about the wiki, including turning it on and pointing it at a worktree.
+# The personal LLM wiki integration is owned entirely here: the read-only
+# querying-notes skill (installed into ~/.claude/skills like every other skill,
+# so it reaches both claude and opencode) and LLM_WIKI_PATH. The consumer hands
+# in the wiki's skills/ tree via wiki.skillSrc and the checkout path via
+# wiki.path. This module used to instead consume the llm-wiki flake's own
+# home-manager module, which shipped the skill as a claude-only Claude Code
+# plugin -- so opencode never saw it; delivering the skill through
+# ~/.claude/skills is what fixed that.
 { lib, pkgs, config, ... }:
 
 let
@@ -676,20 +677,40 @@ in
     # --- personal LLM wiki --------------------------------------------------
 
     wiki.enable = lib.mkEnableOption ''
-      the personal LLM wiki integration: the `wiki` Claude Code plugin (skills +
-      SessionStart index hook) and LLM_WIKI_PATH. Only valid where the consumer
-      also imports cjlarose-llm-wiki.homeManagerModules.default, which is what
-      declares programs.llmWiki (see the header comment)
+      the personal LLM wiki integration: the read-only querying-notes skill
+      (installed into ~/.claude/skills, so it reaches both claude and opencode)
+      and LLM_WIKI_PATH. The skill body comes from wiki.skillSrc; the wiki is
+      read-only, so there is no SessionStart hook and no maintenance skills
     '';
 
     wiki.path = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      example = "/home/you/worktrees/owner/llm-wiki/default";
+      example = "/home/you/repos/cjlarose/llm-wiki";
       description = ''
-        Absolute path to the writable llm-wiki git worktree on the target
-        machine. Exported as LLM_WIKI_PATH and baked into the plugin's
-        session-start hook, which cats the live index.md there.
+        Absolute path to the llm-wiki checkout on the target machine. Exported
+        as LLM_WIKI_PATH, which the querying-notes skill reads to locate the
+        wiki. Required when wiki.enable is set.
+      '';
+    };
+
+    wiki.skillSrc = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        The wiki's skills/ directory (the cjlarose-llm-wiki flake input's
+        skills tree), from which the module installs the read-only
+        querying-notes skill into ~/.claude/skills. Same shape as
+        herdr.skillSrc: a source tree comes in, the module reads one SKILL.md
+        out of it.
+
+        Delivered through ~/.claude/skills rather than a Claude Code plugin
+        because that one location reaches BOTH harnesses -- the wiki used to
+        ship this as a claude-only plugin, which opencode never saw.
+
+        Optional: left null, wiki.enable still exports LLM_WIKI_PATH but installs
+        no skill. Set it from the SAME flake input wiki.path points at, so the
+        skill matches the wiki it queries.
       '';
     };
   };
@@ -945,11 +966,25 @@ in
     })
 
     # --- personal LLM wiki --------------------------------------------------
-    # The programs.llmWiki definition itself lives in ./wiki-bridge.nix, which
-    # the consumer imports next to the wiki flake's module. It cannot live here:
-    # mkIf distributes down to the attribute path, so a `programs.llmWiki`
-    # definition under a false mkIf is still checked against the declarations
-    # and errors with "option does not exist" on every wiki-less host.
+    # Owned entirely here now: LLM_WIKI_PATH plus the read-only querying-notes
+    # skill in ~/.claude/skills (both harnesses). This used to be a claude-only
+    # plugin defined in the llm-wiki flake's own HM module, reached through a
+    # programs.llmWiki bridge -- opencode never saw it. Both the env var and the
+    # skill go through always-declared options (home.sessionVariables,
+    # home.file), so unlike programs.llmWiki they need no separately-imported
+    # declaration and live under a plain mkIf here.
+    (lib.mkIf cfg.wiki.enable {
+      home.sessionVariables.LLM_WIKI_PATH = cfg.wiki.path;
+
+      # skillsWanted gates it to hosts running at least one harness; skillSrc is
+      # the wiki's own skills/ tree, handed in by the consumer. Left null (or on
+      # a host with neither harness), only LLM_WIKI_PATH is set.
+      home.file = lib.mkIf (skillsWanted && cfg.wiki.skillSrc != null) {
+        ".claude/skills/querying-notes/SKILL.md".source =
+          "${cfg.wiki.skillSrc}/querying-notes/SKILL.md";
+      };
+    })
+
     # Every enable that needs a package asserts it rather than defaulting one, so
     # a host that leaves the feature off never has to name a package at all.
     {

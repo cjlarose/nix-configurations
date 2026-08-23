@@ -64,7 +64,12 @@
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
             llm-wiki-path = "/home/cjlarose/repos/cjlarose/llm-wiki";
-            llm-wiki-module = cjlarose-llm-wiki.homeManagerModules.default;
+            # The wiki flake input's skills/ tree; llm-agents reads the
+            # read-only querying-notes SKILL.md out of it and installs it into
+            # ~/.claude/skills (both harnesses). Replaces the old
+            # homeManagerModules.default import, which shipped it as a
+            # claude-only plugin opencode could not see.
+            llm-wiki-skill-src = "${cjlarose-llm-wiki}/skills";
           })
         ];
         # ns1010301 is the trial host for the ~/repos + ~/workspaces layout:
