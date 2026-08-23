@@ -12,7 +12,7 @@
 # it is stated once.
 # Off by default: home-manager-modules/ is shared across the fleet and only
 # hosts actually migrated to this layout should carry the CLAUDE.md.
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 
 let
   cfg = config.cjlarose.llmAgents.claude.workspaceLayout;
@@ -133,6 +133,19 @@ let
     of your own under `~/repos`, and route your work through `~/workspaces`.
   '';
 
+  # The user-level agent instructions, built once so both harness entry points
+  # can point at the SAME store path: ~/.claude/CLAUDE.md (claude) and
+  # ~/.config/opencode/AGENTS.md (opencode). opencode reads ~/.claude/CLAUDE.md
+  # only as a fallback and opencode v2 not at all, so a matching AGENTS.md is what
+  # keeps these rules reaching opencode; one shared store path keeps the two
+  # byte-identical rather than two copies that can drift.
+  agentInstructions = pkgs.writeText "agent-instructions.md" (
+    builtins.readFile ./workspace-layout/CLAUDE.md
+    + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
+    + lib.optionalString wikiUnderRepos wikiCarveOut
+    + lib.optionalString aiMemoryRepoUnderRepos aiMemoryCarveOut
+  );
+
 in
 {
   options.cjlarose.llmAgents.claude.workspaceLayout = {
@@ -169,17 +182,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # programs.claude-code has no memory/CLAUDE.md option (it covers settings,
-    # agents, commands, hooks, skills and mcpServers only), so this goes
-    # through home.file. Consequence: ~/.claude/CLAUDE.md becomes a read-only
-    # store symlink, and Claude's `#` memory-append shortcut cannot write to
+    # ~/.claude/CLAUDE.md (claude) and ~/.config/opencode/AGENTS.md (opencode)
+    # both point at agentInstructions -- one store path, so the two harnesses read
+    # byte-identical rules. programs.claude-code has no memory/CLAUDE.md option, so
+    # CLAUDE.md goes through home.file; the consequence is that ~/.claude/CLAUDE.md
+    # is a read-only store symlink and Claude's `#` memory-append cannot write to
     # it -- the same trade this module already makes for settings.json.
     home.file = {
-      ".claude/CLAUDE.md".text =
-        builtins.readFile ./workspace-layout/CLAUDE.md
-        + lib.optionalString (cfg.extraInstructions != "") "\n${cfg.extraInstructions}"
-        + lib.optionalString wikiUnderRepos wikiCarveOut
-        + lib.optionalString aiMemoryRepoUnderRepos aiMemoryCarveOut;
+      ".claude/CLAUDE.md".source = agentInstructions;
     }
     # The mechanics the CLAUDE.md above deliberately does not carry. It states
     # the rules and names the skill at each gate; the commands, the decision
@@ -194,6 +204,14 @@ in
       ".claude/skills/starting-a-workspace".source = skills.starting-a-workspace;
       ".claude/skills/adding-a-repo-to-a-workspace".source = skills.adding-a-repo-to-a-workspace;
       ".claude/skills/tearing-down-a-workspace".source = skills.tearing-down-a-workspace;
+    };
+
+    # opencode's entry point for the same rules, sourced from the same store path
+    # as CLAUDE.md above. Written only where opencode is enabled. Do not also set
+    # programs.opencode.context -- the home-manager module writes this same file
+    # from it, which would collide.
+    xdg.configFile = lib.mkIf agents.opencode.enable {
+      "opencode/AGENTS.md".source = agentInstructions;
     };
   };
 }
