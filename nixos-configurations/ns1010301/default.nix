@@ -101,9 +101,23 @@
         # Editor Claude skill. Scoped to this interactive/browser host (not the
         # shared profile, which fans out to the headless cjlarose hosts that have
         # no use for a browser review tool).
+        # Also serve its review UI over tailscale, so a browser elsewhere on the
+        # tailnet can open the session at http://ns1010301.cjlarose.dev:4387
+        # rather than only this host's loopback. host binds by hostname:
+        # ns1010301.cjlarose.dev resolves to this node's tailscale IP, so lavish
+        # listens on the tailscale interface and nowhere public -- and the literal
+        # IP stays out of this public repo. linkHost writes that name into the
+        # session URLs lavish prints; allowedHosts clears its DNS-rebinding guard
+        # for it; port is pinned to lavish's default so it stays in lockstep with
+        # the firewall rule in configuration.nix, which opens 4387 on tailscale0
+        # ONLY -- the public path stays closed.
         cjlarose.llmAgents.lavish = {
           enable = true;
           package = additionalPackages.${system}.lavish-axi;
+          host = "ns1010301.cjlarose.dev";
+          linkHost = "ns1010301.cjlarose.dev";
+          allowedHosts = [ "ns1010301.cjlarose.dev" ];
+          port = 4387;
         };
         # ai-memory, on a two-week parallel trial against the llm-wiki. Scoped
         # to this host and no further: it is the trial host for the
