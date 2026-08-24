@@ -17,6 +17,19 @@ let
     then additionalPackages.${system}.claude-code-node
     else additionalPackages.${system}.claude-code;
 
+  # obra/superpowers as a namespaced Claude Code plugin, built by harness-config
+  # from its own pinned source. Only referenced under `enableSuperpowers`, so the
+  # build is never forced on a host that leaves it off. Two customizations: drop
+  # upstream's SessionStart hook (which force-feeds using-superpowers into every
+  # session, opening with a brainstorm on questions that only wanted an answer)
+  # and the brainstorming skill's spec-commit instructions (docs/superpowers is
+  # gitignored fleet-wide; implementation commits are untouched).
+  superpowersPlugin = harnessConfig.mkSuperpowersPlugin {
+    inherit pkgs;
+    disableHooks = true;
+    disableSpecCommits = true;
+  };
+
   # The statusline command, built at the consumer now that the llm-agents module
   # no longer owns Claude Code. jq + gawk on PATH; body lives beside this file.
   statusline = pkgs.writeShellApplication {
@@ -97,6 +110,15 @@ in
         command = "${statusline}/bin/claude-code-statusline";
       };
     };
+  }
+  # The superpowers plugin only where programs.claude-code.plugins exists
+  # (home-manager >= 26.05). On HM 25-11 hosts (immich, edge-lax) the option does
+  # not exist and defining it -- even [] -- is an eval error, so the whole
+  # `plugins` key has to be ABSENT there. Those hosts set enableSuperpowers =
+  # false, so gating the key on that flag keeps it absent exactly where it must
+  # be. This replaces the old conditional import of superpowers-plugin.nix.
+  // lib.optionalAttrs enableSuperpowers {
+    plugins = [ superpowersPlugin ];
   };
 
   # Local LSP plugin marketplace consumed via programs.claude-code.settings
@@ -127,37 +149,17 @@ in
     };
   };
 
+  # superpowers' skills for opencode, through its native skills.paths key (the
+  # plugin's /skills subdir). Empty -- and superpowersPlugin never forced -- when
+  # superpowers is off.
+  programs.opencode.settings.skills.paths =
+    lib.optionals enableSuperpowers [ "${superpowersPlugin}/skills" ];
+
   # The rest of the LLM-agent tooling lives behind the single llm-agents module,
   # which defaults every feature off. Everything wanted fleet-wide is opted into
   # here, and the rest per-host where the closure cost warrants it. The module
   # takes no additionalPackages arg -- every package is named explicitly here.
   cjlarose.llmAgents = {
-    # obra/superpowers as a namespaced plugin: brainstorming, planning, TDD,
-    # code review, worktrees, systematic debugging. Replaces both the vendored
-    # single-skill systematic-debugging copy and the phx workflow skills, whose
-    # spine upstream covers natively.
-    #
-    # `enable` and the superpowers-plugin.nix import below are driven off the
-    # same enableSuperpowers flag: home-manager 25-11 has no
-    # programs.claude-code.plugins option at all, so on those hosts the
-    # definition has to be ABSENT rather than merely disabled. One flag, both
-    # effects, so they cannot drift apart.
-    #
-    # The module builds the plugin from this source rather than taking a
-    # prebuilt one, because the two customizations below are module options.
-    superpowers = {
-      enable = enableSuperpowers;
-      src = additionalPackages.${system}.superpowers-src;
-      # Upstream's SessionStart hook force-feeds the using-superpowers skill
-      # into every session, which makes the agent open with a brainstorm on
-      # questions that only wanted an answer. Skills stay invocable by name.
-      disableHooks = true;
-      # Specs are working notes here, not repo history; docs/superpowers is
-      # gitignored globally (home-manager-modules/git.nix). Implementation
-      # commits are untouched.
-      disableSpecCommits = true;
-    };
-
     # Both are small CLIs that pair with claude, so they ride the shared profile
     # rather than being host-scoped: opencode as a second agent, herdr to manage
     # claude sessions. herdr reaches the no-AVX pve guests too — its AVX2 paths
@@ -217,14 +219,17 @@ in
   # wiki.skillSrc + wiki.path. It used to import the wiki flake's own HM module
   # (which declared programs.llmWiki and shipped a claude-only plugin) plus
   # wiki-bridge.nix; both are gone, and opencode now sees the skill.
+  #
+  # superpowers-plugin.nix is gone too: the superpowers plugin is now defined
+  # inline on programs.claude-code.plugins above, gated on enableSuperpowers so
+  # the key stays absent on the HM 25-11 hosts that lack the option.
   imports = [
     ../../home-manager-modules/dev-tools.nix
     ../../home-manager-modules/neovim.nix
     ../../home-manager-modules/git.nix
     ../../home-manager-modules/shell.nix
     ../../home-manager-modules/llm-agents
-  ] ++ lib.optional enableSuperpowers
-    ../../home-manager-modules/llm-agents/superpowers-plugin.nix;
+  ];
 
   # gh from nixpkgs-unstable (2.96.0) rather than the host's 26-05 (2.93.0);
   # see packages/default.nix.

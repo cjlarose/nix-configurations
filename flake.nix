@@ -93,14 +93,6 @@
       url = "git+https://gist.github.com/db6c5654fa976be33808b8b33a6eb861.git";
       flake = false;
     };
-    superpowers = {
-      # obra/superpowers, pinned to a release tag rather than tracking the
-      # branch: it ships a SessionStart hook that injects context into every
-      # session, so an unpinned bump would change every host's prompt silently.
-      # Repackaged in packages/superpowers (flake = false).
-      url = "github:obra/superpowers/v6.2.0";
-      flake = false;
-    };
     nvr = {
       url = "github:cstyles/nvr";
       flake = false;
@@ -218,7 +210,6 @@
     trueColorTest,
     nvr,
     cs-automation,
-    superpowers,
     microvm,
     hermes-agent,
     picktrace-nix-configurations,
@@ -243,7 +234,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers harness-config lavish-axi herdr ai-memory;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack harness-config lavish-axi herdr ai-memory;
           };
         in
           import ./packages packageArgs

@@ -1870,7 +1870,6 @@
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
         "picktrace-nix-configurations": "picktrace-nix-configurations",
-        "superpowers": "superpowers_3",
         "tfenv": "tfenv_3",
         "trueColorTest": "trueColorTest",
         "tuicr": "tuicr_2"
@@ -2003,23 +2002,6 @@
       }
     },
     "superpowers_2": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1784852836,
-        "narHash": "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=",
-        "owner": "obra",
-        "repo": "superpowers",
-        "rev": "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "obra",
-        "ref": "v6.2.0",
-        "repo": "superpowers",
-        "type": "github"
-      }
-    },
-    "superpowers_3": {
       "flake": false,
       "locked": {
         "lastModified": 1784852836,

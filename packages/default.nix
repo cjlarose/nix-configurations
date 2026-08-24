@@ -14,7 +14,6 @@
   tuicr,
   llm-agents,
   gh-stack,
-  superpowers,
   harness-config,
   lavish-axi,
   herdr,
@@ -29,10 +28,9 @@ let
   llm-agents-pkgs = llm-agents.packages.${system};
 
   # Both claude-code attrs below are UNWRAPPED. The worktree terminal-title /
-  # TMUX / CLAUDE_CODE_SHELL wrapper used to live here as mkTitleWrapper, but it
-  # was duplicated (and drifting) in picktrace/nix-configurations too; it now
-  # lives once in home-manager-modules/llm-agents, which wraps whichever build
-  # cjlarose.llmAgents.claude.package selects.
+  # TMUX / CLAUDE_CODE_SHELL wrapper used to live here as mkTitleWrapper; it now
+  # lives once in harness-config's lib.wrapClaudeCode, which the consumer applies
+  # over whichever build it selects (see home/cjlarose).
 
   # Latest Bun standalone claude-code, used by AVX-capable hosts. The no-AVX pve
   # guests use claude-code-node instead — the Bun binary's JIT requires AVX, so
@@ -151,16 +149,12 @@ in
   # From llm-agents.nix rather than nixpkgs-unstable so it tracks the same
   # daily-updated source as claude-code.
   opencode = llm-agents-pkgs.opencode;
-  # Upstream obra/superpowers source, re-exported unbuilt for
-  # cjlarose.llmAgents.superpowers.src -- the llm-agents module builds the
-  # plugin itself, since the customizations it applies (disabling the
-  # SessionStart hook, stripping the spec-commit instructions) are driven by
-  # module options that packages/ cannot see. Same shape as herdr-src above.
-  superpowers-src = superpowers;
   # cjlarose/harness-config.nix's lib, re-exported to every consumer through
   # additionalPackages.${system}.harnessConfig. Exposes wrapClaudeCode (the
   # terminal-env claude wrapper) and mkSuperpowersPlugin (builds obra/superpowers
-  # into a plugin from harness-config's own pinned source).
+  # into a plugin from harness-config's own pinned source). Replaces the vendored
+  # claude wrapper and the obra/superpowers source passthrough that used to live
+  # here.
   harnessConfig = harness-config.lib;
   tuicr = tuicr.packages.${system}.default;
   # Built from source (flake = false input `lavish-axi` is the upstream src).
