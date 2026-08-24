@@ -26,10 +26,11 @@
         67  # DHCP server for microvm bridge (bridge interface only)
       ];
       # lavish-axi's review UI, reachable over tailscale only (never the public
-      # path). cjlarose's home sets LAVISH_AXI_HOST/PORT so lavish binds the
-      # tailscale interface on 4387; this opens that port on tailscale0 alone,
-      # the same tailscale-only trade as mosh below.
-      interfaces."tailscale0".allowedTCPPorts = [ 4387 ];
+      # path). lavish now binds loopback (127.0.0.1:4387) and is fronted by the
+      # TLS-terminating nginx vhost lavish.ns1010301.cjlarose.dev below, so what
+      # we open on the tailnet is 443, not 4387 -- the proxy hop to lavish is
+      # loopback-internal. Same tailscale-only trade as mosh below.
+      interfaces."tailscale0".allowedTCPPorts = [ 443 ];
       # mosh sessions, reachable over tailscale only (never the public path).
       # programs.mosh.openFirewall is disabled below so the range isn't opened
       # on every interface.
@@ -151,6 +152,19 @@
   security.acme = {
     acceptTerms = true;
     defaults.email = "cjlarose@gmail.com";
+    # DNS-01 for the tailnet-only lavish name. HTTP-01 (as minecraft uses on the
+    # public interface) is impossible here: lavish.ns1010301.cjlarose.dev resolves
+    # to this host's 100.x tailnet IP, which LE's HTTP validators can't reach. Uses
+    # the fleet's DigitalOcean token (full-zone scope, same one media/hermes use);
+    # copied out of nix to /persistence/secrets/digitalocean.secret (root:root
+    # 0600) since it must not land world-readable in the /nix/store.
+    certs."lavish.ns1010301.cjlarose.dev" = {
+      domain = "lavish.ns1010301.cjlarose.dev";
+      dnsProvider = "digitalocean";
+      dnsResolver = "1.1.1.1:53";
+      dnsPropagationCheck = false;
+      environmentFile = "/persistence/secrets/digitalocean.secret";
+    };
   };
 
   services.nginx = {
@@ -161,8 +175,49 @@
         forceSSL = true;
         root = "${additionalPackages.${system}.minecraft-mods-zip}";
       };
+      # TLS front for lavish-axi's review UI. Bound to this host's tailnet IP
+      # ONLY (100.68.229.121 = ns1010301.cjlarose.dev) so it never shares the
+      # public 0.0.0.0:443 listener the minecraft vhost uses -- belt-and-suspenders
+      # on top of the tailscale0-only firewall. Terminates TLS (LE DNS-01 cert
+      # above) and reverse-proxies to lavish on loopback. lavish rebinds to
+      # 127.0.0.1:4387 (see default.nix). X-Forwarded-Proto + the trust-proxy
+      # build patch let lavish's same-origin guard see https; Host carries the
+      # name lavish allowlists. proxy_buffering off + cleared Connection keep the
+      # /events/:key SSE stream (live reload / feedback) flowing unbuffered.
+      "lavish.ns1010301.cjlarose.dev" = {
+        listenAddresses = [ "100.68.229.121" ];
+        enableACME = true;
+        acmeRoot = null; # DNS-01: no HTTP webroot challenge directory
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:4387";
+          extraConfig = ''
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header Connection "";
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_read_timeout 3600s;
+          '';
+        };
+      };
     };
   };
+
+  # nginx now binds a fixed tailnet IP (100.68.229.121) and reads its ACME certs
+  # off the impermanence-persisted /var/lib/acme bind mount, so order it after
+  # tailscaled has assigned the address and after the persist mount exists. The
+  # per-cert ACME unit likewise needs /var/lib/acme. (The minecraft vhost binds
+  # 0.0.0.0 and is unaffected by the added ordering, which only ever delays.)
+  systemd.services.nginx = {
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
+    unitConfig.RequiresMountsFor = [ "/var/lib/acme" ];
+  };
+  systemd.services."acme-lavish.ns1010301.cjlarose.dev".unitConfig.RequiresMountsFor = [ "/var/lib/acme" ];
 
   fileSystems."/var/lib/microvms/pt-docker-cjlarose/acme" = {
     device = "tank/microvms/pt-docker-cjlarose/acme";

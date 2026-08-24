@@ -101,22 +101,28 @@
         # Editor Claude skill. Scoped to this interactive/browser host (not the
         # shared profile, which fans out to the headless cjlarose hosts that have
         # no use for a browser review tool).
-        # Also serve its review UI over tailscale, so a browser elsewhere on the
-        # tailnet can open the session at http://ns1010301.cjlarose.dev:4387
-        # rather than only this host's loopback. host binds by hostname:
-        # ns1010301.cjlarose.dev resolves to this node's tailscale IP, so lavish
-        # listens on the tailscale interface and nowhere public -- and the literal
-        # IP stays out of this public repo. linkHost writes that name into the
-        # session URLs lavish prints; allowedHosts clears its DNS-rebinding guard
-        # for it; port is pinned to lavish's default so it stays in lockstep with
-        # the firewall rule in configuration.nix, which opens 4387 on tailscale0
-        # ONLY -- the public path stays closed.
+        # Serve its review UI over tailscale with real TLS. lavish speaks only
+        # plain HTTP, and the whole .dev TLD is HSTS-preloaded, so a browser
+        # force-upgrades any lavish.ns1010301.cjlarose.dev request to https --
+        # which a bare http lavish can't answer. So lavish binds loopback ONLY
+        # (host = null) and a TLS-terminating nginx vhost on this host's tailscale
+        # IP fronts it (see configuration.nix): browser -> nginx :443 (LE DNS-01
+        # cert) -> http://127.0.0.1:4387. allowedHosts clears lavish's
+        # DNS-rebinding guard for the name nginx forwards as Host; linkScheme +
+        # linkPort make the printed session links the clean https URL with no
+        # port (nginx serves 443, the scheme default), composing with linkHost
+        # (needs the reverse-proxy patch in packages/lavish-axi); port is pinned
+        # so nginx's proxy_pass and the loopback bind stay in lockstep. The
+        # firewall in configuration.nix now opens 443 on tailscale0 (not 4387) --
+        # the public path stays closed.
         cjlarose.llmAgents.lavish = {
           enable = true;
           package = additionalPackages.${system}.lavish-axi;
-          host = "ns1010301.cjlarose.dev";
-          linkHost = "ns1010301.cjlarose.dev";
-          allowedHosts = [ "ns1010301.cjlarose.dev" ];
+          host = null; # loopback-only; nginx is the only reachable front
+          linkHost = "lavish.ns1010301.cjlarose.dev";
+          linkScheme = "https"; # nginx terminates TLS
+          linkPort = ""; # omit the port; nginx serves the scheme default (443)
+          allowedHosts = [ "lavish.ns1010301.cjlarose.dev" ];
           port = 4387;
         };
         # The soliciting-pr-feedback skill and its mock-pr-html renderer, which
