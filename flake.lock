@@ -679,6 +679,27 @@
         "url": "https://flakehub.com/f/cachix/git-hooks.nix/0.1.941"
       }
     },
+    "harness-config": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-26-05"
+        ],
+        "superpowers": "superpowers"
+      },
+      "locked": {
+        "lastModified": 1787593037,
+        "narHash": "sha256-A/01Ljsk60HU+smLKbAaR9WqyeMW+aVUIAEPXD47XsI=",
+        "owner": "cjlarose",
+        "repo": "harness-config.nix",
+        "rev": "c4d7470251b2d0c53c7a8dfdd1e9dec208a62ad1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cjlarose",
+        "repo": "harness-config.nix",
+        "type": "github"
+      }
+    },
     "herdr": {
       "inputs": {
         "nixpkgs": [
@@ -1711,7 +1732,7 @@
         "nixpkgs-25-11": "nixpkgs-25-11_2",
         "nixpkgs-26-05": "nixpkgs-26-05_2",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
-        "superpowers": "superpowers",
+        "superpowers": "superpowers_2",
         "tfenv": "tfenv",
         "tuicr": "tuicr"
       },
@@ -1827,6 +1848,7 @@
         "fzfProject": "fzfProject",
         "fzfVim": "fzfVim",
         "gh-stack": "gh-stack",
+        "harness-config": "harness-config",
         "herdr": "herdr",
         "hermes-agent": "hermes-agent",
         "home-manager-25-05": "home-manager-25-05",
@@ -1848,7 +1870,7 @@
         "omnisharpVim": "omnisharpVim",
         "pce": "pce",
         "picktrace-nix-configurations": "picktrace-nix-configurations",
-        "superpowers": "superpowers_2",
+        "superpowers": "superpowers_3",
         "tfenv": "tfenv_3",
         "trueColorTest": "trueColorTest",
         "tuicr": "tuicr_2"
@@ -1981,6 +2003,23 @@
       }
     },
     "superpowers_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784852836,
+        "narHash": "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=",
+        "owner": "obra",
+        "repo": "superpowers",
+        "rev": "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "ref": "v6.2.0",
+        "repo": "superpowers",
+        "type": "github"
+      }
+    },
+    "superpowers_3": {
       "flake": false,
       "locked": {
         "lastModified": 1784852836,

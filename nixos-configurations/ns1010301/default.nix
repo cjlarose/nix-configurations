@@ -63,6 +63,12 @@
         imports = [
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
+            # Browser automation for cjlarose's sessions on this host: register
+            # the Playwright MCP with Claude Code. The shared home/cjlarose
+            # profile leaves this off so the chromium closure only lands where
+            # it's wanted; scope the enable to ns1010301 here (it fans out to
+            # every linux host otherwise).
+            enablePlaywrightMcp = true;
             llm-wiki-path = "/home/cjlarose/repos/cjlarose/llm-wiki";
             # The wiki flake input's skills/ tree; llm-agents reads the
             # read-only querying-notes SKILL.md out of it and installs it into
@@ -92,11 +98,6 @@
         # It is picktrace that has to ban it, and only on PR descriptions.
         cjlarose.llmAgents.gitConventions.enable = true;
         cjlarose.llmAgents.githubConventions.enable = true;
-        # Browser automation for cjlarose's sessions on this host. The shared
-        # home/cjlarose profile leaves enablePlaywrightMcp off so the chromium
-        # closure only lands where it's wanted; scope the enable to ns1010301
-        # here rather than in home/cjlarose (which fans out to every linux host).
-        cjlarose.llmAgents.claude.enablePlaywrightMcp = true;
         # Upstream lavish-axi CLI (built from source, telemetry off) + its Lavish
         # Editor Claude skill. Scoped to this interactive/browser host (not the
         # shared profile, which fans out to the headless cjlarose hosts that have

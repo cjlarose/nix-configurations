@@ -15,6 +15,7 @@
   llm-agents,
   gh-stack,
   superpowers,
+  harness-config,
   lavish-axi,
   herdr,
   ai-memory,
@@ -156,6 +157,11 @@ in
   # SessionStart hook, stripping the spec-commit instructions) are driven by
   # module options that packages/ cannot see. Same shape as herdr-src above.
   superpowers-src = superpowers;
+  # cjlarose/harness-config.nix's lib, re-exported to every consumer through
+  # additionalPackages.${system}.harnessConfig. Exposes wrapClaudeCode (the
+  # terminal-env claude wrapper) and mkSuperpowersPlugin (builds obra/superpowers
+  # into a plugin from harness-config's own pinned source).
+  harnessConfig = harness-config.lib;
   tuicr = tuicr.packages.${system}.default;
   # Built from source (flake = false input `lavish-axi` is the upstream src).
   # callPackage supplies lib/stdenv/nodejs_22/pnpm/makeWrapper from nixpkgs-26-05.

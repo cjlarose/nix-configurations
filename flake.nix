@@ -119,6 +119,15 @@
       url = "git+ssh://git@github.com/cjlarose/llm-wiki";
       inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
+    harness-config = {
+      # cjlarose/harness-config.nix -- reusable Claude Code / agent tooling for
+      # home-manager. Exposes lib.wrapClaudeCode (the terminal-env claude wrapper)
+      # and lib.mkSuperpowersPlugin (builds obra/superpowers into a plugin, from
+      # its own pinned source). Replaces the vendored wrapper and the superpowers
+      # input, both of which used to live here.
+      url = "github:cjlarose/harness-config.nix";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
+    };
     gh-stack = {
       # github/gh-stack -- GitHub's official stacked-PR gh CLI extension
       # (https://github.github.com/gh-stack/). flake = false: upstream ships no
@@ -220,6 +229,7 @@
     lavish-axi,
     herdr,
     ai-memory,
+    harness-config,
   }:
     let
       supportedPlatforms = [
@@ -233,7 +243,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers lavish-axi herdr ai-memory;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack superpowers harness-config lavish-axi herdr ai-memory;
           };
         in
           import ./packages packageArgs

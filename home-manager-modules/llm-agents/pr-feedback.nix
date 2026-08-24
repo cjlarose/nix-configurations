@@ -64,7 +64,7 @@ in
 
     # ~/.claude/skills only: opencode scans it natively, so a second copy under
     # opencode/skills would collide rather than help (see default.nix).
-    home.file = lib.mkIf (agents.claude.enable || agents.opencode.enable) {
+    home.file = lib.mkIf (config.programs.claude-code.enable || agents.opencode.enable) {
       ".claude/skills/soliciting-pr-feedback".source =
         ./pr-feedback/soliciting-pr-feedback;
     };

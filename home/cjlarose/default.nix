@@ -1,17 +1,137 @@
-{ system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-skill-src ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true }:
-{ pkgs, lib, ... }: {
-  # All LLM-agent tooling lives behind the single llm-agents module, which
-  # defaults every feature off -- claude included. Everything wanted fleet-wide
-  # is opted into here, and the rest per-host where the closure cost warrants
-  # it. The module takes no additionalPackages arg -- every package is named
-  # explicitly here.
-  cjlarose.llmAgents = {
-    # Claude Code for the whole cjlarose fleet. Stated here rather than assumed:
-    # the module defaults it off like everything else, so this one line is what
-    # keeps all seven hosts that import this profile on claude.
-    claude.enable = true;
-    claude.remoteControlAtStartup = true;
+{ system, additionalPackages, stateVersion, llm-wiki-path ? null, llm-wiki-skill-src ? null, claudeUseNodeRuntime ? false, enableSuperpowers ? true, enablePlaywrightMcp ? false }:
+{ pkgs, lib, config, ... }:
+let
+  # harness-config's lib, re-exported through additionalPackages (see
+  # packages/default.nix). Provides wrapClaudeCode (the terminal-env claude
+  # wrapper) and mkSuperpowersPlugin (builds obra/superpowers into a plugin from
+  # harness-config's own pinned source). Claude Code itself is now stock
+  # programs.claude-code, configured here rather than by the llm-agents module.
+  harnessConfig = additionalPackages.${system}.harnessConfig;
 
+  # Which claude build is a property of the host, not of the module. The
+  # Goldmont-based pve guests have no AVX and segfault on the Bun standalone at
+  # launch, so they take the node-pinned build (frozen at npm 2.1.112); every
+  # AVX-capable host tracks the latest Bun build from llm-agents.nix.
+  claudePkg =
+    if claudeUseNodeRuntime
+    then additionalPackages.${system}.claude-code-node
+    else additionalPackages.${system}.claude-code;
+
+  # The statusline command, built at the consumer now that the llm-agents module
+  # no longer owns Claude Code. jq + gawk on PATH; body lives beside this file.
+  statusline = pkgs.writeShellApplication {
+    name = "claude-code-statusline";
+    runtimeInputs = [ pkgs.jq pkgs.gawk ];
+    text = builtins.readFile ./claude-code-statusline.sh;
+  };
+
+  # playwright-mcp 0.0.69 ignores the PLAYWRIGHT_MCP_BROWSER env var nixpkgs
+  # sets, so it falls back to the "chrome" channel and tries to provision a
+  # chrome-for-testing build by writing into its (read-only) Nix store browsers
+  # path -- which fails with ENOENT/mkdir. Point it explicitly at the
+  # nix-provided chromium instead (the same playwright-driver.browsers derivation
+  # the upstream wrapper already exports, so versions stay in sync). The chromium
+  # revision is globbed at runtime to survive nixpkgs bumps. Headless because
+  # this targets displayless hosts; isolated keeps the profile in memory.
+  playwrightMcp = pkgs.writeShellScriptBin "playwright-mcp-chromium" ''
+    chrome=( ${pkgs.playwright-driver.browsers}/chromium-*/chrome-linux*/chrome )
+    exec ${pkgs.playwright-mcp}/bin/playwright-mcp \
+      --headless --isolated --executable-path "''${chrome[0]}" "$@"
+  '';
+in
+{
+  # Stock Claude Code for the whole cjlarose fleet, wrapped by harness-config's
+  # lib. The llm-agents module no longer gates it; the siblings that install
+  # skills read config.programs.claude-code.enable instead.
+  programs.claude-code = {
+    enable = true;
+    # harness-config's terminal-env wrapper over the host's claude build.
+    # home-manager wraps this again with its --plugin-dir flags, so the final
+    # chain is: HM plugin wrapper -> env wrapper -> claude-code. Agent-teams is
+    # opted in through the wrapper's agentTeams arg, which exports
+    # CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS with a :- default -- so an explicit
+    # per-session opt-out still wins -- rather than pinning it in settings.env.
+    package = harnessConfig.wrapClaudeCode {
+      inherit pkgs;
+      package = claudePkg;
+      trueColorInTmux = true;
+      fullscreenTui = true;
+      toolShell = "${pkgs.bashInteractive}/bin/bash";
+      agentTeams = true;
+    };
+
+    # Pinned, self-contained Playwright MCP (chromium baked in). Gated per-host
+    # via enablePlaywrightMcp -- ns1010301 only -- so the chromium closure only
+    # lands where browser automation is wanted. Merges with the ai-memory MCP
+    # entry the ai-memory module defines.
+    mcpServers = lib.optionalAttrs enablePlaywrightMcp {
+      playwright = {
+        type = "stdio";
+        command = "${playwrightMcp}/bin/playwright-mcp-chromium";
+      };
+    };
+
+    settings = {
+      # nixd Nix language server, provided by the local marketplace in home.file
+      # below (nixd binary from home.packages so bare `nixd` resolves on PATH).
+      enabledPlugins."nixd@cjlarose-lsps" = true;
+      extraKnownMarketplaces."cjlarose-lsps".source = {
+        source = "directory";
+        path = "${config.home.homeDirectory}/.claude/lsp-marketplace";
+      };
+      skipDangerousModePermissionPrompt = true;
+      remoteControlAtStartup = true;
+      # high, not xhigh: on Opus 4.8 thinking is off unless a request sets
+      # thinking.type = "adaptive", and the API rejects xhigh/max while thinking
+      # is disabled. Claude Code silently clamps xhigh back to high, so it only
+      # ever looked applied. Revisit if thinking gets turned on.
+      effortLevel = "high";
+      model = "claude-opus-4-8";
+      autoMemoryEnabled = false;
+      # Keep session transcripts effectively forever (default is 30 days). They
+      # are the source for llm-wiki backfill/capture, so retention matters.
+      cleanupPeriodDays = 3650;
+      permissions.defaultMode = "bypassPermissions";
+      statusLine = {
+        type = "command";
+        command = "${statusline}/bin/claude-code-statusline";
+      };
+    };
+  };
+
+  # Local LSP plugin marketplace consumed via programs.claude-code.settings
+  # above. Ships nixd as the Nix language server so Claude Code gets real
+  # diagnostics on .nix edits. nixd itself is added to home.packages below.
+  home.file = {
+    ".claude/lsp-marketplace/.claude-plugin/marketplace.json".text = builtins.toJSON {
+      name = "cjlarose-lsps";
+      owner.name = "cjlarose";
+      description = "cjlarose local LSP plugins";
+      plugins = [{
+        name = "nixd";
+        source = "./nixd";
+        description = "Nix language server (nixd)";
+      }];
+    };
+    ".claude/lsp-marketplace/nixd/.claude-plugin/plugin.json".text = builtins.toJSON {
+      name = "nixd";
+      description = "Nix language server (nixd)";
+      version = "1.0.0";
+      author.name = "cjlarose";
+    };
+    ".claude/lsp-marketplace/nixd/.lsp.json".text = builtins.toJSON {
+      nix = {
+        command = "nixd";
+        extensionToLanguage.".nix" = "nix";
+      };
+    };
+  };
+
+  # The rest of the LLM-agent tooling lives behind the single llm-agents module,
+  # which defaults every feature off. Everything wanted fleet-wide is opted into
+  # here, and the rest per-host where the closure cost warrants it. The module
+  # takes no additionalPackages arg -- every package is named explicitly here.
+  cjlarose.llmAgents = {
     # obra/superpowers as a namespaced plugin: brainstorming, planning, TDD,
     # code review, worktrees, systematic debugging. Replaces both the vendored
     # single-skill systematic-debugging copy and the phx workflow skills, whose
@@ -37,15 +157,6 @@
       # commits are untouched.
       disableSpecCommits = true;
     };
-
-    # Which claude build is a property of the host, not of the module. The
-    # Goldmont-based pve guests have no AVX and segfault on the Bun standalone at
-    # launch, so they take the node-pinned build (frozen at npm 2.1.112); every
-    # AVX-capable host tracks the latest Bun build from llm-agents.nix.
-    claude.package =
-      if claudeUseNodeRuntime
-      then additionalPackages.${system}.claude-code-node
-      else additionalPackages.${system}.claude-code;
 
     # Both are small CLIs that pair with claude, so they ride the shared profile
     # rather than being host-scoped: opencode as a second agent, herdr to manage
@@ -96,9 +207,10 @@
     wiki.skillSrc = llm-wiki-skill-src;
   };
 
-  # lavish and claude.enablePlaywrightMcp are left at their module defaults
-  # (off) here and enabled per-host in nixos-configurations/ns1010301: a browser
-  # review tool and a chromium closure have no business on the headless guests.
+  # lavish is left at its module default (off) here and enabled per-host in
+  # nixos-configurations/ns1010301, as is the Playwright MCP (enablePlaywrightMcp
+  # above): a browser review tool and a chromium closure have no business on the
+  # headless guests.
   #
   # The wiki integration needs no extra import any more: the llm-agents module
   # installs the querying-notes skill and LLM_WIKI_PATH itself from
@@ -147,6 +259,9 @@
     pkgs.parallel
     pkgs.socat
     additionalPackages.${system}.trueColorTest
+    # nixd on PATH so the local LSP marketplace plugin's bare `nixd` command
+    # resolves (marketplace + settings wired onto programs.claude-code above).
+    pkgs.nixd
   ];
 
   programs.git.userName = "Christopher La Rose";

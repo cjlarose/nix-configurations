@@ -63,89 +63,13 @@ let
   # read, so on a host running opencode alone it is still where opencode looks.
   # Writing under ~/.claude with claude off reads oddly for a moment, and is
   # cheaper than a second copy that opencode would only warn about.
-  skillsWanted = cfg.claude.enable || cfg.opencode.enable;
+  skillsWanted = config.programs.claude-code.enable || cfg.opencode.enable;
 
   # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
   # format rather than a typed option per key: tuicr's config surface is its
   # own, and every key it grows would otherwise need a change here before a
   # consumer could set it.
   tomlFormat = pkgs.formats.toml { };
-
-  # The claude wrapper, shared by both consuming flakes. It used to be duplicated
-  # as `mkTitleWrapper` in each repo's packages/default.nix, where it drifted
-  # (cjlarose had it as a reusable function over both the Bun and node builds;
-  # picktrace had the body inlined). Living here means one definition, and `pkgs`
-  # is the host's own nixpkgs -- so bashInteractive is the one the system already
-  # pulls in, with no nixpkgs-26-05 plumbing through packages/. The rationale for
-  # each line lives in the script itself, so it survives into the store copy the
-  # user actually reads.
-  wrappedClaude = pkgs.writeShellScriptBin "claude" ''
-    # Set the terminal title from the checkout layout. Three schemes are
-    # recognized so a host may use either the old or the new one:
-    #   ~/worktrees/<owner>/<repo>/<worktree> -> owner/repo [worktree]
-    #   ~/workspaces/<task>/<owner>-<repo>    -> owner-repo [task]
-    #   ~/repos/<owner>/<repo>                -> owner/repo
-    # Elsewhere the title is left alone. The ~/repos form has no bracket
-    # because nothing should ever be edited there.
-    if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
-    elif [[ "$PWD" =~ ^''${HOME}/workspaces/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[2]} [''${BASH_REMATCH[1]}]"
-    elif [[ "$PWD" =~ ^''${HOME}/repos/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]}"
-    fi
-
-    # We set the title above, so stop claude from fighting us over it.
-    export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
-
-    # claude (via chalk) hard-caps its color level to 256 whenever $TMUX is set,
-    # a cap even FORCE_COLOR=3 cannot defeat. Dropping the variable is the only
-    # way to get 24-bit color inside tmux; we are already past the point where
-    # anything else in this process needs it.
-    unset TMUX
-
-    # Pin the shell claude spawns for the Bash tool. Left unset it follows
-    # $SHELL, which is zsh on these hosts, so tool invocations would run under a
-    # different shell than the bash the agent's snippets assume. The :- default
-    # means an explicit value in the environment still wins.
-    export CLAUDE_CODE_SHELL="''${CLAUDE_CODE_SHELL:-${pkgs.bashInteractive}/bin/bash}"
-
-    # Always use the fullscreen (alt-screen, flicker-free) TUI renderer rather
-    # than leaving it to a rollout gate. There is no CLI flag for this; the two
-    # real mechanisms are the settings.json "tui": "fullscreen" key (what the
-    # /tui slash command writes) and this variable, which the setting's own
-    # description calls equivalent. The variable is the stronger of the two:
-    # claude consults it *before* the settings key and before the automatic
-    # opt-outs, so it also survives the tmux -CC and Windows-over-SSH
-    # auto-disables, which the setting does not. It is parsed as a tri-state,
-    # so the :- default leaves CLAUDE_CODE_NO_FLICKER=0 as a working escape
-    # hatch for a session that needs the classic renderer. Screen-reader mode
-    # still wins over both, by design.
-    export CLAUDE_CODE_NO_FLICKER="''${CLAUDE_CODE_NO_FLICKER:-1}"
-
-    exec ${cfg.claude.package}/bin/claude "$@"
-  '';
-
-  claudeCodeStatusline = pkgs.writeShellApplication {
-    name = "claude-code-statusline";
-    runtimeInputs = [ pkgs.jq pkgs.gawk ];
-    text = builtins.readFile ./claude-code-statusline.sh;
-  };
-
-  # playwright-mcp 0.0.69 ignores the PLAYWRIGHT_MCP_BROWSER env var that
-  # nixpkgs sets, so it falls back to the "chrome" channel and tries to
-  # provision a chrome-for-testing build by writing into its (read-only) Nix
-  # store browsers path — which fails with ENOENT/mkdir. Point it explicitly at
-  # the nix-provided chromium instead (the same playwright-driver.browsers
-  # derivation the upstream wrapper already exports, so versions stay in sync).
-  # The chromium revision is globbed at runtime to survive nixpkgs bumps.
-  # Headless because this targets displayless hosts; isolated keeps the profile
-  # in memory.
-  playwrightMcp = pkgs.writeShellScriptBin "playwright-mcp-chromium" ''
-    chrome=( ${pkgs.playwright-driver.browsers}/chromium-*/chrome-linux*/chrome )
-    exec ${pkgs.playwright-mcp}/bin/playwright-mcp \
-      --headless --isolated --executable-path "''${chrome[0]}" "$@"
-  '';
 
   # herdr's agent integrations -- the hook/plugin that report pane agent state
   # (working/blocked/idle) back to the herdr server, so panes show live status.
@@ -347,57 +271,6 @@ in
   imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ./ai-memory.nix ./pr-feedback.nix ];
 
   options.cjlarose.llmAgents = {
-
-    # --- Claude Code -------------------------------------------------------
-
-    claude.enable = lib.mkEnableOption ''
-      Claude Code: the wrapped package, its settings and MCP servers, the nixd
-      LSP marketplace, and every skill this module installs into ~/.claude/skills.
-
-      Off by default like everything else here, so a consumer of this module has
-      to ask for claude explicitly. The cjlarose fleet does it once, in
-      home/cjlarose
-    '';
-
-    claude.enablePlaywrightMcp = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Register the Playwright MCP server with Claude Code, using the pinned
-        pkgs.playwright-mcp build (chromium baked in via PLAYWRIGHT_BROWSERS_PATH,
-        so no runtime npx/network). Default off because it pulls a chromium
-        browser closure; enable only on hosts where browser automation is wanted.
-      '';
-    };
-
-    claude.remoteControlAtStartup = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Enable Remote Control for every new session at startup (the
-        remoteControlAtStartup setting). Default off; enabled on cjlarose's own
-        hosts via home/cjlarose/default.nix. Left off on pt-docker-cjlarose,
-        whose picktrace Claude subscription doesn't have Remote Control.
-      '';
-    };
-
-    claude.package = lib.mkOption {
-      type = lib.types.package;
-      description = ''
-        The UNWRAPPED claude-code package. Required when claude.enable is set,
-        and only then: it is read from inside the block that option gates, so a
-        host with claude off never has to name one. The module applies its own
-        wrapper (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on
-        top, so hand over a plain build.
-
-        Which build is a property of the HOST, not of this module: AVX-capable
-        machines take the latest Bun standalone, while the Goldmont-based pve
-        guests need the node-pinned build (frozen at npm 2.1.112) because the Bun
-        binary segfaults at launch there. The consumer picks; this used to be a
-        `useNodeRuntime` boolean here, which forced the module to know both
-        package names.
-      '';
-    };
 
     # --- superpowers ---------------------------------------------------------
 
@@ -789,102 +662,6 @@ in
   };
 
   config = lib.mkMerge [
-
-    # --- Claude Code -------------------------------------------------------
-    # Off unless claude.enable says otherwise, like every other feature here.
-    # The cjlarose fleet turns it on once, in home/cjlarose.
-    (lib.mkIf cfg.claude.enable {
-      programs.claude-code = {
-        enable = true;
-        # The module's own wrapper, not cfg.claude.package directly -- see
-        # wrappedClaude above. home-manager wraps this again with its
-        # --plugin-dir flags, so the final chain is
-        # HM plugin wrapper -> title/env wrapper -> claude-code.
-        package = wrappedClaude;
-
-        # Pinned, self-contained Playwright MCP (chromium baked in via the
-        # package's PLAYWRIGHT_BROWSERS_PATH wrapper, so no runtime npx/network).
-        # Gated default-off so headless hosts don't pull the chromium closure.
-        # The HM module surfaces this as a .mcp.json in a generated plugin-dir
-        # wired onto claude-code via --plugin-dir. Uses the chromium-pinned
-        # wrapper above so the browser actually launches (see its comment).
-        mcpServers = lib.optionalAttrs cfg.claude.enablePlaywrightMcp {
-          playwright = {
-            type = "stdio";
-            command = "${playwrightMcp}/bin/playwright-mcp-chromium";
-          };
-        };
-
-        settings = {
-          enabledPlugins = {
-            # nixd Nix language server, provided by the local marketplace below.
-            "nixd@cjlarose-lsps" = true;
-          };
-          # Local plugin marketplace (files materialized via home.file below) that
-          # ships a single LSP plugin wiring nixd as the Nix language server, so
-          # Claude Code gets real diagnostics on .nix edits (unused bindings,
-          # undefined vars, flake/option-aware analysis). nixd binary comes from
-          # home.packages so the bare "nixd" command resolves on PATH.
-          extraKnownMarketplaces."cjlarose-lsps".source = {
-            source = "directory";
-            path = "${config.home.homeDirectory}/.claude/lsp-marketplace";
-          };
-          skipDangerousModePermissionPrompt = true;
-          remoteControlAtStartup = cfg.claude.remoteControlAtStartup;
-          # high, not xhigh: on Opus 4.8 thinking is off unless a request sets
-          # thinking.type = "adaptive", and the API rejects xhigh/max while
-          # thinking is disabled. Claude Code silently clamps xhigh back to
-          # high here, so xhigh only ever looked applied. Revisit if thinking
-          # gets turned on, or on a model where it defaults to on.
-          effortLevel = "high";
-          model = "claude-opus-4-8";
-          autoMemoryEnabled = false;
-          # Keep session transcripts effectively forever (default is 30 days, which
-          # silently garbage-collects ~/.claude/projects history). These transcripts
-          # are the source for llm-wiki backfill/capture, so retention matters.
-          cleanupPeriodDays = 3650;
-          env = {
-            CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-          };
-          permissions = {
-            defaultMode = "bypassPermissions";
-          };
-          statusLine = {
-            type = "command";
-            command = "${claudeCodeStatusline}/bin/claude-code-statusline";
-          };
-        };
-      };
-
-      home.packages = [ pkgs.nixd ];
-
-      home.file = {
-        # Local LSP plugin marketplace consumed via settings.extraKnownMarketplaces
-        # + enabledPlugins above. Ships nixd as the Nix language server.
-        ".claude/lsp-marketplace/.claude-plugin/marketplace.json".text = builtins.toJSON {
-          name = "cjlarose-lsps";
-          owner.name = "cjlarose";
-          description = "cjlarose local LSP plugins";
-          plugins = [{
-            name = "nixd";
-            source = "./nixd";
-            description = "Nix language server (nixd)";
-          }];
-        };
-        ".claude/lsp-marketplace/nixd/.claude-plugin/plugin.json".text = builtins.toJSON {
-          name = "nixd";
-          description = "Nix language server (nixd)";
-          version = "1.0.0";
-          author.name = "cjlarose";
-        };
-        ".claude/lsp-marketplace/nixd/.lsp.json".text = builtins.toJSON {
-          nix = {
-            command = "nixd";
-            extensionToLanguage.".nix" = "nix";
-          };
-        };
-      };
-    })
 
     # --- superpowers ---------------------------------------------------------
     # Only builds the plugin; the programs.claude-code.plugins definition that
