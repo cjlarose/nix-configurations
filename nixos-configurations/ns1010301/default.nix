@@ -108,17 +108,20 @@
         # (host = null) and a TLS-terminating nginx vhost on this host's tailscale
         # IP fronts it (see configuration.nix): browser -> nginx :443 (LE DNS-01
         # cert) -> http://127.0.0.1:4387. allowedHosts clears lavish's
-        # DNS-rebinding guard for the name nginx forwards as Host; linkBase makes
-        # the printed session links the clean https URL (needs the reverse-proxy
-        # patch in packages/lavish-axi); port is pinned so nginx's proxy_pass and
-        # the loopback bind stay in lockstep. The firewall in configuration.nix
-        # now opens 443 on tailscale0 (not 4387) -- the public path stays closed.
+        # DNS-rebinding guard for the name nginx forwards as Host; linkScheme +
+        # linkPort make the printed session links the clean https URL with no
+        # port (nginx serves 443, the scheme default), composing with linkHost
+        # (needs the reverse-proxy patch in packages/lavish-axi); port is pinned
+        # so nginx's proxy_pass and the loopback bind stay in lockstep. The
+        # firewall in configuration.nix now opens 443 on tailscale0 (not 4387) --
+        # the public path stays closed.
         cjlarose.llmAgents.lavish = {
           enable = true;
           package = additionalPackages.${system}.lavish-axi;
           host = null; # loopback-only; nginx is the only reachable front
           linkHost = "lavish.ns1010301.cjlarose.dev";
-          linkBase = "https://lavish.ns1010301.cjlarose.dev";
+          linkScheme = "https"; # nginx terminates TLS
+          linkPort = ""; # omit the port; nginx serves the scheme default (443)
           allowedHosts = [ "lavish.ns1010301.cjlarose.dev" ];
           port = 4387;
         };

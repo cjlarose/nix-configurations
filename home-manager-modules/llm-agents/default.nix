@@ -550,17 +550,28 @@ in
       '';
     };
 
-    lavish.linkBase = lib.mkOption {
+    lavish.linkScheme = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "http" "https" ]);
+      default = null;
+      example = "https";
+      description = ''
+        Scheme lavish prints its session links with (LAVISH_AXI_LINK_SCHEME).
+        Null leaves upstream's http. Set https when a TLS-terminating reverse
+        proxy fronts the loopback server. Composes with linkHost/linkPort and
+        requires the reverse-proxy build patch in packages/lavish-axi.
+      '';
+    };
+
+    lavish.linkPort = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      example = "https://lavish.example.ts.net";
+      example = "";
       description = ''
-        Full scheme+host (+optional port) base URL lavish prints its session
-        links against (LAVISH_AXI_LINK_BASE), e.g. when a TLS-terminating reverse
-        proxy fronts the loopback server. When set, printed links become
-        `<linkBase>/session/<key>` instead of the built-in
-        `http://<linkHost>:<port>/session/<key>`. Null leaves upstream behavior.
-        Requires the reverse-proxy build patch in packages/lavish-axi.
+        Port segment lavish prints its session links with (LAVISH_AXI_LINK_PORT).
+        Null keeps the actual bind port. The empty string omits the port entirely
+        -- use it when a reverse proxy serves the link on the scheme's default
+        port (443/80), so the printed URL has no `:port`. A number forces that
+        port. Composes with linkScheme; requires the packages/lavish-axi patch.
       '';
     };
 
@@ -934,7 +945,8 @@ in
       home.sessionVariables =
         lib.optionalAttrs (cfg.lavish.host != null) { LAVISH_AXI_HOST = cfg.lavish.host; }
         // lib.optionalAttrs (cfg.lavish.linkHost != null) { LAVISH_AXI_LINK_HOST = cfg.lavish.linkHost; }
-        // lib.optionalAttrs (cfg.lavish.linkBase != null) { LAVISH_AXI_LINK_BASE = cfg.lavish.linkBase; }
+        // lib.optionalAttrs (cfg.lavish.linkScheme != null) { LAVISH_AXI_LINK_SCHEME = cfg.lavish.linkScheme; }
+        // lib.optionalAttrs (cfg.lavish.linkPort != null) { LAVISH_AXI_LINK_PORT = cfg.lavish.linkPort; }
         // lib.optionalAttrs (cfg.lavish.allowedHosts != [ ]) { LAVISH_AXI_ALLOWED_HOSTS = lib.concatStringsSep " " cfg.lavish.allowedHosts; }
         // lib.optionalAttrs (cfg.lavish.port != null) { LAVISH_AXI_PORT = toString cfg.lavish.port; };
     })

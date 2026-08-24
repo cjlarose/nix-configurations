@@ -43,17 +43,21 @@ stdenv.mkDerivation (finalAttrs: {
     #    nginx's X-Forwarded-Proto. The Host-allowlist guard is unaffected (it
     #    reads the Host header directly, which nginx forwards verbatim).
     #
-    # 2. LAVISH_AXI_LINK_BASE — the printed session URL is hardcoded
-    #    `http://<linkHost>:<port>`; there is no env for scheme/port. When set,
-    #    this env makes it emit `<base>/session/<key>` so the link is a clean
-    #    `https://lavish.ns1010301.cjlarose.dev/session/<key>`. Unset -> upstream
-    #    behavior. --replace-fail so an upstream drift fails the build loudly.
+    # 2. LAVISH_AXI_LINK_SCHEME / LAVISH_AXI_LINK_PORT — the printed session URL
+    #    is hardcoded `http://<linkHost>:<publicPort>`, and publicPort is the
+    #    loopback BIND port (4387), not the public TLS port nginx serves (443).
+    #    Two orthogonal knobs that compose with the existing linkHost fix that:
+    #    SCHEME overrides http (default http); PORT overrides the port segment --
+    #    unset keeps :publicPort, "" omits it (so a default 443/80 vanishes), "N"
+    #    forces :N. For our proxy: SCHEME=https + PORT="" ->
+    #    `https://lavish.ns1010301.cjlarose.dev/session/<key>`. Both unset ->
+    #    upstream behavior. --replace-fail so an upstream drift fails the build.
     substituteInPlace dist/cli.mjs \
       --replace-fail 'const app = express()' \
                      'const app = express(); app.set("trust proxy", true)'
     substituteInPlace dist/cli.mjs \
       --replace-fail '`http://''${hostForUrl(linkHostName)}:''${publicPort}/session/''${key}`' \
-                     '(process.env.LAVISH_AXI_LINK_BASE ? `''${process.env.LAVISH_AXI_LINK_BASE}/session/''${key}` : `http://''${hostForUrl(linkHostName)}:''${publicPort}/session/''${key}`)'
+                     '(() => { const s = process.env.LAVISH_AXI_LINK_SCHEME || "http"; const lp = process.env.LAVISH_AXI_LINK_PORT; const pp = lp === undefined ? `:''${publicPort}` : (lp === "" ? "" : `:''${lp}`); return `''${s}://''${hostForUrl(linkHostName)}''${pp}/session/''${key}`; })()'
 
     # Drop devDependencies (esbuild + native binaries, the whiteboard build-only
     # deps like @excalidraw/mermaid/react, eslint, prettier, typescript) now that
