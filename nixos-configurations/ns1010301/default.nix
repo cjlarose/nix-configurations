@@ -107,11 +107,12 @@
         # which a bare http lavish can't answer. So lavish binds loopback ONLY
         # (host = null) and a TLS-terminating nginx vhost on this host's tailscale
         # IP fronts it (see configuration.nix): browser -> nginx :443 (LE DNS-01
-        # cert) -> http://127.0.0.1:4387. allowedHosts clears lavish's
-        # DNS-rebinding guard for the name nginx forwards as Host; linkScheme +
+        # cert) -> http://127.0.0.1:4387. linkHost both names the printed link
+        # and authorizes that name in lavish's DNS-rebinding guard (the Host
+        # nginx forwards), so no separate allowedHosts is needed; linkScheme +
         # linkPort make the printed session links the clean https URL with no
-        # port (nginx serves 443, the scheme default), composing with linkHost
-        # (needs the reverse-proxy patch in packages/lavish-axi); port is pinned
+        # port (nginx serves 443, the scheme default) -- these need the
+        # reverse-proxy patch in packages/lavish-axi; port is pinned
         # so nginx's proxy_pass and the loopback bind stay in lockstep. The
         # firewall in configuration.nix now opens 443 on tailscale0 (not 4387) --
         # the public path stays closed.
@@ -122,7 +123,6 @@
           linkHost = "lavish.ns1010301.cjlarose.dev";
           linkScheme = "https"; # nginx terminates TLS
           linkPort = ""; # omit the port; nginx serves the scheme default (443)
-          allowedHosts = [ "lavish.ns1010301.cjlarose.dev" ];
           port = 4387;
         };
         # The soliciting-pr-feedback skill and its mock-pr-html renderer, which
