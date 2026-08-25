@@ -139,8 +139,13 @@ export function esc(s) {
     .replaceAll("'", "&#x27;");
 }
 function inlineJson(data) {
-  // </ -> <\/ so no </script> can terminate the block early; \/ is valid JSON.
-  return JSON.stringify(data).replaceAll("</", "<\\/");
+  // Escape every "<" as the JSON escape \\u003c (JSON.parse restores it). This
+  // stops a "</script>" in the data from closing the block early AND a
+  // "<!--<script" from driving the HTML tokenizer into the
+  // script-data-double-escaped state, where the block's real </script> is not
+  // recognised and the rest of the page -- every commitdiff block and the
+  // client module -- gets swallowed into this one element.
+  return JSON.stringify(data).replaceAll("<", "\\u003c");
 }
 
 const MERGE_ICON =

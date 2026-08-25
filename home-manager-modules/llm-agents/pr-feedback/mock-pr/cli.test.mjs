@@ -181,3 +181,41 @@ test("page has three exclusive tab panels, Conversation active by default", () =
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("inlineJson escapes < so a diff's content cannot break the page", () => {
+  const { dir, g } = initRepo();
+  const out = join(dir, "out.html");
+  const body = join(dir, "body.md");
+  try {
+    writeFileSync(join(dir, "base.txt"), "x\n");
+    g("add", "-A");
+    g("commit", "-qm", "base");
+    // A diff whose content carries the tokenizer-hostile sequence: a literal
+    // </script> plus a <!--<script that, unescaped, drives the HTML parser into
+    // script-data-double-escaped and swallows the rest of the document.
+    writeFileSync(join(dir, "evil.html"), "line\n</script>\n<!--<script>\nmore\n");
+    g("add", "-A");
+    g("commit", "-qm", "add evil");
+    writeFileSync(body, "# hi\n");
+    execFileSync(
+      process.execPath,
+      [CLI, "--title", "T", "--body-file", body, "--base", "HEAD~1", "--head", "HEAD", "--repo-path", dir, "--out", out],
+      { encoding: "utf8" },
+    );
+    const html = readFileSync(out, "utf8");
+    // Every inlined JSON block is free of a raw "<" and still parses.
+    const blocks = [...html.matchAll(/<script id="(?:diffdata|commitdiff-\d+)"[^>]*>([\s\S]*?)<\/script>/g)];
+    assert.ok(blocks.length >= 2, "expected diffdata + at least one commitdiff block");
+    for (const [, jsonText] of blocks) {
+      assert.doesNotMatch(jsonText, /</, "inlined JSON must not contain a raw <");
+      assert.doesNotThrow(() => JSON.parse(jsonText));
+    }
+    // The hostile bytes survive: JSON.parse restores the literal "<".
+    assert.ok(
+      JSON.stringify(JSON.parse(blocks[0][1])).includes("<!--<script>"),
+      "hostile bytes must round-trip through the inlined JSON",
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
