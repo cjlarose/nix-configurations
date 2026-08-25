@@ -5,10 +5,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { esc, changedFiles } from "./cli.mjs";
+import { fileURLToPath } from "node:url";
+import { esc, changedFiles, commitFiles } from "./cli.mjs";
+
+const CLI = fileURLToPath(new URL("./cli.mjs", import.meta.url));
 
 test("esc escapes the five HTML-significant characters", () => {
   assert.equal(esc(`<img src=x onerror="a">&'`), "&lt;img src=x onerror=&quot;a&quot;&gt;&amp;&#x27;");
@@ -70,6 +73,65 @@ test("changedFiles: rename+edit counts, add/delete/modify, spaced+unquoted paths
   }
 });
 
+test("commitFiles: each commit's own diff, distinct from the unified range diff", () => {
+  const { dir, g } = initRepo();
+  try {
+    // base -> add X (commit A) -> add Y (commit B), all to the same file.
+    writeFileSync(join(dir, "f.txt"), "a\n");
+    g("add", "-A");
+    g("commit", "-qm", "base");
+    writeFileSync(join(dir, "f.txt"), "a\nX\n");
+    g("add", "-A");
+    g("commit", "-qm", "add X");
+    writeFileSync(join(dir, "f.txt"), "a\nX\nY\n");
+    g("add", "-A");
+    g("commit", "-qm", "add Y");
+
+    // The unified range diff (base..HEAD) folds both edits together.
+    const [range] = changedFiles(dir, "HEAD~2", "HEAD");
+    assert.equal(range.path, "f.txt");
+    assert.deepEqual([range.additions, range.deletions], [2, 0]);
+    assert.equal(range.new, "a\nX\nY\n");
+
+    // Commit A adds only X; its "new" side stops before Y exists.
+    const [a] = commitFiles(dir, "HEAD~1");
+    assert.equal(a.path, "f.txt");
+    assert.deepEqual([a.additions, a.deletions], [1, 0]);
+    assert.equal(a.old, "a\n");
+    assert.equal(a.new, "a\nX\n");
+
+    // Commit B adds only Y, on top of A's contents.
+    const [b] = commitFiles(dir, "HEAD");
+    assert.deepEqual([b.additions, b.deletions], [1, 0]);
+    assert.equal(b.old, "a\nX\n");
+    assert.equal(b.new, "a\nX\nY\n");
+
+    // Each per-commit diff really is narrower than the folded range diff.
+    assert.notEqual(a.new, range.new);
+    assert.notEqual(b.old, range.old);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("commitFiles: a root commit diffs against the empty tree (all adds)", () => {
+  const { dir, g } = initRepo();
+  try {
+    writeFileSync(join(dir, "seed.txt"), "hello\n");
+    g("add", "-A");
+    g("commit", "-qm", "root");
+    const files = commitFiles(dir, "HEAD");
+    const seed = files.find((f) => f.path === "seed.txt");
+    assert.ok(seed, "root commit's file present");
+    assert.equal(seed.status, "A");
+    assert.equal(seed.old, "");
+    assert.equal(seed.new, "hello\n");
+    assert.deepEqual([seed.additions, seed.deletions], [1, 0]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("changedFiles: binary file reports 0/0 rather than NaN", () => {
   const { dir, g } = initRepo();
   try {
@@ -80,6 +142,79 @@ test("changedFiles: binary file reports 0/0 rather than NaN", () => {
     const [f] = changedFiles(dir, "HEAD~1", "HEAD");
     assert.equal(f.path, "blob.bin");
     assert.deepEqual([f.additions, f.deletions], [0, 0]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("page has three exclusive tab panels, Conversation active by default", () => {
+  const { dir, g } = initRepo();
+  const out = join(dir, "out.html");
+  const body = join(dir, "body.md");
+  try {
+    writeFileSync(join(dir, "a.txt"), "one\n");
+    g("add", "-A");
+    g("commit", "-qm", "base");
+    writeFileSync(join(dir, "a.txt"), "one\ntwo\n");
+    g("add", "-A");
+    g("commit", "-qm", "second");
+    writeFileSync(body, "# hi\n");
+    execFileSync(
+      process.execPath,
+      [CLI, "--title", "T", "--body-file", body, "--base", "HEAD~1", "--head", "HEAD", "--repo-path", dir, "--out", out],
+      { encoding: "utf8" },
+    );
+    const html = readFileSync(out, "utf8");
+
+    // Exactly three tab panels, exactly one active -- one section shown at a time.
+    assert.equal((html.match(/class="tab-panel[^"]*"/g) || []).length, 3);
+    assert.equal((html.match(/class="tab-panel active"/g) || []).length, 1);
+    // Conversation is the default-active section; the other two start hidden.
+    assert.match(html, /<section id="conversation" class="tab-panel active">/);
+    assert.match(html, /<section id="commits" class="tab-panel">/);
+    assert.match(html, /<section id="files" class="tab-panel">/);
+    // Tab buttons target the sections by id.
+    for (const t of ["#conversation", "#commits", "#files"]) {
+      assert.match(html, new RegExp(`data-target="${t}"`));
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("inlineJson escapes < so a diff's content cannot break the page", () => {
+  const { dir, g } = initRepo();
+  const out = join(dir, "out.html");
+  const body = join(dir, "body.md");
+  try {
+    writeFileSync(join(dir, "base.txt"), "x\n");
+    g("add", "-A");
+    g("commit", "-qm", "base");
+    // A diff whose content carries the tokenizer-hostile sequence: a literal
+    // </script> plus a <!--<script that, unescaped, drives the HTML parser into
+    // script-data-double-escaped and swallows the rest of the document.
+    writeFileSync(join(dir, "evil.html"), "line\n</script>\n<!--<script>\nmore\n");
+    g("add", "-A");
+    g("commit", "-qm", "add evil");
+    writeFileSync(body, "# hi\n");
+    execFileSync(
+      process.execPath,
+      [CLI, "--title", "T", "--body-file", body, "--base", "HEAD~1", "--head", "HEAD", "--repo-path", dir, "--out", out],
+      { encoding: "utf8" },
+    );
+    const html = readFileSync(out, "utf8");
+    // Every inlined JSON block is free of a raw "<" and still parses.
+    const blocks = [...html.matchAll(/<script id="(?:diffdata|commitdiff-\d+)"[^>]*>([\s\S]*?)<\/script>/g)];
+    assert.ok(blocks.length >= 2, "expected diffdata + at least one commitdiff block");
+    for (const [, jsonText] of blocks) {
+      assert.doesNotMatch(jsonText, /</, "inlined JSON must not contain a raw <");
+      assert.doesNotThrow(() => JSON.parse(jsonText));
+    }
+    // The hostile bytes survive: JSON.parse restores the literal "<".
+    assert.ok(
+      JSON.stringify(JSON.parse(blocks[0][1])).includes("<!--<script>"),
+      "hostile bytes must round-trip through the inlined JSON",
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

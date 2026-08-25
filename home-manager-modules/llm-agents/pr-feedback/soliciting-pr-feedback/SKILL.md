@@ -1,13 +1,13 @@
 ---
 name: soliciting-pr-feedback
-description: Use when you are about to open a GitHub pull request, or about to push new commits to an already-open PR, and want the user to review the exact change first — its title, body, commits, and per-file diff — as a GitHub-styled page before it becomes public. Triggers on "let me review the PR before opening it", "show me the PR first", "mock PR", "review before pushing".
+description: Use when you are about to open a GitHub pull request, or about to push new commits to an already-open PR, and want the user to review the exact change first — its title, body, commits (each with its own diff), and the unified per-file diff — as a GitHub-styled page before it becomes public. Triggers on "let me review the PR before opening it", "show me the PR first", "mock PR", "review before pushing".
 ---
 
 # Soliciting PR feedback
 
 ## Overview
 
-Before a pull request goes public — opened, or pushed to with new commits — show the human the *exact* change as a GitHub-styled page in lavish and act on their annotations. They review the real title, body, commits, and diff, not a prose summary, and nothing leaves the machine until they approve.
+Before a pull request goes public — opened, or pushed to with new commits — show the human the *exact* change as a GitHub-styled page in lavish and act on their annotations. They review the real title, body, and diff, not a prose summary. The page has three tabs, one shown at a time: Conversation (the title and body), Commits (each commit with its own diff — the changes that commit alone introduced), and Files changed (the unified diff of the whole range). Nothing leaves the machine until they approve.
 
 **Core rule: never hand-write the HTML.** Building the page by hand is where the bugs live (broken diff loading, wrong file lists, drift). `mock-pr-html` produces it deterministically from git + your title and body. Use it.
 

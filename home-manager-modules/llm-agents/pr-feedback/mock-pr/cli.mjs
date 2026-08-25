@@ -116,6 +116,18 @@ export function changedFiles(repo, base, head) {
   return files;
 }
 
+// git's empty tree: diffing against it makes a root commit's every file an "add".
+const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+
+// The diff a single commit introduced: parent..commit, reusing changedFiles so
+// per-commit and range diffs share one extraction path. A root commit (no
+// parent) is diffed against the empty tree.
+export function commitFiles(repo, sha) {
+  const parent =
+    gitMaybe(repo, "rev-parse", "--verify", "--quiet", `${sha}^`).trim() || EMPTY_TREE;
+  return changedFiles(repo, parent, sha);
+}
+
 // --- HTML rendering --------------------------------------------------------
 
 export function esc(s) {
@@ -127,8 +139,13 @@ export function esc(s) {
     .replaceAll("'", "&#x27;");
 }
 function inlineJson(data) {
-  // </ -> <\/ so no </script> can terminate the block early; \/ is valid JSON.
-  return JSON.stringify(data).replaceAll("</", "<\\/");
+  // Escape every "<" as the JSON escape \\u003c (JSON.parse restores it). This
+  // stops a "</script>" in the data from closing the block early AND a
+  // "<!--<script" from driving the HTML tokenizer into the
+  // script-data-double-escaped state, where the block's real </script> is not
+  // recognised and the rest of the page -- every commitdiff block and the
+  // client module -- gets swallowed into this one element.
+  return JSON.stringify(data).replaceAll("<", "\\u003c");
 }
 
 const MERGE_ICON =
@@ -153,11 +170,19 @@ function buildHtml({ slug, title, bodyHtml, bodyMd, branch, baseLabel, prNumber,
 
   const commitsHtml =
     cmts
-      .map(
-        (c) =>
+      .map((c, i) => {
+        const cf = c.files || [];
+        const cAdd = cf.reduce((a, f) => a + f.additions, 0);
+        const cDel = cf.reduce((a, f) => a + f.deletions, 0);
+        const cn = cf.length;
+        return (
+          `<div class="commit-block">` +
           `<div class="commit-row"><div class="avatar" style="width:32px;height:32px;font-size:13px;background:linear-gradient(135deg,#6e7681,#30363d);">✲</div><div class="commit-main"><div class="commit-subject">${esc(c.subject)}</div><div class="commit-meta"><strong>${esc(c.author)}</strong> committed · ${esc(c.short)}</div></div><span class="sha">${esc(c.short)}</span></div>` +
-          `<div class="commit-msg"><pre>${esc(c.message)}</pre></div>`,
-      )
+          `<div class="commit-msg"><pre>${esc(c.message)}</pre></div>` +
+          `<div class="commit-diff"><div class="cdiff-head"><span class="chev">▾</span><span class="cdiff-stat"><strong style="color:var(--fg)">${cn}</strong> file${s(cn)} changed</span><span class="add">+${cAdd}</span><span class="del">−${cDel}</span></div><div class="cdiff-body"><div class="commit-files" data-commit="${i}"></div></div></div>` +
+          `</div>`
+        );
+      })
       .join("\n") || '<div class="empty">No commits in this range.</div>';
 
   const [owner, ...rest] = slug.split("/");
@@ -191,7 +216,7 @@ function buildHtml({ slug, title, bodyHtml, bodyMd, branch, baseLabel, prNumber,
       <button class="tab" data-target="#files">📄 Files changed <span class="count">${nFiles}</span></button>
     </div>
   </div>
-  <section id="conversation">
+  <section id="conversation" class="tab-panel active">
     <div class="comment">
       <div class="avatar">✲</div>
       <div class="bubble">
@@ -203,11 +228,11 @@ function buildHtml({ slug, title, bodyHtml, bodyMd, branch, baseLabel, prNumber,
       </div>
     </div>
   </section>
-  <section id="commits">
+  <section id="commits" class="tab-panel">
     <div class="sec-h">Commits</div>
     ${commitsHtml}
   </section>
-  <section id="files">
+  <section id="files" class="tab-panel">
     <div class="sec-h">Files changed</div>
     <div class="files-toolbar">
       <div class="diffstat"><span><strong style="color:var(--fg)">${nFiles}</strong> file(s) changed</span><span class="add">+${totalAdd}</span><span class="del">−${totalDel}</span></div>
@@ -218,6 +243,9 @@ function buildHtml({ slug, title, bodyHtml, bodyMd, branch, baseLabel, prNumber,
   <footer>Mock pull-request preview generated locally for review · rendered with @pierre/diffs · GitHub visual style</footer>
 </div>
 <script id="diffdata" type="application/json">${inlineJson(files)}</script>
+${cmts
+  .map((c, i) => `<script id="commitdiff-${i}" type="application/json">${inlineJson(c.files || [])}</script>`)
+  .join("\n")}
 <script type="module">${CLIENT}</script>
 </body>
 </html>
@@ -260,6 +288,7 @@ async function main() {
 
   const bodyHtml = await renderBody(bodyMd, slug);
   const cmts = commits(repo, values.base, values.head);
+  for (const c of cmts) c.files = commitFiles(repo, c.sha);
   const files = changedFiles(repo, values.base, values.head);
 
   const doc = buildHtml({ slug, title: values.title, bodyHtml, bodyMd, branch, baseLabel, prNumber, cmts, files });
