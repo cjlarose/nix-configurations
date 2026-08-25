@@ -7,7 +7,7 @@ description: Use when you are about to open a GitHub pull request, or about to p
 
 ## Overview
 
-Before a pull request goes public — opened, or pushed to with new commits — show the human the *exact* change as a GitHub-styled page in lavish and act on their annotations. They review the real title, body, and diff, not a prose summary: the Commits tab shows each commit with its own diff (the changes that commit alone introduced), and the Files changed tab shows the unified diff of the whole range. Nothing leaves the machine until they approve.
+Before a pull request goes public — opened, or pushed to with new commits — show the human the *exact* change as a GitHub-styled page in lavish and act on their annotations. They review the real title, body, and diff, not a prose summary. The page has three tabs, one shown at a time: Conversation (the title and body), Commits (each commit with its own diff — the changes that commit alone introduced), and Files changed (the unified diff of the whole range). Nothing leaves the machine until they approve.
 
 **Core rule: never hand-write the HTML.** Building the page by hand is where the bugs live (broken diff loading, wrong file lists, drift). `mock-pr-html` produces it deterministically from git + your title and body. Use it.
 

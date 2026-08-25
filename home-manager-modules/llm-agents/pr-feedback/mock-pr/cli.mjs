@@ -211,7 +211,7 @@ function buildHtml({ slug, title, bodyHtml, bodyMd, branch, baseLabel, prNumber,
       <button class="tab" data-target="#files">📄 Files changed <span class="count">${nFiles}</span></button>
     </div>
   </div>
-  <section id="conversation">
+  <section id="conversation" class="tab-panel active">
     <div class="comment">
       <div class="avatar">✲</div>
       <div class="bubble">
@@ -223,11 +223,11 @@ function buildHtml({ slug, title, bodyHtml, bodyMd, branch, baseLabel, prNumber,
       </div>
     </div>
   </section>
-  <section id="commits">
+  <section id="commits" class="tab-panel">
     <div class="sec-h">Commits</div>
     ${commitsHtml}
   </section>
-  <section id="files">
+  <section id="files" class="tab-panel">
     <div class="sec-h">Files changed</div>
     <div class="files-toolbar">
       <div class="diffstat"><span><strong style="color:var(--fg)">${nFiles}</strong> file(s) changed</span><span class="add">+${totalAdd}</span><span class="del">−${totalDel}</span></div>

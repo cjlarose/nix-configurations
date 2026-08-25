@@ -5,10 +5,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { esc, changedFiles, commitFiles } from "./cli.mjs";
+
+const CLI = fileURLToPath(new URL("./cli.mjs", import.meta.url));
 
 test("esc escapes the five HTML-significant characters", () => {
   assert.equal(esc(`<img src=x onerror="a">&'`), "&lt;img src=x onerror=&quot;a&quot;&gt;&amp;&#x27;");
@@ -139,6 +142,41 @@ test("changedFiles: binary file reports 0/0 rather than NaN", () => {
     const [f] = changedFiles(dir, "HEAD~1", "HEAD");
     assert.equal(f.path, "blob.bin");
     assert.deepEqual([f.additions, f.deletions], [0, 0]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("page has three exclusive tab panels, Conversation active by default", () => {
+  const { dir, g } = initRepo();
+  const out = join(dir, "out.html");
+  const body = join(dir, "body.md");
+  try {
+    writeFileSync(join(dir, "a.txt"), "one\n");
+    g("add", "-A");
+    g("commit", "-qm", "base");
+    writeFileSync(join(dir, "a.txt"), "one\ntwo\n");
+    g("add", "-A");
+    g("commit", "-qm", "second");
+    writeFileSync(body, "# hi\n");
+    execFileSync(
+      process.execPath,
+      [CLI, "--title", "T", "--body-file", body, "--base", "HEAD~1", "--head", "HEAD", "--repo-path", dir, "--out", out],
+      { encoding: "utf8" },
+    );
+    const html = readFileSync(out, "utf8");
+
+    // Exactly three tab panels, exactly one active -- one section shown at a time.
+    assert.equal((html.match(/class="tab-panel[^"]*"/g) || []).length, 3);
+    assert.equal((html.match(/class="tab-panel active"/g) || []).length, 1);
+    // Conversation is the default-active section; the other two start hidden.
+    assert.match(html, /<section id="conversation" class="tab-panel active">/);
+    assert.match(html, /<section id="commits" class="tab-panel">/);
+    assert.match(html, /<section id="files" class="tab-panel">/);
+    // Tab buttons target the sections by id.
+    for (const t of ["#conversation", "#commits", "#files"]) {
+      assert.match(html, new RegExp(`data-target="${t}"`));
+    }
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
