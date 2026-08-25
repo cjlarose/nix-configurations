@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { esc, changedFiles } from "./cli.mjs";
+import { esc, changedFiles, commitFiles } from "./cli.mjs";
 
 test("esc escapes the five HTML-significant characters", () => {
   assert.equal(esc(`<img src=x onerror="a">&'`), "&lt;img src=x onerror=&quot;a&quot;&gt;&amp;&#x27;");
@@ -65,6 +65,65 @@ test("changedFiles: rename+edit counts, add/delete/modify, spaced+unquoted paths
     // deterministic: output sorted by path
     const paths = files.map((f) => f.path);
     assert.deepEqual(paths, [...paths].sort());
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("commitFiles: each commit's own diff, distinct from the unified range diff", () => {
+  const { dir, g } = initRepo();
+  try {
+    // base -> add X (commit A) -> add Y (commit B), all to the same file.
+    writeFileSync(join(dir, "f.txt"), "a\n");
+    g("add", "-A");
+    g("commit", "-qm", "base");
+    writeFileSync(join(dir, "f.txt"), "a\nX\n");
+    g("add", "-A");
+    g("commit", "-qm", "add X");
+    writeFileSync(join(dir, "f.txt"), "a\nX\nY\n");
+    g("add", "-A");
+    g("commit", "-qm", "add Y");
+
+    // The unified range diff (base..HEAD) folds both edits together.
+    const [range] = changedFiles(dir, "HEAD~2", "HEAD");
+    assert.equal(range.path, "f.txt");
+    assert.deepEqual([range.additions, range.deletions], [2, 0]);
+    assert.equal(range.new, "a\nX\nY\n");
+
+    // Commit A adds only X; its "new" side stops before Y exists.
+    const [a] = commitFiles(dir, "HEAD~1");
+    assert.equal(a.path, "f.txt");
+    assert.deepEqual([a.additions, a.deletions], [1, 0]);
+    assert.equal(a.old, "a\n");
+    assert.equal(a.new, "a\nX\n");
+
+    // Commit B adds only Y, on top of A's contents.
+    const [b] = commitFiles(dir, "HEAD");
+    assert.deepEqual([b.additions, b.deletions], [1, 0]);
+    assert.equal(b.old, "a\nX\n");
+    assert.equal(b.new, "a\nX\nY\n");
+
+    // Each per-commit diff really is narrower than the folded range diff.
+    assert.notEqual(a.new, range.new);
+    assert.notEqual(b.old, range.old);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("commitFiles: a root commit diffs against the empty tree (all adds)", () => {
+  const { dir, g } = initRepo();
+  try {
+    writeFileSync(join(dir, "seed.txt"), "hello\n");
+    g("add", "-A");
+    g("commit", "-qm", "root");
+    const files = commitFiles(dir, "HEAD");
+    const seed = files.find((f) => f.path === "seed.txt");
+    assert.ok(seed, "root commit's file present");
+    assert.equal(seed.status, "A");
+    assert.equal(seed.old, "");
+    assert.equal(seed.new, "hello\n");
+    assert.deepEqual([seed.additions, seed.deletions], [1, 0]);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
