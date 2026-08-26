@@ -199,7 +199,7 @@ in
     # opencode/skills would collide rather than help (see default.nix). None is
     # gated beyond that -- the read-side gate applies on every host with
     # ~/repos, which is exactly the hosts enabling this module.
-    // lib.optionalAttrs (agents.claude.enable || agents.opencode.enable) {
+    // lib.optionalAttrs (config.programs.claude-code.enable || agents.opencode.enable) {
       ".claude/skills/refreshing-a-repo".source = skills.refreshing-a-repo;
       ".claude/skills/starting-a-workspace".source = skills.starting-a-workspace;
       ".claude/skills/adding-a-repo-to-a-workspace".source = skills.adding-a-repo-to-a-workspace;

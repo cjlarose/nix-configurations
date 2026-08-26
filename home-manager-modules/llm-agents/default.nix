@@ -1,25 +1,21 @@
 # Unified LLM-agent tooling module.
 #
-# One module owning everything agent-related for a user: Claude Code itself
-# (package choice, MCP servers, settings, the nixd LSP marketplace), the
-# superpowers skills plugin, lavish-axi, the personal LLM wiki integration, the
-# standalone agent CLIs (opencode, herdr, git-surgeon), tuicr, and the gh-stack
-# agent skill. Options ending in `Skill` install documentation only -- the tool
-# they describe is installed elsewhere; an option without the suffix that
-# happens to ship a skill (lavish, gitSurgeon) installs the tool too. herdr is
-# the third case: the tool is here but upstream keeps its skill out of the
-# package, so the module lifts it out of upstream's source tree
-# (herdr.skillSrc). tuicr is the fourth: no skill at all, and the only option
-# here that carries configuration rather than just a package. superpowers is the
-# fifth, and the same shape as herdr: a source comes in (superpowers.src) and
-# the module builds the plugin from it, because its customizations
-# (disableHooks, disableSpecCommits) are module options and a package built out
-# in a consuming flake's packages/ cannot see them.
+# One module owning the agent-adjacent tooling for a user: lavish-axi, the
+# personal LLM wiki integration, the standalone agent CLIs (opencode, herdr,
+# git-surgeon), tuicr, and the gh-stack agent skill. Options ending in `Skill`
+# install documentation only -- the tool they describe is installed elsewhere;
+# an option without the suffix that happens to ship a skill (lavish, gitSurgeon)
+# installs the tool too. herdr is the third case: the tool is here but upstream
+# keeps its skill out of the package, so the module lifts it out of upstream's
+# source tree (herdr.skillSrc). tuicr is the fourth: no skill at all, and the
+# only option here that carries configuration rather than just a package.
 #
-# It replaces the former separate claude / phx-workflow / lavish / opencode
-# modules. EVERYTHING here is opt-in per host/user, claude included:
-# claude.enable gates the package, its settings, and everything installed under
-# ~/.claude. The cjlarose fleet turns it on once, in home/cjlarose.
+# Claude Code itself is NOT owned here any more. The consumer configures stock
+# programs.claude-code directly and applies harness-config's lib.wrapClaudeCode /
+# lib.mkSuperpowersPlugin (see home/cjlarose). This module still installs skills
+# into ~/.claude/skills and wires the herdr SessionStart hook onto
+# programs.claude-code.settings, gated on config.programs.claude-code.enable
+# (the stock option) rather than a claude.enable of its own.
 #
 # Every skill an option here installs lands in ~/.claude/skills and nowhere
 # else, because that one location reaches BOTH harnesses: opencode scans
@@ -32,7 +28,7 @@
 #
 #   ~/.claude/skills          claude + opencode
 #   ~/.agents/skills          opencode only
-#   opencode skills.paths     opencode only  (used for superpowers, below)
+#   opencode skills.paths     opencode only
 #   a Claude Code plugin      claude only
 #
 # So an opencode-only skill goes through skills.paths, and a CLAUDE-only skill
@@ -63,89 +59,13 @@ let
   # read, so on a host running opencode alone it is still where opencode looks.
   # Writing under ~/.claude with claude off reads oddly for a moment, and is
   # cheaper than a second copy that opencode would only warn about.
-  skillsWanted = cfg.claude.enable || cfg.opencode.enable;
+  skillsWanted = config.programs.claude-code.enable || cfg.opencode.enable;
 
   # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
   # format rather than a typed option per key: tuicr's config surface is its
   # own, and every key it grows would otherwise need a change here before a
   # consumer could set it.
   tomlFormat = pkgs.formats.toml { };
-
-  # The claude wrapper, shared by both consuming flakes. It used to be duplicated
-  # as `mkTitleWrapper` in each repo's packages/default.nix, where it drifted
-  # (cjlarose had it as a reusable function over both the Bun and node builds;
-  # picktrace had the body inlined). Living here means one definition, and `pkgs`
-  # is the host's own nixpkgs -- so bashInteractive is the one the system already
-  # pulls in, with no nixpkgs-26-05 plumbing through packages/. The rationale for
-  # each line lives in the script itself, so it survives into the store copy the
-  # user actually reads.
-  wrappedClaude = pkgs.writeShellScriptBin "claude" ''
-    # Set the terminal title from the checkout layout. Three schemes are
-    # recognized so a host may use either the old or the new one:
-    #   ~/worktrees/<owner>/<repo>/<worktree> -> owner/repo [worktree]
-    #   ~/workspaces/<task>/<owner>-<repo>    -> owner-repo [task]
-    #   ~/repos/<owner>/<repo>                -> owner/repo
-    # Elsewhere the title is left alone. The ~/repos form has no bracket
-    # because nothing should ever be edited there.
-    if [[ "$PWD" =~ ^''${HOME}/worktrees/([^/]+)/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]} [''${BASH_REMATCH[3]}]"
-    elif [[ "$PWD" =~ ^''${HOME}/workspaces/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[2]} [''${BASH_REMATCH[1]}]"
-    elif [[ "$PWD" =~ ^''${HOME}/repos/([^/]+)/([^/]+) ]]; then
-      printf '\033]2;%s\007' "Claude Code ✳ ''${BASH_REMATCH[1]}/''${BASH_REMATCH[2]}"
-    fi
-
-    # We set the title above, so stop claude from fighting us over it.
-    export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
-
-    # claude (via chalk) hard-caps its color level to 256 whenever $TMUX is set,
-    # a cap even FORCE_COLOR=3 cannot defeat. Dropping the variable is the only
-    # way to get 24-bit color inside tmux; we are already past the point where
-    # anything else in this process needs it.
-    unset TMUX
-
-    # Pin the shell claude spawns for the Bash tool. Left unset it follows
-    # $SHELL, which is zsh on these hosts, so tool invocations would run under a
-    # different shell than the bash the agent's snippets assume. The :- default
-    # means an explicit value in the environment still wins.
-    export CLAUDE_CODE_SHELL="''${CLAUDE_CODE_SHELL:-${pkgs.bashInteractive}/bin/bash}"
-
-    # Always use the fullscreen (alt-screen, flicker-free) TUI renderer rather
-    # than leaving it to a rollout gate. There is no CLI flag for this; the two
-    # real mechanisms are the settings.json "tui": "fullscreen" key (what the
-    # /tui slash command writes) and this variable, which the setting's own
-    # description calls equivalent. The variable is the stronger of the two:
-    # claude consults it *before* the settings key and before the automatic
-    # opt-outs, so it also survives the tmux -CC and Windows-over-SSH
-    # auto-disables, which the setting does not. It is parsed as a tri-state,
-    # so the :- default leaves CLAUDE_CODE_NO_FLICKER=0 as a working escape
-    # hatch for a session that needs the classic renderer. Screen-reader mode
-    # still wins over both, by design.
-    export CLAUDE_CODE_NO_FLICKER="''${CLAUDE_CODE_NO_FLICKER:-1}"
-
-    exec ${cfg.claude.package}/bin/claude "$@"
-  '';
-
-  claudeCodeStatusline = pkgs.writeShellApplication {
-    name = "claude-code-statusline";
-    runtimeInputs = [ pkgs.jq pkgs.gawk ];
-    text = builtins.readFile ./claude-code-statusline.sh;
-  };
-
-  # playwright-mcp 0.0.69 ignores the PLAYWRIGHT_MCP_BROWSER env var that
-  # nixpkgs sets, so it falls back to the "chrome" channel and tries to
-  # provision a chrome-for-testing build by writing into its (read-only) Nix
-  # store browsers path — which fails with ENOENT/mkdir. Point it explicitly at
-  # the nix-provided chromium instead (the same playwright-driver.browsers
-  # derivation the upstream wrapper already exports, so versions stay in sync).
-  # The chromium revision is globbed at runtime to survive nixpkgs bumps.
-  # Headless because this targets displayless hosts; isolated keeps the profile
-  # in memory.
-  playwrightMcp = pkgs.writeShellScriptBin "playwright-mcp-chromium" ''
-    chrome=( ${pkgs.playwright-driver.browsers}/chromium-*/chrome-linux*/chrome )
-    exec ${pkgs.playwright-mcp}/bin/playwright-mcp \
-      --headless --isolated --executable-path "''${chrome[0]}" "$@"
-  '';
 
   # herdr's agent integrations -- the hook/plugin that report pane agent state
   # (working/blocked/idle) back to the herdr server, so panes show live status.
@@ -228,279 +148,11 @@ let
     fi
   '';
 
-  # The literal text "${CLAUDE_PLUGIN_ROOT}" to search for. Built in a normal
-  # double-quoted string where \${ is an unambiguous escape; writing it inline
-  # in the '' block below collides with Nix's own '' and ''${ escapes.
-  pluginRootVar = "\${CLAUDE_PLUGIN_ROOT}";
-
-  # obra/superpowers as a force-loadable Claude Code plugin, built from
-  # upstream's source with this fleet's customizations applied on top.
-  #
-  # Upstream already ships the plugin layout (.claude-plugin/plugin.json,
-  # skills/, hooks/), so this is a copy with edits rather than a build. It used
-  # to be packages/superpowers in each consuming flake -- hand-duplicated, and
-  # therefore drifting -- but the customizations below are driven by module
-  # options, which packages/ cannot see. Same reasoning as herdrSkill above:
-  # a source comes in, the transformation happens once, here.
-  #
-  # Every edit is --replace-fail or an explicit guard, so an upstream rewording
-  # breaks the BUILD rather than silently shipping unmodified text. The
-  # line-count tripwires cover the opposite failure -- an upstream release that
-  # ADDS commit language, which no search-and-replace can detect on its own.
-  # When one fires, read the upstream diff and re-derive the strings; do not
-  # just bump the expected count.
-  #
-  # Lazy, like the two herdr derivations: only forced from the block that
-  # already guards src != null.
-  superpowersPlugin = pkgs.runCommand "superpowers-plugin"
-    {
-      src = cfg.superpowers.src;
-      meta = {
-        description = "obra/superpowers skills library, packaged as a Claude Code plugin";
-        homepage = "https://github.com/obra/superpowers";
-        license = lib.licenses.mit;
-      };
-    }
-    ''
-      cp -r "$src" "$out"
-      chmod -R u+w "$out"
-
-      # Guard before either branch: both of them assume hook registration lives
-      # in this file, so if upstream moves it, the disable branch would write a
-      # stray no-op while the real hook keeps firing, and the substitute branch
-      # would leave an unresolved path behind.
-      [ -f "$out/hooks/hooks.json" ] \
-        || { echo "hooks/hooks.json is gone; upstream moved hook registration -- re-check this module" >&2; exit 1; }
-
-      ${
-        if cfg.superpowers.disableHooks then ''
-          grep -q '"SessionStart"' "$out/hooks/hooks.json" \
-            || { echo "hooks.json no longer registers SessionStart; re-check superpowers.disableHooks" >&2; exit 1; }
-
-          # Overwrite rather than delete: an empty hook set is unambiguous to
-          # the plugin loader and keeps the file present so the guard above
-          # stays meaningful. The hook scripts are left in place (unreferenced,
-          # harmless) so flipping the option back needs no other change.
-          echo '{"hooks":{}}' > "$out/hooks/hooks.json"
-        '' else ''
-          # hooks.json invokes its own hook runner via
-          # "''${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd", and CLAUDE_PLUGIN_ROOT
-          # is NOT set for SessionStart events -- the hook fails silently, which
-          # is the failure mode hardest to notice, since a missing session
-          # preamble looks like a model that just didn't reach for a skill.
-          # Baking the real store path is the same fix the llm-wiki plugin uses.
-          #
-          # The hook script itself needs no patching: it derives the plugin root
-          # from its own $0, so once hooks.json points at the right
-          # run-hook.cmd everything below resolves relative to it.
-          grep -q 'CLAUDE_PLUGIN_ROOT' "$out/hooks/hooks.json" \
-            || { echo "hooks.json no longer references CLAUDE_PLUGIN_ROOT; re-check this module" >&2; exit 1; }
-
-          substituteInPlace "$out/hooks/hooks.json" \
-            --replace-fail '${pluginRootVar}' '${builtins.placeholder "out"}'
-
-          # `if`, not `grep && exit` -- a correct run leaves no match, so grep
-          # exits 1 and the && form would fail precisely when it succeeded.
-          if grep -q 'CLAUDE_PLUGIN_ROOT' "$out/hooks/hooks.json"; then
-            echo "substitution left a CLAUDE_PLUGIN_ROOT reference behind" >&2
-            exit 1
-          fi
-        ''
-      }
-
-      # The hook runner and its scripts must stay executable through the copy,
-      # whether or not anything currently invokes them.
-      chmod +x "$out/hooks/run-hook.cmd" "$out/hooks/session-start"
-
-      ${lib.optionalString cfg.superpowers.disableSpecCommits ''
-        # The replacement wording deliberately says "add it to git" rather than
-        # "do not commit it": the tripwire below counts lines matching 'commit',
-        # so prose containing the word would inflate the count and blunt it.
-        substituteInPlace "$out/skills/brainstorming/SKILL.md" \
-          --replace-fail \
-            '6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit' \
-            '6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`. Do NOT add it to git.' \
-          --replace-fail \
-            '- Commit the design document to git' \
-            '- Do NOT add the design document to git. `docs/superpowers/` is gitignored globally; the spec is a working note, not repo history.' \
-          --replace-fail \
-            '> "Spec written and committed to `<path>`.' \
-            '> "Spec written to `<path>`.'
-
-        # The two survivors in brainstorming are both "check ... recent commits"
-        # (reading history, not writing it); all four in writing-plans are about
-        # committing the implementation, which this option deliberately keeps.
-        for check in brainstorming:2 writing-plans:4; do
-          skill="''${check%:*}"
-          want="''${check#*:}"
-          got=$(grep -ci 'commit' "$out/skills/$skill/SKILL.md" || true)
-          [ "$got" = "$want" ] || {
-            echo "$skill/SKILL.md: expected $want lines mentioning 'commit', found $got." >&2
-            echo "Upstream changed its commit guidance -- re-read the diff before bumping this count." >&2
-            exit 1
-          }
-        done
-      ''}
-    '';
 in
 {
   imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ./ai-memory.nix ./pr-feedback.nix ];
 
   options.cjlarose.llmAgents = {
-
-    # --- Claude Code -------------------------------------------------------
-
-    claude.enable = lib.mkEnableOption ''
-      Claude Code: the wrapped package, its settings and MCP servers, the nixd
-      LSP marketplace, and every skill this module installs into ~/.claude/skills.
-
-      Off by default like everything else here, so a consumer of this module has
-      to ask for claude explicitly. The cjlarose fleet does it once, in
-      home/cjlarose
-    '';
-
-    claude.enablePlaywrightMcp = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Register the Playwright MCP server with Claude Code, using the pinned
-        pkgs.playwright-mcp build (chromium baked in via PLAYWRIGHT_BROWSERS_PATH,
-        so no runtime npx/network). Default off because it pulls a chromium
-        browser closure; enable only on hosts where browser automation is wanted.
-      '';
-    };
-
-    claude.remoteControlAtStartup = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Enable Remote Control for every new session at startup (the
-        remoteControlAtStartup setting). Default off; enabled on cjlarose's own
-        hosts via home/cjlarose/default.nix. Left off on pt-docker-cjlarose,
-        whose picktrace Claude subscription doesn't have Remote Control.
-      '';
-    };
-
-    claude.package = lib.mkOption {
-      type = lib.types.package;
-      description = ''
-        The UNWRAPPED claude-code package. Required when claude.enable is set,
-        and only then: it is read from inside the block that option gates, so a
-        host with claude off never has to name one. The module applies its own
-        wrapper (terminal title, TMUX/colour and CLAUDE_CODE_SHELL handling) on
-        top, so hand over a plain build.
-
-        Which build is a property of the HOST, not of this module: AVX-capable
-        machines take the latest Bun standalone, while the Goldmont-based pve
-        guests need the node-pinned build (frozen at npm 2.1.112) because the Bun
-        binary segfaults at launch there. The consumer picks; this used to be a
-        `useNodeRuntime` boolean here, which forced the module to know both
-        package names.
-      '';
-    };
-
-    # --- superpowers ---------------------------------------------------------
-
-    superpowers.enable = lib.mkEnableOption ''
-      obra/superpowers as a Claude Code plugin: 14 skills covering
-      brainstorming, planning, TDD, code review, git worktrees and debugging,
-      invocable as superpowers:<name>.
-
-      Replaces two things that used to live here: the vendored
-      systematic-debugging copy (now one skill of the set, with its
-      superpowers:* cross-references finally resolving) and the phx workflow
-      skills, whose brainstorm/plan/work/review spine upstream covers natively
-      with brainstorming + writing-plans + executing-plans + *-code-review.
-
-      Enabling this is NOT enough on its own -- ./superpowers-plugin.nix must
-      also be imported, which is what actually defines
-      programs.claude-code.plugins. That option does not exist on
-      home-manager 25-11, so the definition has to be absent rather than
-      disabled there; see that file. Gate the import and this option off the
-      same flag in the consumer so the two cannot drift
-    '';
-
-    superpowers.src = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      description = ''
-        Upstream's obra/superpowers source tree (the flake input itself, pinned
-        to a release tag). The module builds the plugin from it.
-
-        A source rather than a package because the customizations below are
-        driven by the options in this module, and a package built out in
-        packages/ cannot see them. This used to be packages/superpowers in each
-        consuming flake -- a file hand-copied between two repos, with the
-        customizations frozen into it. Same shape as herdr.skillSrc: the source
-        comes in, the transformation happens once, here.
-
-        Pin to a tag rather than a branch. Upstream ships a SessionStart hook
-        that injects context into every session, so an unpinned bump would
-        change every host's prompt with no lock diff to show for it.
-
-        Required when superpowers.enable is set.
-      '';
-    };
-
-    superpowers.disableHooks = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Ship the plugin with an empty hook set, replacing upstream's
-        hooks/hooks.json.
-
-        Upstream registers a SessionStart hook that cats
-        skills/using-superpowers/SKILL.md into every session wrapped in
-        <EXTREMELY_IMPORTANT>, whose text orders the agent to invoke a skill
-        "BEFORE any response or action" and to brainstorm before entering plan
-        mode. That is too eager -- it front-loads a brainstorm onto questions
-        that only wanted an answer.
-
-        Turning this on leaves every skill invocable through the Skill tool,
-        including superpowers:using-superpowers; it just stops one being
-        force-fed. Note it is a reduction, not an elimination: the skill
-        descriptions still nudge (brainstorming's own description says "You MUST
-        use this before any creative work"). The hook is what made it
-        unconditional.
-
-        Left off (the default), the module instead bakes the plugin's real store
-        path into hooks.json, because CLAUDE_PLUGIN_ROOT is not set for
-        SessionStart events and the hook would otherwise fail silently.
-      '';
-    };
-
-    superpowers.disableSpecCommits = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Remove the brainstorming skill's instructions to COMMIT its design
-        document. Upstream writes the spec to docs/superpowers/specs/ and
-        commits it; where specs are working notes rather than repo history, that
-        dirties every repo the agent touches.
-
-        Only the doc-committing language is touched. The implementation-commit
-        guidance in writing-plans and subagent-driven-development is left alone
-        deliberately -- the implementation step is expected to commit.
-        writing-plans needs no edit at all: it never says to commit the plan
-        document, only the code.
-
-        Pairs with gitignoring docs/superpowers (see home-manager-modules/git.nix),
-        so the specs land untracked rather than as a dirty worktree.
-      '';
-    };
-
-    superpowers.finalPackage = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = null;
-      internal = true;
-      description = ''
-        The built plugin, or null when superpowers is off. Read by
-        ./superpowers-plugin.nix, which is the file that actually defines
-        programs.claude-code.plugins -- it cannot be defined from here, and that
-        sibling module has no way to reach a `let` binding in this one. Internal:
-        set by this module, never by a consumer.
-      '';
-    };
 
     # --- lavish-axi ---------------------------------------------------------
 
@@ -790,136 +442,6 @@ in
 
   config = lib.mkMerge [
 
-    # --- Claude Code -------------------------------------------------------
-    # Off unless claude.enable says otherwise, like every other feature here.
-    # The cjlarose fleet turns it on once, in home/cjlarose.
-    (lib.mkIf cfg.claude.enable {
-      programs.claude-code = {
-        enable = true;
-        # The module's own wrapper, not cfg.claude.package directly -- see
-        # wrappedClaude above. home-manager wraps this again with its
-        # --plugin-dir flags, so the final chain is
-        # HM plugin wrapper -> title/env wrapper -> claude-code.
-        package = wrappedClaude;
-
-        # Pinned, self-contained Playwright MCP (chromium baked in via the
-        # package's PLAYWRIGHT_BROWSERS_PATH wrapper, so no runtime npx/network).
-        # Gated default-off so headless hosts don't pull the chromium closure.
-        # The HM module surfaces this as a .mcp.json in a generated plugin-dir
-        # wired onto claude-code via --plugin-dir. Uses the chromium-pinned
-        # wrapper above so the browser actually launches (see its comment).
-        mcpServers = lib.optionalAttrs cfg.claude.enablePlaywrightMcp {
-          playwright = {
-            type = "stdio";
-            command = "${playwrightMcp}/bin/playwright-mcp-chromium";
-          };
-        };
-
-        settings = {
-          enabledPlugins = {
-            # nixd Nix language server, provided by the local marketplace below.
-            "nixd@cjlarose-lsps" = true;
-          };
-          # Local plugin marketplace (files materialized via home.file below) that
-          # ships a single LSP plugin wiring nixd as the Nix language server, so
-          # Claude Code gets real diagnostics on .nix edits (unused bindings,
-          # undefined vars, flake/option-aware analysis). nixd binary comes from
-          # home.packages so the bare "nixd" command resolves on PATH.
-          extraKnownMarketplaces."cjlarose-lsps".source = {
-            source = "directory";
-            path = "${config.home.homeDirectory}/.claude/lsp-marketplace";
-          };
-          skipDangerousModePermissionPrompt = true;
-          remoteControlAtStartup = cfg.claude.remoteControlAtStartup;
-          # high, not xhigh: on Opus 4.8 thinking is off unless a request sets
-          # thinking.type = "adaptive", and the API rejects xhigh/max while
-          # thinking is disabled. Claude Code silently clamps xhigh back to
-          # high here, so xhigh only ever looked applied. Revisit if thinking
-          # gets turned on, or on a model where it defaults to on.
-          effortLevel = "high";
-          model = "claude-opus-4-8";
-          autoMemoryEnabled = false;
-          # Keep session transcripts effectively forever (default is 30 days, which
-          # silently garbage-collects ~/.claude/projects history). These transcripts
-          # are the source for llm-wiki backfill/capture, so retention matters.
-          cleanupPeriodDays = 3650;
-          env = {
-            CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-          };
-          permissions = {
-            defaultMode = "bypassPermissions";
-          };
-          statusLine = {
-            type = "command";
-            command = "${claudeCodeStatusline}/bin/claude-code-statusline";
-          };
-        };
-      };
-
-      home.packages = [ pkgs.nixd ];
-
-      home.file = {
-        # Local LSP plugin marketplace consumed via settings.extraKnownMarketplaces
-        # + enabledPlugins above. Ships nixd as the Nix language server.
-        ".claude/lsp-marketplace/.claude-plugin/marketplace.json".text = builtins.toJSON {
-          name = "cjlarose-lsps";
-          owner.name = "cjlarose";
-          description = "cjlarose local LSP plugins";
-          plugins = [{
-            name = "nixd";
-            source = "./nixd";
-            description = "Nix language server (nixd)";
-          }];
-        };
-        ".claude/lsp-marketplace/nixd/.claude-plugin/plugin.json".text = builtins.toJSON {
-          name = "nixd";
-          description = "Nix language server (nixd)";
-          version = "1.0.0";
-          author.name = "cjlarose";
-        };
-        ".claude/lsp-marketplace/nixd/.lsp.json".text = builtins.toJSON {
-          nix = {
-            command = "nixd";
-            extensionToLanguage.".nix" = "nix";
-          };
-        };
-      };
-    })
-
-    # --- superpowers ---------------------------------------------------------
-    # Only builds the plugin; the programs.claude-code.plugins definition that
-    # consumes it lives in ./superpowers-plugin.nix, for the same reason the
-    # wiki's does not live here (see the llmWiki note below).
-    (lib.mkIf (cfg.superpowers.enable && cfg.superpowers.src != null) {
-      cjlarose.llmAgents.superpowers.finalPackage = superpowersPlugin;
-    })
-
-    # The same skills for opencode, through `skills.paths` -- a native opencode
-    # config key, not a plugin invention: it reads
-    # `[...skills.paths, ...skills.urls]` straight out of opencode.json. One
-    # store path registers the whole tree, so nothing here has to enumerate the
-    # skills or track upstream adding and removing them.
-    #
-    # NOT upstream's opencode plugin, which is what their INSTALL.md documents.
-    # Two reasons. It installs from `git+https` through opencode's package
-    # manager at runtime, which is unpinned by this flake and whose caching
-    # upstream itself documents as unreliable -- the same trade this module
-    # already declines for `herdr integration install` and `npx skills add`.
-    # And its second hook injects the using-superpowers skill into the first
-    # user message of every session, which is precisely what disableHooks
-    # switches off on the claude side; taking the plugin would reintroduce on
-    # one harness the behaviour this fleet turned off on the other.
-    #
-    # Nothing is lost in namespacing by declining it: that plugin's other hook
-    # only pushes this same directory onto skills.paths. Skills take their flat
-    # frontmatter names either way, so the `superpowers:test-driven-development`
-    # cross-references in their bodies fail to resolve under opencode however it
-    # is installed. That is upstream's, and unfixable short of rewriting the
-    # bodies for a second time.
-    (lib.mkIf (cfg.superpowers.enable && cfg.superpowers.src != null && cfg.opencode.enable) {
-      programs.opencode.settings.skills.paths = [ "${superpowersPlugin}/skills" ];
-    })
-
     # --- lavish-axi ---------------------------------------------------------
     # The `package != null` half of each guard is not redundant with the
     # assertions below: without it a null reaches home.packages and fails the
@@ -1014,11 +536,11 @@ in
       home.file.".claude/hooks/herdr-agent-state.sh".source =
         "${herdrIntegrations}/claude-hook.sh";
 
-      # The registration half. Merges into the settings attrset defined in the
-      # claude.enable block above -- so on a host with herdr but no claude this
-      # defines settings for a claude that is not installed, which home-manager
-      # simply does not write. Kept in sync with the script by the VERSION=7
-      # assertion in herdrIntegrations.
+      # The registration half. Merges into the consumer's
+      # programs.claude-code.settings (see home/cjlarose) -- so on a host with
+      # herdr but no claude this defines settings for a claude that is not
+      # installed, which home-manager simply does not write. Kept in sync with
+      # the script by the VERSION=7 assertion in herdrIntegrations.
       programs.claude-code.settings.hooks.SessionStart = [{
         matcher = "*";
         hooks = [{
@@ -1077,10 +599,6 @@ in
         {
           assertion = !cfg.wiki.enable || cfg.wiki.path != null;
           message = "cjlarose.llmAgents.wiki.enable is true but cjlarose.llmAgents.wiki.path is unset.";
-        }
-        {
-          assertion = !cfg.superpowers.enable || cfg.superpowers.src != null;
-          message = "cjlarose.llmAgents.superpowers.enable is true but cjlarose.llmAgents.superpowers.src is unset.";
         }
         {
           assertion = !cfg.lavish.enable || cfg.lavish.package != null;

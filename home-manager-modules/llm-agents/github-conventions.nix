@@ -92,7 +92,7 @@ in
   # ~/.claude/skills only: opencode scans it natively, so a second copy under
   # opencode/skills would collide rather than help (see default.nix).
   config = lib.mkIf cfg.enable {
-    home.file = lib.mkIf (agents.claude.enable || agents.opencode.enable) {
+    home.file = lib.mkIf (config.programs.claude-code.enable || agents.opencode.enable) {
       ".claude/skills/writing-pull-request-descriptions".source =
         mkSkill "writing-pull-request-descriptions" cfg.pullRequestExtraInstructions;
       ".claude/skills/writing-pull-request-comments".source =

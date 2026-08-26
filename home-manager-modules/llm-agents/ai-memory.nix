@@ -1067,9 +1067,9 @@ in
     # the sandbox, exactly like the claude hook payload: these are Nix values
     # that have to reach home-manager options, and reading them out of a
     # derivation would be import-from-derivation on every eval.
-    (lib.mkIf (enabled && cfg.enableMcp && config.cjlarose.llmAgents.claude.enable) {
-      # Merges with the playwright entry default.nix defines under
-      # claude.enablePlaywrightMcp; home-manager surfaces the union as a
+    (lib.mkIf (enabled && cfg.enableMcp && config.programs.claude-code.enable) {
+      # Merges with the playwright entry home/cjlarose defines under its
+      # enablePlaywrightMcp flag; home-manager surfaces the union as a
       # generated .mcp.json wired on via --plugin-dir.
       programs.claude-code.mcpServers.ai-memory = claudeMcp;
     })
@@ -1083,12 +1083,12 @@ in
     })
 
     # --- Claude Code ---------------------------------------------------------
-    # Merges into the settings attrset default.nix defines under claude.enable,
-    # exactly as the herdr SessionStart registration does. Note both this and
+    # Merges into the programs.claude-code.settings the consumer defines (see
+    # home/cjlarose), exactly as the herdr SessionStart registration does. Note both this and
     # herdr define settings.hooks.SessionStart; home-manager merges the two
     # lists, and Claude Code runs every registered SessionStart hook, so they
     # coexist rather than one winning.
-    (lib.mkIf (enabled && config.cjlarose.llmAgents.claude.enable) {
+    (lib.mkIf (enabled && config.programs.claude-code.enable) {
       programs.claude-code.settings.hooks = claudeHooks;
 
       # This is what makes the diff guard actually RUN on a claude-only host.
