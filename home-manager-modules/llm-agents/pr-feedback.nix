@@ -18,7 +18,6 @@
 
 let
   cfg = config.cjlarose.llmAgents.prFeedback;
-  agents = config.cjlarose.llmAgents;
 
   # `mock-pr-html`, all Node. buildNpmPackage from the pinned lockfile. doCheck
   # runs the renderer's TDD (test.mjs) on every build, so a GFM/autolink
@@ -64,7 +63,7 @@ in
 
     # ~/.claude/skills only: opencode scans it natively, so a second copy under
     # opencode/skills would collide rather than help (see default.nix).
-    home.file = lib.mkIf (config.programs.claude-code.enable || agents.opencode.enable) {
+    home.file = lib.mkIf (config.programs.claude-code.enable || config.programs.opencode.enable) {
       ".claude/skills/soliciting-pr-feedback".source =
         ./pr-feedback/soliciting-pr-feedback;
     };

@@ -155,17 +155,21 @@ in
   programs.opencode.settings.skills.paths =
     lib.optionals enableSuperpowers [ "${superpowersPlugin}/skills" ];
 
+  # opencode itself, through stock programs.opencode with the plain package. It
+  # still leans on Claude Code compatibility to read the shared ~/.claude/skills;
+  # a later change wraps the package to disable that and installs skills natively.
+  programs.opencode.enable = true;
+  programs.opencode.package = additionalPackages.${system}.opencode;
+
   # The rest of the LLM-agent tooling lives behind the single llm-agents module,
   # which defaults every feature off. Everything wanted fleet-wide is opted into
   # here, and the rest per-host where the closure cost warrants it. The module
   # takes no additionalPackages arg -- every package is named explicitly here.
   cjlarose.llmAgents = {
-    # Both are small CLIs that pair with claude, so they ride the shared profile
-    # rather than being host-scoped: opencode as a second agent, herdr to manage
-    # claude sessions. herdr reaches the no-AVX pve guests too — its AVX2 paths
-    # sit behind runtime is_x86_feature_detected! gates, unlike the Bun
+    # herdr is a small CLI that pairs with claude, so it rides the shared profile
+    # rather than being host-scoped. herdr reaches the no-AVX pve guests too — its
+    # AVX2 paths sit behind runtime is_x86_feature_detected! gates, unlike the Bun
     # claude-code binary that forces the node build above.
-    opencode = { enable = true; package = additionalPackages.${system}.opencode; };
     herdr = {
       enable = true;
       package = additionalPackages.${system}.herdr;

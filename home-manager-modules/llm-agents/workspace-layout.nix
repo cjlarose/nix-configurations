@@ -16,7 +16,6 @@
 
 let
   cfg = config.cjlarose.llmAgents.claude.workspaceLayout;
-  agents = config.cjlarose.llmAgents;
   wiki = config.cjlarose.llmAgents.wiki;
 
   # Named once so the two harness blocks below cannot drift to different paths
@@ -199,7 +198,7 @@ in
     # opencode/skills would collide rather than help (see default.nix). None is
     # gated beyond that -- the read-side gate applies on every host with
     # ~/repos, which is exactly the hosts enabling this module.
-    // lib.optionalAttrs (config.programs.claude-code.enable || agents.opencode.enable) {
+    // lib.optionalAttrs (config.programs.claude-code.enable || config.programs.opencode.enable) {
       ".claude/skills/refreshing-a-repo".source = skills.refreshing-a-repo;
       ".claude/skills/starting-a-workspace".source = skills.starting-a-workspace;
       ".claude/skills/adding-a-repo-to-a-workspace".source = skills.adding-a-repo-to-a-workspace;
@@ -210,7 +209,7 @@ in
     # as CLAUDE.md above. Written only where opencode is enabled. Do not also set
     # programs.opencode.context -- the home-manager module writes this same file
     # from it, which would collide.
-    xdg.configFile = lib.mkIf agents.opencode.enable {
+    xdg.configFile = lib.mkIf config.programs.opencode.enable {
       "opencode/AGENTS.md".source = agentInstructions;
     };
   };

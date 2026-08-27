@@ -59,7 +59,7 @@ let
   # read, so on a host running opencode alone it is still where opencode looks.
   # Writing under ~/.claude with claude off reads oddly for a moment, and is
   # cheaper than a second copy that opencode would only warn about.
-  skillsWanted = config.programs.claude-code.enable || cfg.opencode.enable;
+  skillsWanted = config.programs.claude-code.enable || config.programs.opencode.enable;
 
   # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
   # format rather than a typed option per key: tuicr's config surface is its
@@ -336,33 +336,6 @@ in
 
     # --- standalone agent CLIs ---------------------------------------------
 
-    opencode.enable = lib.mkEnableOption ''
-      opencode, the standalone terminal coding agent: its integrations here --
-      the shared ~/.claude/skills, the herdr plugin, superpowers' skills.paths
-      -- and, when `package` is set, the binary itself through
-      programs.opencode
-    '';
-
-    opencode.package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = null;
-      description = ''
-        The opencode package, installed through programs.opencode.
-
-        Null means opencode reaches this host from somewhere else -- another
-        module owning programs.opencode -- and this module contributes only the
-        integrations above. That is what lets a host take the binary from
-        whichever module installs it, including one that has to place it
-        outside the nix store, while keeping the personal wiring here. Nothing
-        is installed and nothing collides.
-
-        The integrations that write files -- the skills and the herdr plugin --
-        land either way. The one that does not is superpowers' skills.paths,
-        which is a programs.opencode SETTING and so needs whichever module owns
-        that option to have enabled it.
-      '';
-    };
-
     herdr.enable = lib.mkEnableOption ''
       herdr, a terminal workspace manager for AI coding agents (herdr.dev).
       Packaged only in llm-agents.nix, not nixpkgs
@@ -515,13 +488,6 @@ in
     })
 
     # --- standalone agent CLIs ---------------------------------------------
-    (lib.mkIf (cfg.opencode.enable && cfg.opencode.package != null) {
-      programs.opencode = {
-        enable = true;
-        package = cfg.opencode.package;
-      };
-    })
-
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null) {
       home.packages = [ cfg.herdr.package ];
 
@@ -567,7 +533,7 @@ in
     # there is no reason to write it. No registration half -- opencode scans the
     # plugins directory, and home-manager's programs.opencode does not manage
     # it, so there is nothing to collide with.
-    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.opencode.enable) {
+    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && config.programs.opencode.enable) {
       xdg.configFile."opencode/plugins/herdr-agent-state.js".source =
         "${herdrIntegrations}/opencode-plugin.js";
     })

@@ -1074,7 +1074,7 @@ in
       programs.claude-code.mcpServers.ai-memory = claudeMcp;
     })
 
-    (lib.mkIf (enabled && cfg.enableMcp && config.cjlarose.llmAgents.opencode.enable) {
+    (lib.mkIf (enabled && cfg.enableMcp && config.programs.opencode.enable) {
       # opencode's own native config key, same shape as the superpowers
       # skills.paths entry already set in default.nix -- not a plugin.
       # `type = "remote"` is opencode's spelling for an HTTP MCP server, and it
@@ -1116,7 +1116,7 @@ in
     #
     # opencode must be RESTARTED to pick up a changed plugin; a home-manager
     # switch alone will not do it.
-    (lib.mkIf (enabled && config.cjlarose.llmAgents.opencode.enable) {
+    (lib.mkIf (enabled && config.programs.opencode.enable) {
       xdg.configFile."opencode/plugins/ai-memory.ts".source =
         "${renderedHooks}/opencode-plugin.ts";
     })
