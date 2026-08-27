@@ -149,6 +149,10 @@ in
   # From llm-agents.nix rather than nixpkgs-unstable so it tracks the same
   # daily-updated source as claude-code.
   opencode = llm-agents-pkgs.opencode;
+  # OpenCode 2.0 beta (bin `opencode2`), installed alongside v1. Only in
+  # llm-agents.nix, not nixpkgs -- it ships as platform-specific Bun executables
+  # on npm and llm-agents wraps them for the store.
+  opencode2 = llm-agents-pkgs.opencode2;
   # cjlarose/harness-config.nix's lib, re-exported to every consumer through
   # additionalPackages.${system}.harnessConfig. Exposes wrapClaudeCode and
   # wrapOpencode (the terminal-env / Claude-compat wrappers) and
