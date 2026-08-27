@@ -18,7 +18,7 @@
 
 let
   cfg = config.cjlarose.llmAgents.prFeedback;
-  agents = config.cjlarose.llmAgents;
+  installSkill = import ./install-skill.nix { inherit lib config; };
 
   # `mock-pr-html`, all Node. buildNpmPackage from the pinned lockfile. doCheck
   # runs the renderer's TDD (test.mjs) on every build, so a GFM/autolink
@@ -57,16 +57,15 @@ in
     '';
   };
 
-  config = lib.mkIf cfg.enable {
-    # The renderer on PATH. Useful on its own (it just writes HTML), so it is not
-    # gated on a harness -- only the skill doc below is.
-    home.packages = [ mockPr ];
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    {
+      # The renderer on PATH. Useful on its own (it just writes HTML), so it is
+      # not gated on a harness -- only the skill doc below is.
+      home.packages = [ mockPr ];
+    }
 
-    # ~/.claude/skills only: opencode scans it natively, so a second copy under
-    # opencode/skills would collide rather than help (see default.nix).
-    home.file = lib.mkIf (config.programs.claude-code.enable || agents.opencode.enable) {
-      ".claude/skills/soliciting-pr-feedback".source =
-        ./pr-feedback/soliciting-pr-feedback;
-    };
-  };
+    # Installed into each enabled harness's native channel (see install-skill.nix).
+    (installSkill "soliciting-pr-feedback"
+      ./pr-feedback/soliciting-pr-feedback)
+  ]);
 }

@@ -130,16 +130,23 @@
         # drive lavish above to review a change as a GitHub PR before it is
         # opened or pushed to. Paired with lavish here because it needs it.
         cjlarose.llmAgents.prFeedback.enable = true;
-        # The rebuild-ns1010301 runbook, as a host-scoped Claude Code skill:
-        # how to rebuild this host and bring its microvm guests forward without
+        # The rebuild-ns1010301 runbook, as a host-scoped agent skill: how to
+        # rebuild this host and bring its microvm guests forward without
         # rebooting them, including the cross-repo bump ceremony for a
         # pt-docker-cjlarose change that lands in picktrace/nix-configurations.
-        # Installed straight into ~/.claude/skills (both harnesses read it there)
-        # from the source tree beside this file. Host-scoped here rather than in
-        # the shared llm-agents module because it hard-codes this host's guests,
-        # bridge IPs and attribute paths -- it makes sense on no other host.
+        # Host-scoped here rather than in the shared llm-agents module because it
+        # hard-codes this host's guests, bridge IPs and attribute paths -- it
+        # makes sense on no other host.
+        #
+        # Delivered to each harness through its own native channel, the same way
+        # the llm-agents module's skills are (see install-skill.nix): claude reads
+        # ~/.claude/skills, and opencode -- which runs here with Claude Code
+        # compatibility disabled -- reads the stock programs.opencode.skills
+        # location, ~/.config/opencode/skills/. This host has both agents on, so
+        # both writes are unconditional.
         home.file.".claude/skills/rebuild-ns1010301".source =
           ./skills/rebuild-ns1010301;
+        programs.opencode.skills.rebuild-ns1010301 = ./skills/rebuild-ns1010301;
         # ai-memory, on a two-week parallel trial against the llm-wiki. Scoped
         # to this host and no further: it is the trial host for the
         # ~/repos + ~/workspaces layout above, and the marker below only makes

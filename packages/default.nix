@@ -150,11 +150,11 @@ in
   # daily-updated source as claude-code.
   opencode = llm-agents-pkgs.opencode;
   # cjlarose/harness-config.nix's lib, re-exported to every consumer through
-  # additionalPackages.${system}.harnessConfig. Exposes wrapClaudeCode (the
-  # terminal-env claude wrapper) and mkSuperpowersPlugin (builds obra/superpowers
-  # into a plugin from harness-config's own pinned source). Replaces the vendored
-  # claude wrapper and the obra/superpowers source passthrough that used to live
-  # here.
+  # additionalPackages.${system}.harnessConfig. Exposes wrapClaudeCode and
+  # wrapOpencode (the terminal-env / Claude-compat wrappers) and
+  # mkSuperpowersPlugin (builds obra/superpowers into a plugin from harness-config's
+  # own pinned source). Replaces the vendored claude wrapper and the obra/superpowers
+  # source passthrough that used to live here.
   harnessConfig = harness-config.lib;
   tuicr = tuicr.packages.${system}.default;
   # Built from source (flake = false input `lavish-axi` is the upstream src).

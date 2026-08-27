@@ -10,30 +10,27 @@
 # source tree (herdr.skillSrc). tuicr is the fourth: no skill at all, and the
 # only option here that carries configuration rather than just a package.
 #
-# Claude Code itself is NOT owned here any more. The consumer configures stock
-# programs.claude-code directly and applies harness-config's lib.wrapClaudeCode /
-# lib.mkSuperpowersPlugin (see home/cjlarose). This module still installs skills
-# into ~/.claude/skills and wires the herdr SessionStart hook onto
-# programs.claude-code.settings, gated on config.programs.claude-code.enable
-# (the stock option) rather than a claude.enable of its own.
+# Neither agent is owned here any more. The consumer configures stock
+# programs.claude-code and stock programs.opencode directly and applies
+# harness-config's lib.wrapClaudeCode / lib.wrapOpencode / lib.mkSuperpowersPlugin
+# (see home/cjlarose). This module installs skills and wires the herdr SessionStart
+# hook onto programs.claude-code.settings, gated on the STOCK options
+# config.programs.{claude-code,opencode}.enable rather than a claude.enable /
+# opencode.enable of its own.
 #
-# Every skill an option here installs lands in ~/.claude/skills and nowhere
-# else, because that one location reaches BOTH harnesses: opencode scans
-# ~/.claude/skills (and ~/.agents/skills) natively, alongside anything named in
-# its own skills.paths. Installing a second copy under opencode/skills is not
-# belt-and-braces, it is a collision -- opencode logs `duplicate skill name` and
-# silently picks one by scan order.
+# opencode runs with Claude Code compatibility DISABLED here (lib.wrapOpencode
+# sets OPENCODE_DISABLE_CLAUDE_CODE), so it no longer scans ~/.claude. Each skill
+# therefore reaches each harness through its OWN native channel, and a skill
+# wanted by both is delivered through both -- the install-skill.nix helper does
+# exactly this, and its header carries the full reasoning:
 #
-# The reach of each location, which is what any change here has to respect:
+#   claude    ~/.claude/skills/<name>                 (home.file)
+#   opencode  stock programs.opencode.skills.<name>   (-> ~/.config/opencode/skill/<name>/)
 #
-#   ~/.claude/skills          claude + opencode
-#   ~/.agents/skills          opencode only
-#   opencode skills.paths     opencode only
-#   a Claude Code plugin      claude only
-#
-# So an opencode-only skill goes through skills.paths, and a CLAUDE-only skill
-# is not expressible except as a plugin: opencode's scan of ~/.claude is
-# unconditional and has no exclude setting.
+# There is no duplicate-name collision -- the hazard the old "~/.claude/skills
+# only" rule guarded against -- because with compat off opencode never sees the
+# ~/.claude copy. superpowers reaches opencode separately, through
+# programs.opencode.settings.skills.paths in the consumer.
 #
 # The module takes no flake-specific arguments: every package it installs comes
 # in through a `*.package` option that the consumer sets explicitly. It used to
@@ -42,24 +39,21 @@
 # renamed or dropped an attr.
 #
 # The personal LLM wiki integration is owned entirely here: the read-only
-# querying-notes skill (installed into ~/.claude/skills like every other skill,
-# so it reaches both claude and opencode) and LLM_WIKI_PATH. The consumer hands
-# in the wiki's skills/ tree via wiki.skillSrc and the checkout path via
-# wiki.path. This module used to instead consume the llm-wiki flake's own
-# home-manager module, which shipped the skill as a claude-only Claude Code
-# plugin -- so opencode never saw it; delivering the skill through
-# ~/.claude/skills is what fixed that.
+# querying-notes skill (installed for every enabled harness like every other
+# skill) and LLM_WIKI_PATH. The consumer hands in the wiki's skills/ tree via
+# wiki.skillSrc and the checkout path via wiki.path. This module used to instead
+# consume the llm-wiki flake's own home-manager module, which shipped the skill
+# as a claude-only Claude Code plugin -- so opencode never saw it; delivering the
+# skill through the per-harness channels below is what fixed that.
 { lib, pkgs, config, ... }:
 
 let
   cfg = config.cjlarose.llmAgents;
 
-  # Whether to install skills at all. ~/.claude/skills is written whenever
-  # EITHER harness is enabled, not just claude: it is the location both of them
-  # read, so on a host running opencode alone it is still where opencode looks.
-  # Writing under ~/.claude with claude off reads oddly for a moment, and is
-  # cheaper than a second copy that opencode would only warn about.
-  skillsWanted = config.programs.claude-code.enable || cfg.opencode.enable;
+  # Installs one skill into each enabled harness's native channel: ~/.claude/skills
+  # for claude, stock programs.opencode.skills for opencode. See install-skill.nix
+  # for why the two are separate now (opencode runs with Claude-compat off).
+  installSkill = import ./install-skill.nix { inherit lib config; };
 
   # Renders cjlarose.llmAgents.tuicr.settings to tuicr's config.toml. A freeform
   # format rather than a typed option per key: tuicr's config surface is its
@@ -335,33 +329,9 @@ in
     };
 
     # --- standalone agent CLIs ---------------------------------------------
-
-    opencode.enable = lib.mkEnableOption ''
-      opencode, the standalone terminal coding agent: its integrations here --
-      the shared ~/.claude/skills, the herdr plugin, superpowers' skills.paths
-      -- and, when `package` is set, the binary itself through
-      programs.opencode
-    '';
-
-    opencode.package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = null;
-      description = ''
-        The opencode package, installed through programs.opencode.
-
-        Null means opencode reaches this host from somewhere else -- another
-        module owning programs.opencode -- and this module contributes only the
-        integrations above. That is what lets a host take the binary from
-        whichever module installs it, including one that has to place it
-        outside the nix store, while keeping the personal wiring here. Nothing
-        is installed and nothing collides.
-
-        The integrations that write files -- the skills and the herdr plugin --
-        land either way. The one that does not is superpowers' skills.paths,
-        which is a programs.opencode SETTING and so needs whichever module owns
-        that option to have enabled it.
-      '';
-    };
+    # opencode is stock programs.opencode now, owned by the consumer (home/cjlarose),
+    # exactly as claude-code is. This module keys its opencode skills and the herdr
+    # plugin off config.programs.opencode.enable, so there is no opencode option here.
 
     herdr.enable = lib.mkEnableOption ''
       herdr, a terminal workspace manager for AI coding agents (herdr.dev).
@@ -446,58 +416,54 @@ in
     # The `package != null` half of each guard is not redundant with the
     # assertions below: without it a null reaches home.packages and fails the
     # `package` type check FIRST, burying the assertion's readable message.
-    (lib.mkIf (cfg.lavish.enable && cfg.lavish.package != null) {
-      # CLI on PATH. Under home-manager useUserPackages this rides the system
-      # profile, so the picktrace VM needs a system switch-to-configuration to pick
-      # it up (an HM-only activate won't), same as tuicr / the playwright closure.
-      home.packages = [ cfg.lavish.package ];
+    (lib.mkIf (cfg.lavish.enable && cfg.lavish.package != null) (lib.mkMerge [
+      {
+        # CLI on PATH. Under home-manager useUserPackages this rides the system
+        # profile, so the picktrace VM needs a system switch-to-configuration to pick
+        # it up (an HM-only activate won't), same as tuicr / the playwright closure.
+        home.packages = [ cfg.lavish.package ];
+
+        # The LAVISH_AXI_* env vars the CLI reads, rendered only from the options a
+        # host actually sets -- an unconfigured host keeps lavish's loopback
+        # default. The firewall that exposes the port is a system-level concern and
+        # lives in the host's nixos config, not here.
+        home.sessionVariables =
+          lib.optionalAttrs (cfg.lavish.host != null) { LAVISH_AXI_HOST = cfg.lavish.host; }
+          // lib.optionalAttrs (cfg.lavish.linkHost != null) { LAVISH_AXI_LINK_HOST = cfg.lavish.linkHost; }
+          // lib.optionalAttrs (cfg.lavish.linkScheme != null) { LAVISH_AXI_LINK_SCHEME = cfg.lavish.linkScheme; }
+          // lib.optionalAttrs (cfg.lavish.linkPort != null) { LAVISH_AXI_LINK_PORT = cfg.lavish.linkPort; }
+          // lib.optionalAttrs (cfg.lavish.allowedHosts != [ ]) { LAVISH_AXI_ALLOWED_HOSTS = lib.concatStringsSep " " cfg.lavish.allowedHosts; }
+          // lib.optionalAttrs (cfg.lavish.port != null) { LAVISH_AXI_PORT = toString cfg.lavish.port; };
+      }
 
       # The skill drives the on-PATH lavish-axi binary directly (never npx), so
       # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in
       # the package's share/ output, installed into each enabled harness.
-      home.file = lib.mkIf skillsWanted {
-        ".claude/skills/lavish/SKILL.md".source =
-          "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md";
-      };
-
-      # The LAVISH_AXI_* env vars the CLI reads, rendered only from the options a
-      # host actually sets -- an unconfigured host keeps lavish's loopback
-      # default. The firewall that exposes the port is a system-level concern and
-      # lives in the host's nixos config, not here.
-      home.sessionVariables =
-        lib.optionalAttrs (cfg.lavish.host != null) { LAVISH_AXI_HOST = cfg.lavish.host; }
-        // lib.optionalAttrs (cfg.lavish.linkHost != null) { LAVISH_AXI_LINK_HOST = cfg.lavish.linkHost; }
-        // lib.optionalAttrs (cfg.lavish.linkScheme != null) { LAVISH_AXI_LINK_SCHEME = cfg.lavish.linkScheme; }
-        // lib.optionalAttrs (cfg.lavish.linkPort != null) { LAVISH_AXI_LINK_PORT = cfg.lavish.linkPort; }
-        // lib.optionalAttrs (cfg.lavish.allowedHosts != [ ]) { LAVISH_AXI_ALLOWED_HOSTS = lib.concatStringsSep " " cfg.lavish.allowedHosts; }
-        // lib.optionalAttrs (cfg.lavish.port != null) { LAVISH_AXI_PORT = toString cfg.lavish.port; };
-    })
+      (installSkill "lavish"
+        "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md")
+    ]))
 
     # --- gh stacked PRs (skill only) ----------------------------------------
-    (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null) {
-      # Upstream's own skill, read out of the package so it always matches the
-      # extension binary built from the same source.
-      home.file = lib.mkIf skillsWanted {
-        ".claude/skills/gh-stack/SKILL.md".source =
-          "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md";
-      };
-    })
+    # Upstream's own skill, read out of the package so it always matches the
+    # extension binary built from the same source.
+    (lib.mkIf (cfg.ghStackSkill.enable && cfg.ghStackSkill.package != null)
+      (installSkill "gh-stack"
+        "${cfg.ghStackSkill.package}/share/gh-stack/skill/SKILL.md"))
 
     # --- git-surgeon --------------------------------------------------------
-    (lib.mkIf (cfg.gitSurgeon.enable && cfg.gitSurgeon.package != null) {
-      # Binary and skill together, out of one package, so the documented
-      # subcommands and flags always match the build that is installed.
-      home.packages = [ cfg.gitSurgeon.package ];
+    (lib.mkIf (cfg.gitSurgeon.enable && cfg.gitSurgeon.package != null) (lib.mkMerge [
+      {
+        # Binary and skill together, out of one package, so the documented
+        # subcommands and flags always match the build that is installed.
+        home.packages = [ cfg.gitSurgeon.package ];
+      }
 
       # Upstream nests its skill one level deeper than the other two tools we
       # read a SKILL.md out of: share/git-surgeon/skills/<name>/SKILL.md, not
-      # share/<tool>/skill/SKILL.md. Irrelevant to where it lands, which is
-      # spelled out on the left of each assignment below.
-      home.file = lib.mkIf skillsWanted {
-        ".claude/skills/git-surgeon/SKILL.md".source =
-          "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md";
-      };
-    })
+      # share/<tool>/skill/SKILL.md. Irrelevant to where it lands.
+      (installSkill "git-surgeon"
+        "${cfg.gitSurgeon.package}/share/git-surgeon/skills/git-surgeon/SKILL.md")
+    ]))
 
     # --- tuicr ---------------------------------------------------------------
     (lib.mkIf (cfg.tuicr.enable && cfg.tuicr.package != null) {
@@ -515,12 +481,10 @@ in
     })
 
     # --- standalone agent CLIs ---------------------------------------------
-    (lib.mkIf (cfg.opencode.enable && cfg.opencode.package != null) {
-      programs.opencode = {
-        enable = true;
-        package = cfg.opencode.package;
-      };
-    })
+    # opencode itself is stock programs.opencode now, configured in the consumer
+    # (home/cjlarose) and wrapped there with harness-config lib.wrapOpencode --
+    # this module only contributes opencode's skills and the herdr plugin below,
+    # gated on the stock config.programs.opencode.enable.
 
     (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null) {
       home.packages = [ cfg.herdr.package ];
@@ -556,41 +520,35 @@ in
     # (see herdr.skillSrc), but gated on herdr.enable all the same. Harmless on
     # hosts where herdr is installed but unused: the skill's first instruction
     # is to check HERDR_ENV=1 and stop if it is unset.
-    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null) {
-      home.file = lib.mkIf skillsWanted {
-        ".claude/skills/herdr/SKILL.md".source = "${herdrSkill}/SKILL.md";
-      };
-    })
+    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.herdr.skillSrc != null)
+      (installSkill "herdr" "${herdrSkill}/SKILL.md"))
 
     # opencode integration. Split from the block above because it needs both
     # tools; the plugin is inert (and harmless) without opencode installed, but
     # there is no reason to write it. No registration half -- opencode scans the
     # plugins directory, and home-manager's programs.opencode does not manage
     # it, so there is nothing to collide with.
-    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && cfg.opencode.enable) {
+    (lib.mkIf (cfg.herdr.enable && cfg.herdr.package != null && config.programs.opencode.enable) {
       xdg.configFile."opencode/plugins/herdr-agent-state.js".source =
         "${herdrIntegrations}/opencode-plugin.js";
     })
 
     # --- personal LLM wiki --------------------------------------------------
     # Owned entirely here now: LLM_WIKI_PATH plus the read-only querying-notes
-    # skill in ~/.claude/skills (both harnesses). This used to be a claude-only
-    # plugin defined in the llm-wiki flake's own HM module, reached through a
-    # programs.llmWiki bridge -- opencode never saw it. Both the env var and the
-    # skill go through always-declared options (home.sessionVariables,
-    # home.file), so unlike programs.llmWiki they need no separately-imported
-    # declaration and live under a plain mkIf here.
-    (lib.mkIf cfg.wiki.enable {
-      home.sessionVariables.LLM_WIKI_PATH = cfg.wiki.path;
+    # skill (each enabled harness). This used to be a claude-only plugin defined
+    # in the llm-wiki flake's own HM module, reached through a programs.llmWiki
+    # bridge -- opencode never saw it. The env var and the skill go through
+    # always-declared options, so unlike programs.llmWiki they need no
+    # separately-imported declaration and live under a plain mkIf here.
+    (lib.mkIf cfg.wiki.enable (lib.mkMerge [
+      { home.sessionVariables.LLM_WIKI_PATH = cfg.wiki.path; }
 
-      # skillsWanted gates it to hosts running at least one harness; skillSrc is
-      # the wiki's own skills/ tree, handed in by the consumer. Left null (or on
-      # a host with neither harness), only LLM_WIKI_PATH is set.
-      home.file = lib.mkIf (skillsWanted && cfg.wiki.skillSrc != null) {
-        ".claude/skills/querying-notes/SKILL.md".source =
-          "${cfg.wiki.skillSrc}/querying-notes/SKILL.md";
-      };
-    })
+      # skillSrc is the wiki's own skills/ tree, handed in by the consumer. Left
+      # null (or on a host with neither harness), only LLM_WIKI_PATH is set.
+      (lib.mkIf (cfg.wiki.skillSrc != null)
+        (installSkill "querying-notes"
+          "${cfg.wiki.skillSrc}/querying-notes/SKILL.md"))
+    ]))
 
     # Every enable that needs a package asserts it rather than defaulting one, so
     # a host that leaves the feature off never has to name a package at all.

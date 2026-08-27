@@ -149,23 +149,37 @@ in
     };
   };
 
-  # superpowers' skills for opencode, through its native skills.paths key (the
-  # plugin's /skills subdir). Empty -- and superpowersPlugin never forced -- when
-  # superpowers is off.
-  programs.opencode.settings.skills.paths =
-    lib.optionals enableSuperpowers [ "${superpowersPlugin}/skills" ];
+  # Stock opencode for the whole fleet, wrapped by harness-config's lib to disable
+  # Claude Code compatibility: without this opencode falls back to reading Claude's
+  # ~/.claude/CLAUDE.md and ~/.claude/skills, which on a host running both agents
+  # deliberately is a leak. With compat off it reads only its own AGENTS.md (stock
+  # programs.opencode.rules, see workspace-layout.nix) and its own skill dirs (stock
+  # programs.opencode.skills, written by the llm-agents siblings) plus skills.paths.
+  programs.opencode = {
+    enable = true;
+    package = harnessConfig.wrapOpencode {
+      inherit pkgs;
+      package = additionalPackages.${system}.opencode;
+      disableClaudeCompat = true;
+    };
+
+    # superpowers' skills for opencode, through its native skills.paths key (the
+    # plugin's /skills subdir). Empty -- and superpowersPlugin never forced --
+    # when superpowers is off.
+    settings.skills.paths =
+      lib.optionals enableSuperpowers [ "${superpowersPlugin}/skills" ];
+  };
 
   # The rest of the LLM-agent tooling lives behind the single llm-agents module,
   # which defaults every feature off. Everything wanted fleet-wide is opted into
   # here, and the rest per-host where the closure cost warrants it. The module
   # takes no additionalPackages arg -- every package is named explicitly here.
   cjlarose.llmAgents = {
-    # Both are small CLIs that pair with claude, so they ride the shared profile
-    # rather than being host-scoped: opencode as a second agent, herdr to manage
-    # claude sessions. herdr reaches the no-AVX pve guests too — its AVX2 paths
-    # sit behind runtime is_x86_feature_detected! gates, unlike the Bun
-    # claude-code binary that forces the node build above.
-    opencode = { enable = true; package = additionalPackages.${system}.opencode; };
+    # herdr manages claude/opencode sessions and rides the shared profile
+    # fleet-wide rather than being host-scoped. It reaches the no-AVX pve guests
+    # too — its AVX2 paths sit behind runtime is_x86_feature_detected! gates,
+    # unlike the Bun claude-code binary that forces the node build above.
+    # (opencode itself is stock programs.opencode above, no longer a module option.)
     herdr = {
       enable = true;
       package = additionalPackages.${system}.herdr;

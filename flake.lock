@@ -687,11 +687,11 @@
         "superpowers": "superpowers"
       },
       "locked": {
-        "lastModified": 1787593037,
-        "narHash": "sha256-A/01Ljsk60HU+smLKbAaR9WqyeMW+aVUIAEPXD47XsI=",
+        "lastModified": 1787720371,
+        "narHash": "sha256-hFgqBp2TfoXIRBc1t9PNhIK73sHJpGC8Cn7/6HWXLDE=",
         "owner": "cjlarose",
         "repo": "harness-config.nix",
-        "rev": "c4d7470251b2d0c53c7a8dfdd1e9dec208a62ad1",
+        "rev": "64c48709e1136dd719ca5981968ce9c0f959e032",
         "type": "github"
       },
       "original": {
