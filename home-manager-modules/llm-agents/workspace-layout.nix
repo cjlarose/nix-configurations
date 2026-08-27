@@ -16,6 +16,7 @@
 
 let
   cfg = config.cjlarose.llmAgents.claude.workspaceLayout;
+  installSkill = import ./install-skill.nix { inherit lib config; };
   wiki = config.cjlarose.llmAgents.wiki;
 
   # Named once so the two harness blocks below cannot drift to different paths
@@ -134,9 +135,9 @@ let
 
   # The user-level agent instructions, built once so both harness entry points
   # can point at the SAME store path: ~/.claude/CLAUDE.md (claude) and
-  # ~/.config/opencode/AGENTS.md (opencode). opencode reads ~/.claude/CLAUDE.md
-  # only as a fallback and opencode v2 not at all, so a matching AGENTS.md is what
-  # keeps these rules reaching opencode; one shared store path keeps the two
+  # ~/.config/opencode/AGENTS.md (opencode, via stock programs.opencode.rules).
+  # With Claude-compat off opencode never reads ~/.claude/CLAUDE.md, so AGENTS.md
+  # is what keeps these rules reaching it; one shared store path keeps the two
   # byte-identical rather than two copies that can drift.
   agentInstructions = pkgs.writeText "agent-instructions.md" (
     builtins.readFile ./workspace-layout/CLAUDE.md
@@ -180,37 +181,36 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    # ~/.claude/CLAUDE.md (claude) and ~/.config/opencode/AGENTS.md (opencode)
-    # both point at agentInstructions -- one store path, so the two harnesses read
-    # byte-identical rules. programs.claude-code has no memory/CLAUDE.md option, so
-    # CLAUDE.md goes through home.file; the consequence is that ~/.claude/CLAUDE.md
-    # is a read-only store symlink and Claude's `#` memory-append cannot write to
-    # it -- the same trade this module already makes for settings.json.
-    home.file = {
-      ".claude/CLAUDE.md".source = agentInstructions;
-    }
-    # The mechanics the CLAUDE.md above deliberately does not carry. It states
-    # the rules and names the skill at each gate; the commands, the decision
-    # trees and the scripts live here, where they cost nothing until invoked.
-    #
-    # ~/.claude/skills only: opencode scans it natively, so a second copy under
-    # opencode/skills would collide rather than help (see default.nix). None is
-    # gated beyond that -- the read-side gate applies on every host with
-    # ~/repos, which is exactly the hosts enabling this module.
-    // lib.optionalAttrs (config.programs.claude-code.enable || config.programs.opencode.enable) {
-      ".claude/skills/refreshing-a-repo".source = skills.refreshing-a-repo;
-      ".claude/skills/starting-a-workspace".source = skills.starting-a-workspace;
-      ".claude/skills/adding-a-repo-to-a-workspace".source = skills.adding-a-repo-to-a-workspace;
-      ".claude/skills/tearing-down-a-workspace".source = skills.tearing-down-a-workspace;
-    };
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    {
+      # ~/.claude/CLAUDE.md (claude) and ~/.config/opencode/AGENTS.md (opencode)
+      # both come from agentInstructions -- one store path, so the two harnesses
+      # read byte-identical rules. CLAUDE.md goes through home.file (programs.
+      # claude-code has no memory/CLAUDE.md option), which makes ~/.claude/CLAUDE.md
+      # a read-only store symlink Claude's `#` memory-append cannot write to -- the
+      # same trade this module already makes for settings.json.
+      home.file.".claude/CLAUDE.md".source = agentInstructions;
 
-    # opencode's entry point for the same rules, sourced from the same store path
-    # as CLAUDE.md above. Written only where opencode is enabled. Do not also set
-    # programs.opencode.context -- the home-manager module writes this same file
-    # from it, which would collide.
-    xdg.configFile = lib.mkIf config.programs.opencode.enable {
-      "opencode/AGENTS.md".source = agentInstructions;
-    };
-  };
+      # ~/.config/opencode/AGENTS.md, from the SAME store path as CLAUDE.md above.
+      # This is the only path these rules reach opencode now: v2 discovers AGENTS.md
+      # only, and v1 with Claude-compat off no longer falls back to
+      # ~/.claude/CLAUDE.md. Written through xdg.configFile rather than the stock
+      # programs.opencode.rules because rules takes inline text or a nix path and
+      # mishandles a pre-built store derivation (and reading it to a string would
+      # force IFD); .source symlinks the derivation directly. Do not ALSO set
+      # programs.opencode.rules/context -- the stock module writes this same file
+      # from either, which would collide. Gated on the stock opencode enable.
+      xdg.configFile = lib.mkIf config.programs.opencode.enable {
+        "opencode/AGENTS.md".source = agentInstructions;
+      };
+    }
+
+    # The mechanics the instructions above deliberately do not carry: the commands,
+    # decision trees and scripts, which cost nothing until invoked. Installed into
+    # each enabled harness's native channel (see install-skill.nix).
+    (installSkill "refreshing-a-repo" skills.refreshing-a-repo)
+    (installSkill "starting-a-workspace" skills.starting-a-workspace)
+    (installSkill "adding-a-repo-to-a-workspace" skills.adding-a-repo-to-a-workspace)
+    (installSkill "tearing-down-a-workspace" skills.tearing-down-a-workspace)
+  ]);
 }

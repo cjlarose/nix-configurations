@@ -21,6 +21,7 @@
 
 let
   cfg = config.cjlarose.llmAgents.githubConventions;
+  installSkill = import ./install-skill.nix { inherit lib config; };
 
   # Appended rather than substituted, so the consumer's rules read as additions
   # to the shared ones and the shared text stays greppable. The extra block goes
@@ -88,14 +89,11 @@ in
     };
   };
 
-  # ~/.claude/skills only: opencode scans it natively, so a second copy under
-  # opencode/skills would collide rather than help (see default.nix).
-  config = lib.mkIf cfg.enable {
-    home.file = lib.mkIf (config.programs.claude-code.enable || config.programs.opencode.enable) {
-      ".claude/skills/writing-pull-request-descriptions".source =
-        mkSkill "writing-pull-request-descriptions" cfg.pullRequestExtraInstructions;
-      ".claude/skills/writing-pull-request-comments".source =
-        mkSkill "writing-pull-request-comments" cfg.commentExtraInstructions;
-    };
-  };
+  # Installed into each enabled harness's native channel (see install-skill.nix).
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    (installSkill "writing-pull-request-descriptions"
+      (mkSkill "writing-pull-request-descriptions" cfg.pullRequestExtraInstructions))
+    (installSkill "writing-pull-request-comments"
+      (mkSkill "writing-pull-request-comments" cfg.commentExtraInstructions))
+  ]);
 }

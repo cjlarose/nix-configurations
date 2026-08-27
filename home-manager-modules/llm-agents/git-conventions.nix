@@ -17,6 +17,7 @@
 
 let
   cfg = config.cjlarose.llmAgents.gitConventions;
+  installSkill = import ./install-skill.nix { inherit lib config; };
 
   # Appended rather than substituted, so the consumer's rules read as additions
   # to the shared ones and the shared text stays greppable. The extra block goes
@@ -68,12 +69,8 @@ in
     };
   };
 
-  # ~/.claude/skills only: opencode scans it natively, so a second copy under
-  # opencode/skills would collide rather than help (see default.nix).
-  config = lib.mkIf cfg.enable {
-    home.file = lib.mkIf (config.programs.claude-code.enable || config.programs.opencode.enable) {
-      ".claude/skills/writing-commit-messages".source =
-        mkSkill "writing-commit-messages" cfg.commitExtraInstructions;
-    };
-  };
+  # Installed into each enabled harness's native channel (see install-skill.nix).
+  config = lib.mkIf cfg.enable
+    (installSkill "writing-commit-messages"
+      (mkSkill "writing-commit-messages" cfg.commitExtraInstructions));
 }
