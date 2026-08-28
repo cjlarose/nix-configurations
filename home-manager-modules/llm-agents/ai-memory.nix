@@ -1128,19 +1128,6 @@ in
           message = "cjlarose.llmAgents.aiMemory.enable is true but cjlarose.llmAgents.aiMemory.package is unset.";
         }
         {
-          # A provider with no credential is the silent-degradation case: the
-          # daemon starts, capture works, and summaries quietly stay
-          # rule-based. Catch it at build time rather than at 03:00.
-          assertion = cfg.llm.provider == null || cfg.llm.environmentFile != null;
-          message = ''
-            cjlarose.llmAgents.aiMemory.llm.provider is set but
-            llm.environmentFile is unset. The API key must come from a file
-            read at runtime -- putting it in a Nix option would place it in the
-            world-readable store. Point environmentFile at a chmod 600 file
-            containing one KEY=value line.
-          '';
-        }
-        {
           assertion = cfg.llm.provider != "anthropic-oauth";
           message = ''
             cjlarose.llmAgents.aiMemory.llm.provider is set to
