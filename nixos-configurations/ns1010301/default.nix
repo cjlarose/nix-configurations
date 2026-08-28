@@ -153,14 +153,28 @@
         # sense where that layout exists. The wiki is untouched -- the two run
         # side by side and the trial is judged on evidence, not on switching.
         #
-        # Everything else stays at the module's defaults, which ARE the trial
+        # Nearly everything stays at the module's defaults, which ARE the trial
         # configuration: loopback bind, no auth token, no LLM provider, and
         # upstream's own ~/.local/share/ai-memory data dir rather than a scratch
         # one, so a trial that goes well needs no migration to adopt.
+        #
+        # The one deliberate departure is the port. ai-memory's upstream default
+        # bind is 127.0.0.1:49374 -- which is 0xC0DE -- and opencode2 (installed
+        # for this host in home/cjlarose) hardcodes that same 0xC0DE as its
+        # background-service port for every release channel we track, with no
+        # fallback scan when it is taken. So the two race for the port and the
+        # loser cannot start. opencode2's is a compile-time constant; ai-memory's
+        # is a plain option, so ai-memory is the one that moves.
         cjlarose.llmAgents.aiMemory = {
           enable = true;
           package = additionalPackages.${system}.ai-memory;
           workspace = "personal";
+          # Off 0xC0DE (49374) so opencode2's background service can bind it.
+          # serverUrl and bind are separate options that must address the same
+          # socket (see ai-memory.nix); the MCP url both agents connect to is
+          # derived from serverUrl.
+          serverUrl = "http://127.0.0.1:49380";
+          bind = "127.0.0.1:49380";
           # One marker at $HOME, pinning every session to a single project.
           #
           # This deliberately drops the per-task-project idea the trial started

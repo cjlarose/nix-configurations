@@ -281,6 +281,17 @@ in
     # nixd on PATH so the local LSP marketplace plugin's bare `nixd` command
     # resolves (marketplace + settings wired onto programs.claude-code above).
     pkgs.nixd
+    # opencode2 (the OpenCode 2.0 beta) alongside v1, same wrapper (Claude-compat
+    # off) under its own binary name. It shares v1's ~/.config/opencode config --
+    # AGENTS.md, the skill dirs, the herdr plugin, opencode.json -- so it needs
+    # nothing but the binary on PATH. Its background service binds 0xC0DE (49374),
+    # which is why ns1010301 moves ai-memory off that port (see aiMemory there).
+    (harnessConfig.wrapOpencode {
+      inherit pkgs;
+      package = additionalPackages.${system}.opencode2;
+      binName = "opencode2";
+      disableClaudeCompat = true;
+    })
   ];
 
   programs.git.userName = "Christopher La Rose";
