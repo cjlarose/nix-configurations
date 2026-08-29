@@ -1,14 +1,13 @@
 # Unified LLM-agent tooling module.
 #
-# One module owning the agent-adjacent tooling for a user: lavish-axi, the
-# personal LLM wiki integration, the standalone agent CLIs (opencode, herdr,
-# git-surgeon), tuicr, and the gh-stack agent skill. Options ending in `Skill`
-# install documentation only -- the tool they describe is installed elsewhere;
-# an option without the suffix that happens to ship a skill (lavish, gitSurgeon)
-# installs the tool too. herdr is the third case: the tool is here but upstream
-# keeps its skill out of the package, so the module lifts it out of upstream's
-# source tree (herdr.skillSrc). tuicr is the fourth: no skill at all, and the
-# only option here that carries configuration rather than just a package.
+# One module owning the agent-adjacent tooling for a user: the personal LLM wiki
+# integration, the standalone agent CLIs (opencode, herdr, git-surgeon), tuicr,
+# and the gh-stack agent skill. Options ending in `Skill` install documentation
+# only -- the tool they describe is installed elsewhere; gitSurgeon installs its
+# tool because its skill drives the same binary. herdr is the other case: the
+# tool is here but upstream keeps its skill out of the package, so the module
+# lifts it out of upstream's source tree (herdr.skillSrc). tuicr carries
+# configuration rather than a skill.
 #
 # Neither agent is owned here any more. The consumer configures stock
 # programs.claude-code and stock programs.opencode directly and applies
@@ -147,101 +146,6 @@ in
   imports = [ ./workspace-layout.nix ./git-conventions.nix ./github-conventions.nix ./ai-memory.nix ./pr-feedback.nix ];
 
   options.cjlarose.llmAgents = {
-
-    # --- lavish-axi ---------------------------------------------------------
-
-    lavish.enable = lib.mkEnableOption ''
-      the lavish-axi CLI (upstream kunchenguid/lavish-axi, built from source with
-      telemetry disabled) and its Lavish Editor agent skill. lavish-axi opens
-      an agent-generated HTML artifact in a sandboxed browser for human annotation
-      and ships the feedback back to the driving agent over a loopback server with
-      a Host-header DNS-rebinding guard. Disabled by default; opt in per host/user
-    '';
-
-    lavish.package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = null;
-      description = ''
-        The lavish-axi package to install. Carries the CLI at bin/lavish-axi and
-        the generated agent skill at share/lavish-axi/skill/SKILL.md, which this
-        module installs into every enabled harness.
-        Required when lavish.enable is set; asserted below rather than defaulted,
-        so hosts with lavish off need not name a package at all.
-      '';
-    };
-
-    lavish.host = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "myhost.example.ts.net";
-      description = ''
-        Bind address for the lavish-axi review server (LAVISH_AXI_HOST). Null
-        leaves lavish on its 127.0.0.1 default -- reachable only from this host.
-        A hostname or IP binds that interface instead; a hostname that resolves
-        to a tailscale IP serves the review UI over the tailnet with no literal
-        IP in config. Binding beyond loopback exposes the files lavish serves to
-        anything that can reach the socket, so pair it with a firewall that only
-        opens the port on the intended interface.
-      '';
-    };
-
-    lavish.linkHost = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      description = ''
-        Hostname written into the session URLs lavish prints
-        (LAVISH_AXI_LINK_HOST). Null uses the bind address. Set it to the name a
-        reviewer actually reaches the server by, so the printed links are
-        clickable from their machine.
-      '';
-    };
-
-    lavish.linkScheme = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "http" "https" ]);
-      default = null;
-      example = "https";
-      description = ''
-        Scheme lavish prints its session links with (LAVISH_AXI_LINK_SCHEME).
-        Null leaves upstream's http. Set https when a TLS-terminating reverse
-        proxy fronts the loopback server. Composes with linkHost/linkPort and
-        requires the reverse-proxy build patch in packages/lavish-axi.
-      '';
-    };
-
-    lavish.linkPort = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      default = null;
-      example = "";
-      description = ''
-        Port segment lavish prints its session links with (LAVISH_AXI_LINK_PORT).
-        Null keeps the actual bind port. The empty string omits the port entirely
-        -- use it when a reverse proxy serves the link on the scheme's default
-        port (443/80), so the printed URL has no `:port`. A number forces that
-        port. Composes with linkScheme; requires the packages/lavish-axi patch.
-      '';
-    };
-
-    lavish.allowedHosts = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      example = [ "myhost.example.ts.net" ];
-      description = ''
-        Extra Host-header values lavish's DNS-rebinding guard accepts
-        (LAVISH_AXI_ALLOWED_HOSTS, space-joined). Loopback, localhost and the
-        bind/link hosts are always allowed; add any other name a reviewer reaches
-        the server by. Empty leaves only that built-in set.
-      '';
-    };
-
-    lavish.port = lib.mkOption {
-      type = lib.types.nullOr lib.types.port;
-      default = null;
-      description = ''
-        Fixed port for the lavish-axi server (LAVISH_AXI_PORT). Null uses
-        lavish's own default (4387). Pin it when a firewall rule has to name the
-        same port.
-      '';
-    };
 
     # --- gh stacked PRs (skill only) ----------------------------------------
 
@@ -412,37 +316,6 @@ in
 
   config = lib.mkMerge [
 
-    # --- lavish-axi ---------------------------------------------------------
-    # The `package != null` half of each guard is not redundant with the
-    # assertions below: without it a null reaches home.packages and fails the
-    # `package` type check FIRST, burying the assertion's readable message.
-    (lib.mkIf (cfg.lavish.enable && cfg.lavish.package != null) (lib.mkMerge [
-      {
-        # CLI on PATH. Under home-manager useUserPackages this rides the system
-        # profile, so the picktrace VM needs a system switch-to-configuration to pick
-        # it up (an HM-only activate won't), same as tuicr / the playwright closure.
-        home.packages = [ cfg.lavish.package ];
-
-        # The LAVISH_AXI_* env vars the CLI reads, rendered only from the options a
-        # host actually sets -- an unconfigured host keeps lavish's loopback
-        # default. The firewall that exposes the port is a system-level concern and
-        # lives in the host's nixos config, not here.
-        home.sessionVariables =
-          lib.optionalAttrs (cfg.lavish.host != null) { LAVISH_AXI_HOST = cfg.lavish.host; }
-          // lib.optionalAttrs (cfg.lavish.linkHost != null) { LAVISH_AXI_LINK_HOST = cfg.lavish.linkHost; }
-          // lib.optionalAttrs (cfg.lavish.linkScheme != null) { LAVISH_AXI_LINK_SCHEME = cfg.lavish.linkScheme; }
-          // lib.optionalAttrs (cfg.lavish.linkPort != null) { LAVISH_AXI_LINK_PORT = cfg.lavish.linkPort; }
-          // lib.optionalAttrs (cfg.lavish.allowedHosts != [ ]) { LAVISH_AXI_ALLOWED_HOSTS = lib.concatStringsSep " " cfg.lavish.allowedHosts; }
-          // lib.optionalAttrs (cfg.lavish.port != null) { LAVISH_AXI_PORT = toString cfg.lavish.port; };
-      }
-
-      # The skill drives the on-PATH lavish-axi binary directly (never npx), so
-      # nothing is fetched from npm at runtime. Single-file SKILL.md shipped in
-      # the package's share/ output, installed into each enabled harness.
-      (installSkill "lavish"
-        "${cfg.lavish.package}/share/lavish-axi/skill/SKILL.md")
-    ]))
-
     # --- gh stacked PRs (skill only) ----------------------------------------
     # Upstream's own skill, read out of the package so it always matches the
     # extension binary built from the same source.
@@ -557,10 +430,6 @@ in
         {
           assertion = !cfg.wiki.enable || cfg.wiki.path != null;
           message = "cjlarose.llmAgents.wiki.enable is true but cjlarose.llmAgents.wiki.path is unset.";
-        }
-        {
-          assertion = !cfg.lavish.enable || cfg.lavish.package != null;
-          message = "cjlarose.llmAgents.lavish.enable is true but cjlarose.llmAgents.lavish.package is unset.";
         }
         {
           assertion = !cfg.herdr.enable || cfg.herdr.package != null;

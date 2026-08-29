@@ -1,4 +1,4 @@
-{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, self, ... }: {
+{ home-manager, stateVersion, additionalPackages, system, impermanence, disko, determinate, microvm, picktrace-nix-configurations, cjlarose-llm-wiki, harness-config, self, ... }: {
   imports = [
     microvm.nixosModules.host
     ({ ... }: {
@@ -61,6 +61,7 @@
       home-manager.backupFileExtension = "hm-backup";
       home-manager.users.cjlarose = {
         imports = [
+          harness-config.homeManagerModules.lavish
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
             # Browser automation for cjlarose's sessions on this host: register
@@ -98,10 +99,8 @@
         # It is picktrace that has to ban it, and only on PR descriptions.
         cjlarose.llmAgents.gitConventions.enable = true;
         cjlarose.llmAgents.githubConventions.enable = true;
-        # Upstream lavish-axi CLI (built from source, telemetry off) + its Lavish
-        # Editor Claude skill. Scoped to this interactive/browser host (not the
-        # shared profile, which fans out to the headless cjlarose hosts that have
-        # no use for a browser review tool).
+        # Lavish AXI and its agent skills are scoped to this interactive/browser
+        # host rather than the shared profile, which also serves headless hosts.
         # Serve its review UI over tailscale with real TLS. lavish speaks only
         # plain HTTP, and the whole .dev TLD is HSTS-preloaded, so a browser
         # force-upgrades any lavish.ns1010301.cjlarose.dev request to https --
@@ -113,18 +112,19 @@
         # nginx forwards), so no separate allowedHosts is needed; linkScheme +
         # linkPort make the printed session links the clean https URL with no
         # port (nginx serves 443, the scheme default) -- these need the
-        # reverse-proxy patch in packages/lavish-axi; port is pinned
+        # reverse-proxy support in harness-config's package; port is pinned
         # so nginx's proxy_pass and the loopback bind stay in lockstep. The
         # firewall in configuration.nix now opens 443 on tailscale0 (not 4387) --
         # the public path stays closed.
-        cjlarose.llmAgents.lavish = {
+        programs.lavish = {
           enable = true;
-          package = additionalPackages.${system}.lavish-axi;
-          host = null; # loopback-only; nginx is the only reachable front
+          disableTelemetry = true;
           linkHost = "lavish.ns1010301.cjlarose.dev";
           linkScheme = "https"; # nginx terminates TLS
           linkPort = ""; # omit the port; nginx serves the scheme default (443)
           port = 4387;
+          claudeCodeSkill.enable = true;
+          opencodeSkill.enable = true;
         };
         # The soliciting-pr-feedback skill and its mock-pr-html renderer, which
         # drive lavish above to review a change as a GitHub PR before it is

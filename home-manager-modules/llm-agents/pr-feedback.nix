@@ -53,7 +53,7 @@ in
       the soliciting-pr-feedback skill and its `mock-pr-html` renderer: build a
       GitHub-styled mock pull request from a commit range and open it in lavish
       for review before the PR is opened or pushed to. Needs lavish to drive the
-      review loop, so enable it on hosts that also set cjlarose.llmAgents.lavish
+      review loop, so enable it on hosts that also set programs.lavish.enable
     '';
   };
 

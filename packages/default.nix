@@ -15,7 +15,6 @@
   llm-agents,
   gh-stack,
   harness-config,
-  lavish-axi,
   herdr,
   ai-memory,
   ...
@@ -161,12 +160,6 @@ in
   # source passthrough that used to live here.
   harnessConfig = harness-config.lib;
   tuicr = tuicr.packages.${system}.default;
-  # Built from source (flake = false input `lavish-axi` is the upstream src).
-  # callPackage supplies lib/stdenv/nodejs_22/pnpm/makeWrapper from nixpkgs-26-05.
-  lavish-axi = nixpkgs-26-05.legacyPackages.${system}.callPackage ./lavish-axi {
-    src = lavish-axi;
-    version = "0.1.43";
-  };
   nvr = import ./nvr { inherit pkgs nvr; };
   trueColorTest = pkgs.stdenv.mkDerivation {
     name = "true-color-test";
