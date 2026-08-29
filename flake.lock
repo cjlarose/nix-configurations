@@ -124,11 +124,11 @@
     "cjlarose-home-manager-modules": {
       "locked": {
         "dir": "home-manager-modules",
-        "lastModified": 1787702214,
-        "narHash": "sha256-QXJGlsdaaY0+JTCif1nC0TziVhTgAjt+9yRDKp2b3o4=",
-        "ref": "refs/heads/main",
-        "rev": "09b1e33f7762949f9b990608ca43cb2ae775283f",
-        "revCount": 1219,
+        "lastModified": 1787979276,
+        "narHash": "sha256-V7VHv6KFPGssJESJn+6bnbyYTdQ9yG0uOtPI70eUvvQ=",
+        "ref": "refs/heads/harness-config",
+        "rev": "0585a34024df8e5c67cc38fc5dbffabc27d19be7",
+        "revCount": 1238,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/nix-configurations"
       },
@@ -702,6 +702,30 @@
         "type": "github"
       }
     },
+    "harness-config_2": {
+      "inputs": {
+        "home-manager": "home-manager_3",
+        "lavish-axi": "lavish-axi_2",
+        "nixpkgs": [
+          "picktrace-nix-configurations",
+          "nixpkgs-26-05"
+        ],
+        "superpowers": "superpowers_2"
+      },
+      "locked": {
+        "lastModified": 1787955440,
+        "narHash": "sha256-Vo9HTSJA4WCucRG3IQNqhdzrzl1FrUSeWMeaPvKXrGk=",
+        "owner": "cjlarose",
+        "repo": "harness-config.nix",
+        "rev": "289d681eb1012ea6df1165711784a429a2ce02fa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cjlarose",
+        "repo": "harness-config.nix",
+        "type": "github"
+      }
+    },
     "herdr": {
       "inputs": {
         "nixpkgs": [
@@ -938,6 +962,29 @@
       },
       "original": {
         "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "home-manager_3": {
+      "inputs": {
+        "nixpkgs": [
+          "picktrace-nix-configurations",
+          "harness-config",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787377438,
+        "narHash": "sha256-Sxu1NLTD/Ern6hFGLlZmtKCSct3YQXZI/lls8RE1XeM=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "65258d5c65a250189fde2e35f490d15e064c4c62",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-26.05",
         "repo": "home-manager",
         "type": "github"
       }
@@ -1741,12 +1788,12 @@
         "cstyles-nvr": "cstyles-nvr",
         "determinate": "determinate_2",
         "gh-stack": "gh-stack_2",
+        "harness-config": "harness-config_2",
         "herdr": "herdr_2",
         "home-manager-24-11": "home-manager-24-11",
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
         "impermanence": "impermanence_2",
-        "lavish-axi": "lavish-axi_2",
         "llm-agents": "llm-agents_2",
         "microvm": "microvm_2",
         "nix-darwin-26-05": "nix-darwin-26-05",
@@ -1756,16 +1803,16 @@
         "nixpkgs-25-11": "nixpkgs-25-11_2",
         "nixpkgs-26-05": "nixpkgs-26-05_2",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
-        "superpowers": "superpowers_2",
+        "rmacklin-pt-home": "rmacklin-pt-home",
         "tfenv": "tfenv",
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1787894880,
-        "narHash": "sha256-11nQn0i2lJ3KRPQ+jBjhQ22u97l34Ohetvtg6DJczTI=",
+        "lastModified": 1787983429,
+        "narHash": "sha256-QZTWH6ozg94c6Z2nn/y7JIcjdRHpBpRFUu7QEIuhGbs=",
         "ref": "refs/heads/main",
-        "rev": "4dea92669c9c24ecb5b210d654967f7e9029b9e5",
-        "revCount": 479,
+        "rev": "2200de739d635f71cfdbc8bb2f29e69b549233ef",
+        "revCount": 494,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1860,6 +1907,27 @@
         "owner": "pyproject-nix",
         "repo": "pyproject.nix",
         "type": "github"
+      }
+    },
+    "rmacklin-pt-home": {
+      "inputs": {
+        "nixpkgs": [
+          "picktrace-nix-configurations",
+          "nixpkgs-26-05"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787956891,
+        "narHash": "sha256-hq7lSWcJYQfBTPg9EeWvYpu+HHxRfk49rOfpJAlqmvw=",
+        "ref": "refs/heads/main",
+        "rev": "2048c04149847959b888f65ef993bb1190186264",
+        "revCount": 525,
+        "type": "git",
+        "url": "ssh://git@github.com/rmacklin/pt-home"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/rmacklin/pt-home"
       }
     },
     "root": {
