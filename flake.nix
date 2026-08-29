@@ -176,14 +176,6 @@
       url = "github:akitaonrails/ai-memory/v1.30.0";
       flake = false;
     };
-    lavish-axi = {
-      # Upstream lavish-axi, pinned to a release tag and built from source in
-      # packages/lavish-axi (flake = false: upstream ships no nix packaging).
-      # v0.1.43 includes the DNS-rebinding Host-guard fix. The build disables
-      # telemetry; see packages/lavish-axi/default.nix.
-      url = "github:kunchenguid/lavish-axi/lavish-axi-v0.1.43";
-      flake = false;
-    };
   };
 
   outputs = {
@@ -217,7 +209,6 @@
     tuicr,
     llm-agents,
     gh-stack,
-    lavish-axi,
     herdr,
     ai-memory,
     harness-config,
@@ -234,7 +225,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack harness-config lavish-axi herdr ai-memory;
+            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack harness-config herdr ai-memory;
           };
         in
           import ./packages packageArgs
@@ -277,7 +268,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules self;
+          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules harness-config self;
         }
       );
 

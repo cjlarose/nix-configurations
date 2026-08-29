@@ -681,17 +681,19 @@
     },
     "harness-config": {
       "inputs": {
+        "home-manager": "home-manager",
+        "lavish-axi": "lavish-axi",
         "nixpkgs": [
           "nixpkgs-26-05"
         ],
         "superpowers": "superpowers"
       },
       "locked": {
-        "lastModified": 1787720371,
-        "narHash": "sha256-hFgqBp2TfoXIRBc1t9PNhIK73sHJpGC8Cn7/6HWXLDE=",
+        "lastModified": 1787955440,
+        "narHash": "sha256-Vo9HTSJA4WCucRG3IQNqhdzrzl1FrUSeWMeaPvKXrGk=",
         "owner": "cjlarose",
         "repo": "harness-config.nix",
-        "rev": "64c48709e1136dd719ca5981968ce9c0f959e032",
+        "rev": "289d681eb1012ea6df1165711784a429a2ce02fa",
         "type": "github"
       },
       "original": {
@@ -771,20 +773,21 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "impermanence",
+          "harness-config",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1768598210,
-        "narHash": "sha256-kkgA32s/f4jaa4UG+2f8C225Qvclxnqs76mf8zvTVPg=",
+        "lastModified": 1787377438,
+        "narHash": "sha256-Sxu1NLTD/Ern6hFGLlZmtKCSct3YQXZI/lls8RE1XeM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "c47b2cc64a629f8e075de52e4742de688f930dc6",
+        "rev": "65258d5c65a250189fde2e35f490d15e064c4c62",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
+        "ref": "release-26.05",
         "repo": "home-manager",
         "type": "github"
       }
@@ -918,9 +921,30 @@
         "type": "github"
       }
     },
+    "home-manager_2": {
+      "inputs": {
+        "nixpkgs": [
+          "impermanence",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768598210,
+        "narHash": "sha256-kkgA32s/f4jaa4UG+2f8C225Qvclxnqs76mf8zvTVPg=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "c47b2cc64a629f8e075de52e4742de688f930dc6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
     "impermanence": {
       "inputs": {
-        "home-manager": "home-manager",
+        "home-manager": "home-manager_2",
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
@@ -1856,7 +1880,6 @@
         "home-manager-26-05": "home-manager-26-05",
         "impermanence": "impermanence",
         "intranetHosts": "intranetHosts",
-        "lavish-axi": "lavish-axi",
         "llm-agents": "llm-agents",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",

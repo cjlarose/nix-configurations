@@ -8,8 +8,7 @@
 # Built from nixpkgs-26-05 rather than the host's own pkgs because upstream's
 # rust-toolchain.toml pins channel 1.95 and workspace.rust-version is 1.95 --
 # 26-05 carries rustc 1.95.0 exactly. (unstable is at 1.97, which also works,
-# but 26-05 is the closer match and is what gh-stack and lavish-axi already
-# build from.)
+# but 26-05 is the closer match and is what gh-stack already builds from.)
 #
 # The output carries:
 #   bin/ai-memory                 the CLI + daemon, one binary
