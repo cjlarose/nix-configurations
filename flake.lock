@@ -1808,11 +1808,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1787984219,
-        "narHash": "sha256-2zSzZ+RXmS5DxYRU2wUvYuMuKW6b3X2QUa/qdW5z9+o=",
+        "lastModified": 1788056124,
+        "narHash": "sha256-2amJLKhbLxzqg01wv0IGtzB+Z2bWSm+vOplHQ8CYQ6k=",
         "ref": "refs/heads/main",
-        "rev": "4e21af3e53fb32b7d4211bd5a7a50815b9e6e2a3",
-        "revCount": 496,
+        "rev": "eae30d0f338f7a570d266880fc991e3064fe13ff",
+        "revCount": 499,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
@@ -1918,10 +1918,10 @@
       },
       "locked": {
         "lastModified": 1787956891,
-        "narHash": "sha256-hq7lSWcJYQfBTPg9EeWvYpu+HHxRfk49rOfpJAlqmvw=",
+        "narHash": "sha256-9Y15Tvn2B/7V9DIWF/Vqat0FiWmBvNWQuGp2cInSVJY=",
         "ref": "refs/heads/main",
-        "rev": "2048c04149847959b888f65ef993bb1190186264",
-        "revCount": 525,
+        "rev": "68d245e400dc3ae024e6eeedba7b047805cf7712",
+        "revCount": 526,
         "type": "git",
         "url": "ssh://git@github.com/rmacklin/pt-home"
       },
