@@ -189,6 +189,7 @@
         enableACME = true;
         acmeRoot = null; # DNS-01: no HTTP webroot challenge directory
         forceSSL = true;
+        basicAuthFile = "/persistence/nginx/lavish.htpasswd";
         locations."/" = {
           proxyPass = "http://127.0.0.1:4387";
           extraConfig = ''
