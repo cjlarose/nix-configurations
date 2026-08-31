@@ -71,6 +71,7 @@ in
       fullscreenTui = true;
       toolShell = "${pkgs.bashInteractive}/bin/bash";
       agentTeams = true;
+      disableAutoMemory = true;
     };
 
     # Pinned, self-contained Playwright MCP (chromium baked in). Gated per-host
@@ -100,7 +101,6 @@ in
       # ever looked applied. Revisit if thinking gets turned on.
       effortLevel = "high";
       model = "claude-opus-4-8";
-      autoMemoryEnabled = false;
       # Keep session transcripts effectively forever (default is 30 days). They
       # are the source for llm-wiki backfill/capture, so retention matters.
       cleanupPeriodDays = 3650;
