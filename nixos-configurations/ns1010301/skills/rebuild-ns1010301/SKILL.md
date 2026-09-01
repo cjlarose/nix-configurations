@@ -95,6 +95,8 @@ sudo nixos-rebuild switch --flake .#ns1010301 \
 
 The switch ends with e.g. `NOT restarting the following changed units: microvm@pt-docker-cjlarose.service, microvm@media.service`. **Ask the user per guest — never restart automatically.** A `microvm@` restart is a real ~12 s reboot that kills in-guest sessions; the same holds for bouncing `hermes-agent.service`.
 
+**Exact authorization gate:** “deploy”, “apply”, “rebuild”, “switch”, “update”, and “bring forward” never authorize a guest restart. Before `sudo systemctl restart microvm@<name>.service`, require a current user instruction that names the exact guest and says **restart** or **reboot**. Otherwise use an in-place system switch, Home Manager activation, or skip. When the activation mode is uncertain, ask; do not restart.
+
 **Diff the closure first — the size of your change tells you nothing about the size of the activation.** Guests are routinely booted well behind `main`, so an in-place switch reconciles all accumulated drift and can restart unrelated units.
 
 ```sh
