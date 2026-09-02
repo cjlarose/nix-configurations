@@ -6,7 +6,6 @@ dim=$'\e[2m'
 reset=$'\e[0m'
 
 model=$(echo "$input" | jq -r '.model.display_name')
-effort=$(echo "$input" | jq -r '.output_style.name // "default"')
 
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 input_tokens=$(echo "$input" | jq -r '.context_window.current_usage | if . then (.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens) else empty end')
@@ -73,7 +72,6 @@ fi
 parts=()
 [ -n "$loc" ] && parts+=("${dim}${loc}${reset}")
 parts+=("$model")
-[ -n "$effort" ] && parts+=("effort:$effort")
 [ -n "$token_part" ] && parts+=("$token_part")
 
 printf "%s" "${parts[*]}"
