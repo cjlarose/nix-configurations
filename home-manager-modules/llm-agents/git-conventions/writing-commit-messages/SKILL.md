@@ -22,6 +22,10 @@ Imperative test: the subject completes "If applied, this commit will ___".
 
 ## House conventions
 
+- **The 50-character subject is a soft target; 72 is the hard limit.** Per Beams,
+  "shoot for 50 characters, but consider 72 the hard limit" — anything under 72
+  is acceptable when 50 cannot hold the subject without sacrificing clarity. Only
+  a subject over 72 characters is a violation.
 - **No prefixes of any kind.** Not `feat:`/`fix:`/`chore:`, and not area scopes
   like `web-api:` or `llm-agents:` either. The subject is a plain imperative
   sentence with no leading qualifier.
