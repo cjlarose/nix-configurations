@@ -1023,6 +1023,22 @@
         "type": "github"
       }
     },
+    "internal-operations": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788215857,
+        "narHash": "sha256-vG3eHi5AugdxkB1vD5Tnv0qB3/uFV3TVfr7ZxJh7Grw=",
+        "ref": "refs/heads/main",
+        "rev": "28847afca675ef19ab4e60f795d6be9a516850b7",
+        "revCount": 1993,
+        "type": "git",
+        "url": "ssh://git@github.com/picktrace/internal-operations"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/picktrace/internal-operations"
+      }
+    },
     "intranetHosts": {
       "flake": false,
       "locked": {
@@ -1794,6 +1810,7 @@
         "home-manager-25-11": "home-manager-25-11_2",
         "home-manager-26-05": "home-manager-26-05_2",
         "impermanence": "impermanence_2",
+        "internal-operations": "internal-operations",
         "llm-agents": "llm-agents_2",
         "microvm": "microvm_2",
         "nix-darwin-26-05": "nix-darwin-26-05",
@@ -1808,11 +1825,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1788545044,
-        "narHash": "sha256-jIqNUv+vWRM74Gs+qFS8nqw45WIp6xE74nDJdLPUyEg=",
+        "lastModified": 1788571923,
+        "narHash": "sha256-Fm33roPMWjEXv3sCgC6UiqwROrxAlMV3jNS6NU8o6UE=",
         "ref": "refs/heads/main",
-        "rev": "e39508387c2a70e5d59a295e4b23a22207488d90",
-        "revCount": 515,
+        "rev": "1dc3858ce834108ddcb56d487bd2d74e9ecab82e",
+        "revCount": 519,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
