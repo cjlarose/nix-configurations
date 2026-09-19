@@ -72,6 +72,7 @@ in
       toolShell = "${pkgs.bashInteractive}/bin/bash";
       agentTeams = true;
       disableAutoMemory = true;
+      disableAgentView = true;
     };
 
     # Pinned, self-contained Playwright MCP (chromium baked in). Gated per-host

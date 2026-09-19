@@ -689,11 +689,11 @@
         "superpowers": "superpowers"
       },
       "locked": {
-        "lastModified": 1788220245,
-        "narHash": "sha256-V4rK6/0Xrh7xVnOgK0cq3OOvkvkYTnhXFA3qa6NmEoY=",
+        "lastModified": 1789786229,
+        "narHash": "sha256-aq65XS6UN3dS92p6HaDp7prba2RlGh/Tg9DSPU050gI=",
         "owner": "cjlarose",
         "repo": "harness-config.nix",
-        "rev": "dc0fcf492c91f8d5dc9cb2eee8a3fa2752efb0c3",
+        "rev": "b9feaa2a7e15f75bd5dd51473f12af671f30f221",
         "type": "github"
       },
       "original": {
@@ -713,11 +713,11 @@
         "superpowers": "superpowers_2"
       },
       "locked": {
-        "lastModified": 1788220245,
-        "narHash": "sha256-V4rK6/0Xrh7xVnOgK0cq3OOvkvkYTnhXFA3qa6NmEoY=",
+        "lastModified": 1789786229,
+        "narHash": "sha256-aq65XS6UN3dS92p6HaDp7prba2RlGh/Tg9DSPU050gI=",
         "owner": "cjlarose",
         "repo": "harness-config.nix",
-        "rev": "dc0fcf492c91f8d5dc9cb2eee8a3fa2752efb0c3",
+        "rev": "b9feaa2a7e15f75bd5dd51473f12af671f30f221",
         "type": "github"
       },
       "original": {
@@ -1825,11 +1825,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1788571923,
-        "narHash": "sha256-Fm33roPMWjEXv3sCgC6UiqwROrxAlMV3jNS6NU8o6UE=",
+        "lastModified": 1789786959,
+        "narHash": "sha256-XP96AyKjF4+hBH90Ic48v4XHFZ9q5HnPskrG4OWxi/0=",
         "ref": "refs/heads/main",
-        "rev": "1dc3858ce834108ddcb56d487bd2d74e9ecab82e",
-        "revCount": 519,
+        "rev": "241ff34f7fde1cddfd9fb61e928f835305ef73e8",
+        "revCount": 523,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
