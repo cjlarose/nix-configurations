@@ -96,12 +96,6 @@ in
       };
       skipDangerousModePermissionPrompt = true;
       remoteControlAtStartup = true;
-      # high, not xhigh: on Opus 4.8 thinking is off unless a request sets
-      # thinking.type = "adaptive", and the API rejects xhigh/max while thinking
-      # is disabled. Claude Code silently clamps xhigh back to high, so it only
-      # ever looked applied. Revisit if thinking gets turned on.
-      effortLevel = "high";
-      model = "claude-opus-4-8";
       # Keep session transcripts effectively forever (default is 30 days). They
       # are the source for llm-wiki backfill/capture, so retention matters.
       cleanupPeriodDays = 3650;
