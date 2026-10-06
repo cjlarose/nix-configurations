@@ -715,11 +715,11 @@
         "superpowers": "superpowers_2"
       },
       "locked": {
-        "lastModified": 1789786229,
-        "narHash": "sha256-aq65XS6UN3dS92p6HaDp7prba2RlGh/Tg9DSPU050gI=",
+        "lastModified": 1791244401,
+        "narHash": "sha256-WA0qpn7JnI0lxqeh2miIP8XaWHK6tCVLGAlNxe5Q1GU=",
         "owner": "cjlarose",
         "repo": "harness-config.nix",
-        "rev": "b9feaa2a7e15f75bd5dd51473f12af671f30f221",
+        "rev": "8a4fa51ef529bace221637ba5434dc615306e8bd",
         "type": "github"
       },
       "original": {
@@ -1827,11 +1827,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1791242594,
-        "narHash": "sha256-XfUoR2q1u+Ja/93g4AMIQYlQlx90I3mjMDTqtQtPsOc=",
+        "lastModified": 1791327837,
+        "narHash": "sha256-kb1Jp6qi49O76CQw2yHPfcEAe1Io8obygoKvosne7a0=",
         "ref": "refs/heads/main",
-        "rev": "6060aa3c70cc7beeb98ede375f6f43e30397f1c0",
-        "revCount": 527,
+        "rev": "3bc1137ba5d420f99515530f11b690050c1e6b47",
+        "revCount": 532,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },
