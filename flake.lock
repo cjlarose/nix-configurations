@@ -1766,11 +1766,11 @@
         "pce-dailies": "pce-dailies"
       },
       "locked": {
-        "lastModified": 1786093882,
-        "narHash": "sha256-OsanjymVgyAFjqCbjTFoKcwVOk5fvg1usG5z6D/Ybnw=",
+        "lastModified": 1791847657,
+        "narHash": "sha256-drEIVpfkX7wvXMjyeTzKFETaMo6tFHVL49mU/Q0bFjY=",
         "ref": "refs/heads/main",
-        "rev": "3bc7b641fa1a9c2fd04dfa7168da1f5b175ddaf7",
-        "revCount": 447,
+        "rev": "ac85b59cfeb37a653debd5380e7dae5292a73fc7",
+        "revCount": 453,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/pixel-cats-end-automation"
       },
