@@ -1,6 +1,6 @@
 ---
 name: rebuild-ns1010301
-description: Use when deploying a nix-configurations change to the ns1010301 host or one of its microvm guests (pt-docker-cjlarose, media, hermes, minecraft-mellowcatfe) — a host system change, a guest system or home-manager change, or a flake.lock bump — and especially when a pt-docker-cjlarose change lives in picktrace/nix-configurations and must reach the guest through cjlarose's picktrace-nix-configurations input. Triggers on "rebuild ns1010301", "deploy to the guest", "nixos-rebuild", "bring the microvm forward", "switch the host", "roll out to pt-docker".
+description: Use when deploying a nix-configurations change to the ns1010301 host or one of its microvm guests (pt-docker-cjlarose, media, hermes, minecraft-mellowcatfe, intranet-dns) — a host system change, a guest system or home-manager change, or a flake.lock bump — and especially when a pt-docker-cjlarose change lives in picktrace/nix-configurations and must reach the guest through cjlarose's picktrace-nix-configurations input. Triggers on "rebuild ns1010301", "deploy to the guest", "nixos-rebuild", "bring the microvm forward", "switch the host", "roll out to pt-docker".
 ---
 
 # Rebuild ns1010301 (host, microvms, home-manager)
@@ -14,11 +14,13 @@ Apply a `cjlarose/nix-configurations` change — or, for `pt-docker-cjlarose`, a
 - A `pt-docker-cjlarose` change that landed in `picktrace/nix-configurations` — see **Cross-repo deploy** below first.
 - After a host switch prints `NOT restarting the following changed units: microvm@*.service` and a guest should be brought forward live.
 
-**Not** for `bots`, `cache`, `dns`, `splitpro` — separate Proxmox VMs on `pve` with their own `/nix/var/nix/profiles/system`, no `microvm@<host>` unit, absent from `/var/lib/microvms/`. They use push-deploy: `nix build` here → `nix copy --to ssh-ng://cjlarose@<fqdn> --no-check-sigs` → `sudo nix-env -p /nix/var/nix/profiles/system --set <top>` + `sudo <top>/bin/switch-to-configuration switch` on the target.
+**Not** for `bots`, `cache`, `dns`, `splitpro` — separate Proxmox VMs on `pve` with their own `/nix/var/nix/profiles/system`, no `microvm@<host>` unit, absent from `/var/lib/microvms/`. They use push-deploy: `nix build` here → `nix copy --to ssh-ng://cjlarose@<ip> --no-check-sigs` → `sudo nix-env -p /nix/var/nix/profiles/system --set <top>` + `sudo <top>/bin/switch-to-configuration switch` (or `boot` + reboot when the kernel changed) on the target. Address them by **tailnet/LAN IP, not name**: short names don't resolve from ns1010301, `bots` has no tailscale and needs `-J cjlarose@100.116.15.106` (cache), and `cache` trusts only root, so copy there via `ssh-ng://…?remote-program=sudo%20nix-daemon`. The ai-memory runbook `runbooks/pve-vms-push-deploy.md` has the full address and `HostKeyAlias` table.
+
+**Pinning nixpkgs ahead of the channel** (a security backport merged to `release-26.05` that the `nixos-26.05` channel hasn't picked up yet): `nix flake lock --override-input nixpkgs-26-05 github:nixos/nixpkgs/<rev>` rewrites only `locked` and keeps `original.ref = nixos-26.05`, so a later plain `nix flake update` returns to the channel. Do that in **both** repos (picktrace's `nixpkgs-26-05` is its own input, not a follows). Until the channel contains the fix, don't run a blanket update, which would silently downgrade. Expect hundreds of local builds: the release branch isn't fully in cache.nixos.org (2026-11-18: pt-docker-cjlarose built 278 derivations, the host 560). Check the channel with `nix run nixpkgs#hydra-check -- --channel 26.05 --eval` / `--releases`.
 
 ## Prerequisites
 
-- Run **on ns1010301** as `cjlarose` (Determinate Nix 3.17.1 / Nix 2.33.3). cjlarose has passwordless sudo and SSH to all four guests.
+- Run **on ns1010301** as `cjlarose` (Determinate Nix 3.17.1 / Nix 2.33.3). cjlarose has passwordless sudo and SSH to four of the five guests (all but `intranet-dns`).
 - **Author changes in `~/workspaces/<task>/<repo>` and land them via PR.** `~/repos` is read-only for editing. Building `main` from `~/repos/cjlarose/nix-configurations` is allowed and expected — your workspace worktrees are on feature branches and git refuses to check `main` out twice.
 - **New/untracked files must be `git add`ed** before building — nix will not see them otherwise. They need not be committed.
 - All private flake inputs are `git+ssh://`, so `ssh-agent` must have the key loaded. In `cjlarose/nix-configurations`: `pce`, `cs-automation`, `intranetHosts`, `picktrace-nix-configurations`, `cjlarose-llm-wiki`. In `picktrace/nix-configurations`: `cjlarose-home-manager-modules`, `cjlarose-llm-wiki`, `cjlarose-darwin-modules`.
@@ -29,7 +31,13 @@ Apply a `cjlarose/nix-configurations` change — or, for `pt-docker-cjlarose`, a
 
 The `pt-docker-cjlarose` guest is built from `picktrace/nix-configurations`, but the ns1010301 host embeds it through cjlarose's **`picktrace-nix-configurations` flake input**. A change merged to picktrace `main` is invisible here until that input moves. So a picktrace-side guest change deploys in two landings, picktrace first, cjlarose second.
 
-1. **Land the change in `picktrace/nix-configurations`** (its own PR). Note the merge commit — that is the rev the guest needs.
+1. **Land the change in `picktrace/nix-configurations`** (its own PR). Note the merge commit — that is the rev the guest needs. Unlike the cjlarose repo, picktrace **has CI** ("Evaluate the credential-free flake outputs", ~3 min), and the PR reads `BLOCKED` until it passes: `gh pr checks <n> -R picktrace/nix-configurations --watch`. While it runs, warm the host build against the PR branch so the slow derivations are done before the cjlarose side starts:
+
+   ```sh
+   nix build .#nixosConfigurations.ns1010301.config.system.build.toplevel --no-link \
+     --override-input picktrace-nix-configurations \
+     "git+ssh://git@github.com/picktrace/nix-configurations?ref=<branch>"
+   ```
 
 2. **Confirm the host's input is behind it.** Read the currently-pinned rev and check whether it already contains the target commit:
 
@@ -127,6 +135,9 @@ The guest's `/nix/store` is a virtiofs share of the host store, so the files are
 | `minecraft-mellowcatfe` | `cjlarose@10.0.0.3` | `cjlarose/nix-configurations` |
 | `media` | `cjlarose@10.0.0.4` | `cjlarose/nix-configurations` |
 | `hermes` | `cjlarose@10.0.0.5` | `cjlarose/nix-configurations` |
+| `intranet-dns` | `10.0.0.6` — **no sshd** | `cjlarose/nix-configurations` |
+
+`intranet-dns` runs no SSH server (`services.openssh` is off), so it cannot be switched in place. It picks up a change only when `microvm@intranet-dns` restarts, which a host reboot does. Verify it from the host: `readlink -f /var/lib/microvms/intranet-dns/booted` vs `current`, and `dig @100.100.100.100 ns1010301.cjlarose.dev`.
 
 Re-derive if in doubt: `ip neigh show dev microvm`, then `ssh -o ConnectTimeout=3 -o BatchMode=yes cjlarose@<ip> hostname`.
 
@@ -160,6 +171,15 @@ DB metadata is tiny (~440 bytes/path) versus hundreds of MB for `--export | --im
 
 ## Step 4 — activate inside the guest
 
+**Dry-run first, and show the user the workload units it would bounce.** `diff-closures` lists packages, not unit restarts. A guest booted months behind restarts its main service on an in-place switch even when your change is a one-liner. On 2026-11-19, a nixpkgs bump would have restarted docker (all containers) on pt-docker-cjlarose, the minecraft server, jellyfin and transmission on media, and `hermes-agent` on hermes. The DB sync (Step 3) must already be done:
+
+```sh
+ssh <user>@<ip> "sudo $GUEST_TOP/bin/switch-to-configuration dry-activate" \
+  | grep -E '^would (restart|stop|start) the following units'
+```
+
+Bouncing `hermes-agent` needs the same explicit go-ahead as a guest restart (Step 2). If the dry run shows the workloads bouncing anyway and the change also carries a kernel, say so: a host reboot costs about the same disruption and delivers the kernel too.
+
 ```sh
 # system switch
 ssh <user>@<ip> "sudo $GUEST_TOP/bin/switch-to-configuration switch"
@@ -170,7 +190,18 @@ ssh <user>@<ip> "$GUEST_TOP/activate"
 
 `Warning: do not know how to make this configuration bootable` is **normal and benign** — the host's qemu wrapper owns the boot path. `switch-to-configuration switch` updates `/run/current-system` only; uptime is preserved.
 
-Verify: `ssh <user>@<ip> "readlink -f /run/current-system"` matches `$GUEST_TOP`.
+Verify: `ssh <user>@<ip> "readlink -f /run/current-system"` matches `$GUEST_TOP`, then `systemctl --failed` and the guest's main services. A `Failed to restart <unit>` line in the switch output can be a transient failure that systemd's retry already fixed. Read the unit's journal before acting on it (see the nginx/tailscaled gotcha).
+
+## Host reboot (kernel changes)
+
+A kernel bump on the host, or on all guests at once, is cheapest as one host reboot: `microvms.target` starts every guest on its `current` spec. It needs the same explicit **reboot** instruction as Step 2. Before scheduling it:
+
+```sh
+sudo bootctl status | grep -E 'Default Entry|linux:'      # new generation and linux-<new> are the default
+systemctl is-enabled microvms.target                      # enabled ⇒ all guests autostart
+```
+
+Schedule it rather than rebooting inline, so the agent's reply lands before the box goes down: `sudo shutdown -r +1 "<reason>"`. Before it fires, give the user the post-reboot checks, the serial console (ttyS1, below), and the previous boot-menu generation to roll back to. After the reboot, check `uname -r`, that `/var/lib/microvms/<name>/booted` equals `current` for every guest, each guest's `uname -r` and services, and `systemctl --failed`. Slow-starting guest services (the minecraft server took ~30 s to bind 25565) can look down at first.
 
 ## Rollback
 
@@ -190,6 +221,8 @@ Guest: restart its `microvm@<name>.service` (returns to the host's current spec)
 - **`diff-closures` hides config-only changes.** It dedups by package name+version, so a guest system that changed only config (same nixpkgs) shows an empty diff even though its store path moved. Confirm the intended content directly (e.g. `nix-store -qR "$GUEST_TOP" | grep <the-thing>`) rather than trusting an empty diff.
 - **ZFS quota.** `/nix` is a `tank/nix` ZFS dataset with a quota. A large build (e.g. an accidental aarch64-darwin closure) can fill it, and the daemon's socket bind then fails with `EDQUOT` — the daemon reads as wedged. The pool has headroom: `sudo zfs set quota=<bigger> tank/nix`, kill orphaned `nix-daemon` workers holding the socket, `sudo systemctl reset-failed nix-daemon.*`, start `nix-daemon.socket`, `nix store gc`, then restore the quota.
 - **ZFS block cloning.** virtiofsd's `copy_file_range` triggers ZFS block cloning, which with `zfs_bclone_enabled=1` can deadlock `txg_sync` on VM start. ns1010301 disables it host-wide.
+- **nginx bound to a tailnet IP races a tailscaled restart.** hermes binds `100.66.120.5:80`. When a switch restarts nginx and tailscaled together, nginx can fail with `bind() … (99: Cannot assign requested address)` until tailscaled re-adds the address. On 2026-11-19 systemd's retry recovered it on the third attempt. The host's nginx already has `after`/`wants = tailscaled.service` for this; hermes doesn't yet. Always check `systemctl is-active nginx` after a switch that restarts tailscaled.
+- **Host tailscaled restarts blip tailnet access briefly.** Right after a host switch, a tailnet request (e.g. to lavish) can time out once. Retry before debugging.
 - **Hermes self-restart.** Restarting the hermes guest from inside it is blocked by the agent runtime. Workaround: a detached tmux session on ns1010301 that sleeps a few seconds then `systemctl restart microvm@hermes`.
 - **Serial console** is on **ttyS1** (not ttyS0) at 115200 via OVH IPMI SoL — the only recovery path if networking breaks.
 
@@ -201,6 +234,6 @@ Guest: restart its `microvm@<name>.service` (returns to the host's current spec)
   - Guest toplevel (cjlarose flake): `.#nixosConfigurations.{media,hermes,minecraft-mellowcatfe}.config.system.build.toplevel`
   - Guest toplevel (picktrace flake): `.#nixosConfigurations.pt-docker-cjlarose.config.system.build.toplevel`
   - Per-user HM activation: `.#nixosConfigurations.<host-or-guest>.config.home-manager.users.<user>.home.activationPackage`
-- **Microvms** (`nixos-configurations/ns1010301/default.nix`): `pt-docker-cjlarose` (`flake = picktrace-nix-configurations`), `minecraft-mellowcatfe`, `media`, `hermes` (all `flake = self`).
+- **Microvms** (`nixos-configurations/ns1010301/default.nix`): `pt-docker-cjlarose` (`flake = picktrace-nix-configurations`), `minecraft-mellowcatfe`, `media`, `hermes`, `intranet-dns` (all `flake = self`). All five are in `microvm.autostart`.
 - **Users:** host and `media`/`hermes`/`minecraft-mellowcatfe` → `cjlarose`; `pt-docker-cjlarose` → **`picktrace`**, despite the guest name.
 - **Paths:** `/var/lib/microvms/<name>/{current,booted}`, `.../current/bin/microvm-run`, `/nix/var/nix/profiles/system` (host only).
