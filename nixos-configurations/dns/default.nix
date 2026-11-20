@@ -10,6 +10,7 @@ in {
     ({ pkgs, ... }: {
       imports = [
         impermanence.nixosModules.impermanence
+        ../../nixos-modules/impermanence-baseline.nix
       ];
       environment.persistence."/persistence" = {
         hideMounts = true;

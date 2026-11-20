@@ -2,6 +2,7 @@
   imports = [
     home-manager.nixosModules.home-manager
     impermanence.nixosModules.impermanence
+    ../../nixos-modules/impermanence-baseline.nix
     (import ./disk-config.nix { inherit disko; })
     ./configuration.nix
   ];

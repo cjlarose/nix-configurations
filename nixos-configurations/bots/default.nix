@@ -5,6 +5,7 @@
     ({ ... }: {
       imports = [
         impermanence.nixosModules.impermanence
+        ../../nixos-modules/impermanence-baseline.nix
       ];
       # Home now lives on the persistent tank/home dataset (see
       # hardware-configuration.nix + disk-config.nix), not per-dir impermanence.
