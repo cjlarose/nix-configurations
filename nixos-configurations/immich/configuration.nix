@@ -53,6 +53,12 @@
     enable = true;
   };
 
+  # 26.05 marks immich 2.7.5 insecure: upstream has stopped updating 2.x and the
+  # fixes for its CVEs are only in 3.x (nixos-unstable / 26.11). This is the
+  # version already running, so allowing it here is no regression; the 2 -> 3
+  # upgrade (one-way DB migrations) is a separate, deliberate step.
+  nixpkgs.config.permittedInsecurePackages = [ "immich-2.7.5" ];
+
   services.nginx = {
     enable = true;
     virtualHosts = {
