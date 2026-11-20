@@ -1,8 +1,5 @@
 {
   pkgs,
-  nixpkgs-24-11,
-  nixpkgs-25-05,
-  nixpkgs-25-11,
   nixpkgs-26-05,
   nixpkgs-unstable,
   system,
@@ -88,7 +85,6 @@ let
     };
 in
 {
-  atlas = nixpkgs-24-11.legacyPackages.${system}.atlas;
   # Local-first session memory for coding agents (akitaonrails/ai-memory), on a
   # two-week parallel trial. Built from nixpkgs-26-05, whose rustc is 1.95.0 --
   # exactly what upstream's rust-toolchain.toml pins. Not in nixpkgs.
@@ -100,7 +96,6 @@ in
   claude-code = claude-code-bun;
   claude-code-node = claude-code-node-pkg;
   cs-automation = cs-automation.packages.${system}.default;
-  immich = nixpkgs-25-11.legacyPackages.${system}.immich;
   intranetHosts = intranetHosts;
   # mosh patched so mosh-server advertises COLORTERM=truecolor to the session.
   # mosh renders 24-bit color but otherwise strips the signal, leaving nothing
