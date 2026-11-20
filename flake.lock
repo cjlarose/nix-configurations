@@ -334,7 +334,7 @@
     "disko": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-24-05"
+          "nixpkgs-26-05"
         ]
       },
       "locked": {
@@ -550,46 +550,6 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "type": "github"
-      }
-    },
-    "fzfProject": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs-24-05"
-        ]
-      },
-      "locked": {
-        "lastModified": 1654884630,
-        "narHash": "sha256-JQZ4mLCsMsJpOR9nzm5rAzbonujwDuzVa4BGP3+7kJE=",
-        "owner": "cjlarose",
-        "repo": "fzf-project",
-        "rev": "d57401d96dc6270a34582ba2199285e732d70bf3",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cjlarose",
-        "repo": "fzf-project",
-        "type": "github"
-      }
-    },
-    "fzfVim": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs-24-05"
-        ]
-      },
-      "locked": {
-        "lastModified": 1654883707,
-        "narHash": "sha256-XsJj4SWs2BdMOQ+ZEV+9I7GVW41RUk/zqvrgeLwE1EE=",
-        "owner": "cjlarose",
-        "repo": "fzf.vim",
-        "rev": "5a6af6579be024efc5f9f8148e4aa5274dd3c861",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cjlarose",
-        "repo": "fzf.vim",
         "type": "github"
       }
     },
@@ -1340,22 +1300,6 @@
     },
     "nixpkgs-24-05": {
       "locked": {
-        "lastModified": 1735563628,
-        "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "b134951a4c9f3c995fd7be05f3243f8ecd65d798",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-24.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-24-05_2": {
-      "locked": {
         "lastModified": 1728500571,
         "narHash": "sha256-dOymOQ3AfNI4Z337yEwHGohrVQb4yPODCW9MDUyAc4w=",
         "owner": "nixos",
@@ -1654,22 +1598,6 @@
         "type": "github"
       }
     },
-    "omnisharpVim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1697407911,
-        "narHash": "sha256-z3Dgrm9pNWkvfShPmB9O8TqpY592sk1W722zduOSing=",
-        "owner": "OmniSharp",
-        "repo": "omnisharp-vim",
-        "rev": "f9c5d3e3375e8b5688a4506e813cb21bdc7329b1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "OmniSharp",
-        "repo": "omnisharp-vim",
-        "type": "github"
-      }
-    },
     "pce": {
       "inputs": {
         "nixpkgs": "nixpkgs_6",
@@ -1727,7 +1655,7 @@
         "microvm": "microvm_2",
         "nix-darwin-26-05": "nix-darwin-26-05",
         "nixpkgs-23-05": "nixpkgs-23-05",
-        "nixpkgs-24-05": "nixpkgs-24-05_2",
+        "nixpkgs-24-05": "nixpkgs-24-05",
         "nixpkgs-24-11": "nixpkgs-24-11",
         "nixpkgs-25-11": "nixpkgs-25-11",
         "nixpkgs-26-05": "nixpkgs-26-05_2",
@@ -1866,8 +1794,6 @@
         "cs-automation": "cs-automation",
         "determinate": "determinate",
         "disko": "disko",
-        "fzfProject": "fzfProject",
-        "fzfVim": "fzfVim",
         "gh-stack": "gh-stack",
         "harness-config": "harness-config",
         "herdr": "herdr",
@@ -1878,11 +1804,9 @@
         "llm-agents": "llm-agents",
         "microvm": "microvm",
         "nix-minecraft": "nix-minecraft",
-        "nixpkgs-24-05": "nixpkgs-24-05",
         "nixpkgs-26-05": "nixpkgs-26-05",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nvr": "nvr",
-        "omnisharpVim": "omnisharpVim",
         "pce": "pce",
         "picktrace-nix-configurations": "picktrace-nix-configurations",
         "tfenv": "tfenv_3",
