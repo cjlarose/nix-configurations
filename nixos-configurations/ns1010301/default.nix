@@ -67,11 +67,14 @@
           harness-config.homeManagerModules.lavish
           ((import ../../home/cjlarose) {
             inherit system stateVersion additionalPackages;
+          })
+          # The LLM-agent tooling is opt-in, and this is the one host that
+          # takes it: every other cjlarose host imports the base profile alone.
+          ((import ../../home/cjlarose/llm-agents.nix) {
+            inherit system additionalPackages;
             # Browser automation for cjlarose's sessions on this host: register
-            # the Playwright MCP with Claude Code. The shared home/cjlarose
-            # profile leaves this off so the chromium closure only lands where
-            # it's wanted; scope the enable to ns1010301 here (it fans out to
-            # every linux host otherwise).
+            # the Playwright MCP with Claude Code. llm-agents.nix leaves this off
+            # by default so the chromium closure only lands where it's wanted.
             enablePlaywrightMcp = true;
             llm-wiki-path = "/home/cjlarose/repos/cjlarose/llm-wiki";
             # The wiki flake input's skills/ tree; llm-agents reads the
