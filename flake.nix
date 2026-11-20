@@ -5,15 +5,6 @@
     nixpkgs-24-05 = {
       url = "github:nixos/nixpkgs/nixos-24.05";
     };
-    nixpkgs-24-11 = {
-      url = "github:nixos/nixpkgs/nixos-24.11";
-    };
-    nixpkgs-25-05 = {
-      url = "github:nixos/nixpkgs/nixos-25.05";
-    };
-    nixpkgs-25-11 = {
-      url = "github:nixos/nixpkgs/nixos-25.11";
-    };
     nixpkgs-26-05 = {
       url = "github:nixos/nixpkgs/nixos-26.05";
     };
@@ -44,14 +35,6 @@
       # second nixpkgs subtree lands in the lock.
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    home-manager-25-05 = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs-25-05";
-    };
-    home-manager-25-11 = {
-      url = "github:nix-community/home-manager/release-25.11";
-      inputs.nixpkgs.follows = "nixpkgs-25-11";
     };
     home-manager-26-05 = {
       url = "github:nix-community/home-manager/release-26.05";
@@ -99,7 +82,7 @@
     };
     microvm = {
       url = "github:microvm-nix/microvm.nix";
-      inputs.nixpkgs.follows = "nixpkgs-25-11";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
@@ -183,16 +166,11 @@
     disko,
     fzfProject,
     fzfVim,
-    home-manager-25-05,
-    home-manager-25-11,
     home-manager-26-05,
     impermanence,
     intranetHosts,
     nix-minecraft,
     nixpkgs-24-05,
-    nixpkgs-24-11,
-    nixpkgs-25-05,
-    nixpkgs-25-11,
     nixpkgs-26-05,
     nixpkgs-unstable,
     omnisharpVim,
@@ -225,7 +203,7 @@
         let
           pkgs = nixpkgs-24-05.legacyPackages.${system};
           packageArgs = {
-            inherit pkgs system nixpkgs-unstable nixpkgs-24-11 nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack harness-config herdr ai-memory;
+            inherit pkgs system nixpkgs-unstable nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack harness-config herdr ai-memory;
           };
         in
           import ./packages packageArgs
@@ -268,7 +246,7 @@
     in {
       nixosConfigurations = (
         import ./nixos-configurations {
-          inherit nixpkgs-25-05 nixpkgs-25-11 nixpkgs-26-05 sharedOverlays additionalPackages home-manager-25-05 home-manager-25-11 home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules harness-config self;
+          inherit nixpkgs-26-05 sharedOverlays additionalPackages home-manager-26-05 pce impermanence disko determinate nix-minecraft microvm hermes-agent picktrace-nix-configurations cjlarose-llm-wiki cjlarose-home-manager-modules harness-config self;
         }
       );
 

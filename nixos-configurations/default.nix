@@ -1,9 +1,7 @@
 {
-  nixpkgs-25-11,
   nixpkgs-26-05,
   sharedOverlays,
   additionalPackages,
-  home-manager-25-11,
   home-manager-26-05,
   pce,
   impermanence,
