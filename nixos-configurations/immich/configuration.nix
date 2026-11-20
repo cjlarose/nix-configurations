@@ -172,4 +172,17 @@
       ];
     };
   };
+
+  # Pin the service users that own data on the persistent disks, at the ids
+  # they hold today. /var/lib/nixos is persisted now too (impermanence-baseline),
+  # but these ids are what the media library, the redis AOF and the ACME certs
+  # are owned by on disk, so they stay fixed even if the uid map is ever lost
+  # or the disks are attached to a rebuilt VM. The 26.05 move renumbered
+  # immich 995 -> 997 and left its media library unwritable until re-owned.
+  users.users.immich.uid = 997;
+  users.groups.immich.gid = 997;
+  users.users.redis-immich.uid = 995;
+  users.groups.redis-immich.gid = 995;
+  users.users.acme.uid = 999;
+  users.groups.acme.gid = 999;
 }
