@@ -25,12 +25,6 @@
       # `nixos-rebuild --target-host`). cjlarose already has passwordless sudo,
       # so trusting the nix user grants no additional privilege.
       trusted-users = [ "root" "cjlarose" ];
-      substituters = [
-        "https://nixcache.toothyshouse.com"
-      ];
-      trusted-public-keys = [
-        "nixcache.toothyshouse.com:kAyteiBuGtyLHPkrYNjDY8G5nNT/LHYgClgTwyVCnNQ="
-      ];
     };
   };
 
