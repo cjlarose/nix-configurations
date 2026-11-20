@@ -2,9 +2,6 @@
   description = "NixOS-based development environment";
 
   inputs = {
-    nixpkgs-24-05 = {
-      url = "github:nixos/nixpkgs/nixos-24.05";
-    };
     nixpkgs-26-05 = {
       url = "github:nixos/nixpkgs/nixos-26.05";
     };
@@ -40,14 +37,6 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
-    fzfVim = {
-      url = "github:cjlarose/fzf.vim";
-      inputs.nixpkgs.follows = "nixpkgs-24-05";
-    };
-    fzfProject = {
-      url = "github:cjlarose/fzf-project";
-      inputs.nixpkgs.follows = "nixpkgs-24-05";
-    };
     tfenv = {
       url = "github:cjlarose/tfenv-nix";
     };
@@ -62,14 +51,10 @@
     };
     disko = {
       url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs-24-05";
+      inputs.nixpkgs.follows = "nixpkgs-26-05";
     };
     intranetHosts = {
       url = "git+ssh://git@github.com/cjlarose/intranet-hosts";
-      flake = false;
-    };
-    omnisharpVim = {
-      url = "github:OmniSharp/omnisharp-vim";
       flake = false;
     };
     trueColorTest = {
@@ -164,16 +149,12 @@
   outputs = {
     determinate,
     disko,
-    fzfProject,
-    fzfVim,
     home-manager-26-05,
     impermanence,
     intranetHosts,
     nix-minecraft,
-    nixpkgs-24-05,
     nixpkgs-26-05,
     nixpkgs-unstable,
-    omnisharpVim,
     pce,
     self,
     tfenv,
@@ -199,9 +180,9 @@
         "x86_64-linux"
       ];
 
-      additionalPackages = nixpkgs-24-05.lib.genAttrs supportedPlatforms (system:
+      additionalPackages = nixpkgs-26-05.lib.genAttrs supportedPlatforms (system:
         let
-          pkgs = nixpkgs-24-05.legacyPackages.${system};
+          pkgs = nixpkgs-26-05.legacyPackages.${system};
           packageArgs = {
             inherit pkgs system nixpkgs-unstable nixpkgs-26-05 intranetHosts nvr trueColorTest cs-automation nix-minecraft tuicr llm-agents gh-stack harness-config herdr ai-memory;
           };
@@ -215,19 +196,9 @@
       cjlarose-home-manager-modules = (import ./home-manager-modules/flake.nix).outputs { self = {}; };
 
       sharedOverlays = [
-        fzfProject.overlay
-        fzfVim.overlay
         tfenv.overlays.default
-        (final: prev: {
-          vimPlugins = prev.vimPlugins // {
-            omnisharpVim = with final; vimUtils.buildVimPlugin {
-              name = "omnisharp-vim";
-              src = omnisharpVim;
-            };
-          };
-        })
       ];
-      lib = nixpkgs-24-05.lib;
+      lib = nixpkgs-26-05.lib;
 
       hmChecks = import ./tests/home-manager-checks.nix { inherit lib; };
 
@@ -254,7 +225,7 @@
 
       checks.x86_64-linux = lib.listToAttrs (map (name: {
         name = "home-cjlarose-${name}";
-        value = mkNixosCheck nixpkgs-24-05.legacyPackages.x86_64-linux name;
+        value = mkNixosCheck nixpkgs-26-05.legacyPackages.x86_64-linux name;
       }) nixosConfigsWithCjlarose);
 
     };
