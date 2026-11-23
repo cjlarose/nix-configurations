@@ -10,8 +10,6 @@
       enable = true;
       interfaces."enp1s0f0" = {
         allowedTCPPorts = [
-          80     # nginx for minecraft.mellowcatfe.com
-          443    # nginx for minecraft.mellowcatfe.com
           8443   # nginx proxy for pt-docker-cjlarose guest
           25565  # minecraft for minecraft-mellowcatfe guest
         ];
@@ -152,9 +150,9 @@
   security.acme = {
     acceptTerms = true;
     defaults.email = "cjlarose@gmail.com";
-    # DNS-01 for the tailnet-only lavish name. HTTP-01 (as minecraft uses on the
-    # public interface) is impossible here: lavish.ns1010301.cjlarose.dev resolves
-    # to this host's 100.x tailnet IP, which LE's HTTP validators can't reach. Uses
+    # DNS-01 for the tailnet-only lavish name. HTTP-01 is impossible here:
+    # lavish.ns1010301.cjlarose.dev resolves to this host's 100.x tailnet IP,
+    # which LE's HTTP validators can't reach. Uses
     # the fleet's DigitalOcean token (full-zone scope, same one media/hermes use);
     # copied out of nix to /persistence/secrets/digitalocean.secret (root:root
     # 0600) since it must not land world-readable in the /nix/store.
@@ -170,15 +168,10 @@
   services.nginx = {
     enable = true;
     virtualHosts = {
-      "minecraft.mellowcatfe.com" = {
-        enableACME = true;
-        forceSSL = true;
-        root = "${additionalPackages.${system}.minecraft-mods-zip}";
-      };
       # TLS front for lavish-axi's review UI. Bound to this host's tailnet IP
-      # ONLY (100.68.229.121 = ns1010301.cjlarose.dev) so it never shares the
-      # public 0.0.0.0:443 listener the minecraft vhost uses -- belt-and-suspenders
-      # on top of the tailscale0-only firewall. Terminates TLS (LE DNS-01 cert
+      # ONLY (100.68.229.121 = ns1010301.cjlarose.dev) so nginx never listens on
+      # the public interface -- belt-and-suspenders on top of the tailscale0-only
+      # firewall. Terminates TLS (LE DNS-01 cert
       # above) and reverse-proxies to lavish on loopback. lavish rebinds to
       # 127.0.0.1:4387 (see default.nix). X-Forwarded-Proto + the trust-proxy
       # build patch let lavish's same-origin guard see https; Host carries the
@@ -211,8 +204,7 @@
   # nginx now binds a fixed tailnet IP (100.68.229.121) and reads its ACME certs
   # off the impermanence-persisted /var/lib/acme bind mount, so order it after
   # tailscaled has assigned the address and after the persist mount exists. The
-  # per-cert ACME unit likewise needs /var/lib/acme. (The minecraft vhost binds
-  # 0.0.0.0 and is unaffected by the added ordering, which only ever delays.)
+  # per-cert ACME unit likewise needs /var/lib/acme.
   systemd.services.nginx = {
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
