@@ -1665,11 +1665,11 @@
         "tuicr": "tuicr"
       },
       "locked": {
-        "lastModified": 1795038607,
-        "narHash": "sha256-dpoyRfLZ1/Cci7TmQMAOtw/+XJAVL1EIdUjBnwUyY/4=",
+        "lastModified": 1795636799,
+        "narHash": "sha256-yoDVMZosKGMBh4dVPolueKNY8ZY0s4ydqOLNnLMGLSs=",
         "ref": "refs/heads/main",
-        "rev": "59605011979be3f8a6e9b5f606ca48c6f480a9cf",
-        "revCount": 538,
+        "rev": "1277b54d97e98c2883dee3ac7d28d8ed8b6a129c",
+        "revCount": 542,
         "type": "git",
         "url": "ssh://git@github.com/picktrace/nix-configurations"
       },

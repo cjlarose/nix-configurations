@@ -43,5 +43,17 @@
       mountPoint = "/persistence/secrets";
       proto = "virtiofs";
     }
+    {
+      # The guest root is tmpfs, so without this share /var/lib/nixos (the
+      # uid/gid maps) is rebuilt on every boot and users without a pinned id
+      # can be renumbered when the set of system users changes, leaving files
+      # on the other persistent shares owned by the old numbers. It is in
+      # nixpkgs' pathsNeededForBoot, so it mounts in the initrd before users
+      # are created.
+      tag = "persist-nixos";
+      source = "nixos";
+      mountPoint = "/var/lib/nixos";
+      proto = "virtiofs";
+    }
   ];
 }
