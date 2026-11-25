@@ -73,12 +73,23 @@
       mountPoint = "/persistence/secrets";
       proto = "virtiofs";
     }
-    # No persist-nixos share here yet: with it media has 10 virtiofs shares, and
-    # the pinned microvm.nix (2026-04) leaves supervisord's event buffer at its
-    # default of 10, so one of the 11 startup events is dropped and
-    # microvm-virtiofsd@media never becomes ready. Re-add it after bumping
-    # microvm.nix past 829896250 ("virtiofs: fix supervisord event queue
-    # buffer size"). tank/microvms/media/nixos is already seeded.
+    {
+      # The guest root is tmpfs, so without this share /var/lib/nixos (the
+      # uid/gid maps) is rebuilt on every boot and users without a pinned id
+      # can be renumbered when the set of system users changes, leaving files
+      # on the other persistent shares owned by the old numbers. It is in
+      # nixpkgs' pathsNeededForBoot, so it mounts in the initrd before users
+      # are created.
+      #
+      # This is media's 10th virtiofs share. It needs microvm.nix at or past
+      # 829896250, which sizes supervisord's event buffer to the share count;
+      # before that the default of 10 dropped one of the 11 startup events and
+      # microvm-virtiofsd@media never became ready.
+      tag = "persist-nixos";
+      source = "nixos";
+      mountPoint = "/var/lib/nixos";
+      proto = "virtiofs";
+    }
     {
       tag = "persist-acme";
       source = "acme";
