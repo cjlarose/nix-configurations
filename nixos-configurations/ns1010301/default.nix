@@ -25,6 +25,7 @@
     ({ pkgs, config, ... }: {
       imports = [
         impermanence.nixosModules.impermanence
+        ../../nixos-modules/impermanence-baseline.nix
       ];
       environment.persistence = {
         "/persistence" = {

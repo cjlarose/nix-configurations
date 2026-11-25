@@ -228,6 +228,16 @@
     device = "tank/microvms/pt-docker-cjlarose/secrets";
     fsType = "zfs";
   };
+  # Each guest's /var/lib/nixos (its uid/gid maps; see the persist-nixos share in
+  # the guest config). These datasets are created by hand, like the guests' other
+  # share datasets, and need the same properties: virtiofs shares only work for
+  # non-root services with POSIX ACLs and xattrs stored in the dnode.
+  #   zfs create -o mountpoint=legacy -o acltype=posix -o xattr=sa \
+  #     tank/microvms/<guest>/nixos
+  fileSystems."/var/lib/microvms/pt-docker-cjlarose/nixos" = {
+    device = "tank/microvms/pt-docker-cjlarose/nixos";
+    fsType = "zfs";
+  };
   fileSystems."/var/lib/microvms/pt-docker-cjlarose/tailscale" = {
     device = "tank/microvms/pt-docker-cjlarose/tailscale";
     fsType = "zfs";
@@ -260,6 +270,10 @@
     device = "tank/microvms/minecraft-mellowcatfe/secrets";
     fsType = "zfs";
   };
+  fileSystems."/var/lib/microvms/minecraft-mellowcatfe/nixos" = {
+    device = "tank/microvms/minecraft-mellowcatfe/nixos";
+    fsType = "zfs";
+  };
 
   fileSystems."/var/lib/microvms/media/nix-rw-store" = {
     device = "tank/microvms/media/nix-rw-store";
@@ -279,6 +293,10 @@
   };
   fileSystems."/var/lib/microvms/media/secrets" = {
     device = "tank/microvms/media/secrets";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/media/nixos" = {
+    device = "tank/microvms/media/nixos";
     fsType = "zfs";
   };
   fileSystems."/var/lib/microvms/media/acme" = {
@@ -314,6 +332,10 @@
     device = "tank/microvms/hermes/secrets";
     fsType = "zfs";
   };
+  fileSystems."/var/lib/microvms/hermes/nixos" = {
+    device = "tank/microvms/hermes/nixos";
+    fsType = "zfs";
+  };
   fileSystems."/var/lib/microvms/hermes/hermes" = {
     device = "tank/microvms/hermes/hermes";
     fsType = "zfs";
@@ -333,6 +355,10 @@
   };
   fileSystems."/var/lib/microvms/intranet-dns/secrets" = {
     device = "tank/microvms/intranet-dns/secrets";
+    fsType = "zfs";
+  };
+  fileSystems."/var/lib/microvms/intranet-dns/nixos" = {
+    device = "tank/microvms/intranet-dns/nixos";
     fsType = "zfs";
   };
 
