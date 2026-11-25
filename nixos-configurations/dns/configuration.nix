@@ -56,9 +56,17 @@ in
 
   services.zfs.expandOnBoot = "all";
 
+  # Subnet router for the home LAN, taking over from pfSense (whose Tailscale is
+  # off, and which the UniFi migration retires). Every toothyshouse.com name
+  # resolves to its LAN address, so LAN-only devices connect directly and tailnet
+  # devices reach the same address through this route. Tailscale SNATs forwarded
+  # traffic by default, so LAN hosts reply to this VM and need no route back to
+  # 100.64.0.0/10. The route must be approved once in the admin console.
   services.tailscale = {
     enable = true;
     openFirewall = true;
+    useRoutingFeatures = "server";
+    extraSetFlags = [ "--advertise-routes=192.168.2.0/24" ];
   };
 
   services.openssh = {
