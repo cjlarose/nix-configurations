@@ -962,11 +962,11 @@
     "intranetHosts": {
       "flake": false,
       "locked": {
-        "lastModified": 1787529738,
-        "narHash": "sha256-1d78UP0rFIj26ykZUTIMMuhwFlJp9cQaeb5r+oWhm1Q=",
+        "lastModified": 1795634710,
+        "narHash": "sha256-lMuYsAH0FC0RWRpuJxXYe1/OOZq8ys0zJoHnZ63cM+k=",
         "ref": "refs/heads/main",
-        "rev": "7418b0a03d480600d0d38b0f8ea28bf47e29a28c",
-        "revCount": 39,
+        "rev": "78426bb3d32f1d5c702de4ed3d3fc18056c1e0e4",
+        "revCount": 41,
         "type": "git",
         "url": "ssh://git@github.com/cjlarose/intranet-hosts"
       },
